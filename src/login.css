@@ -1,0 +1,151 @@
+/* Login.css - styles for the login page */
+:root{
+  --bg-1: #eaf6fb;
+  --bg-2: #d6eefb;
+  --accent: #0f172a;
+  --muted: #64748b;
+}
+
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{
+  margin:0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  background: radial-gradient(1200px 600px at 80% 20%, #ffffff 0%, #f0f7fb 20%, #dbeff8 50%, #c6e6f8 100%), linear-gradient(180deg, var(--bg-1), var(--bg-2));
+  color: #0f172a;
+  min-height:100vh;
+}
+
+/* Header */
+.rk-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:20px 48px;
+  position:relative;
+  z-index:5;
+}
+.rk-brand{display:flex; align-items:center; gap:12px}
+.rk-logo{width:42px; height:42px}
+.rk-title{font-weight:700; font-size:18px}
+.rk-actions button{margin-left:12px}
+.btn-outline{
+  background:white;
+  border:1px solid rgba(15,23,42,0.08);
+  padding:8px 14px;
+  border-radius:999px;
+  cursor:pointer;
+}
+.btn-solid{
+  background:var(--accent);
+  color:white;
+  border:none;
+  padding:8px 14px;
+  border-radius:999px;
+  cursor:pointer;
+}
+
+/* Content layout */
+.rk-content{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:48px;
+  padding:60px 48px;
+  max-width:1200px;
+  margin:0 auto;
+}
+
+/* Card */
+.rk-card{
+  width:480px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+  border-radius:18px;
+  padding:34px;
+  box-shadow: 0 10px 30px rgba(15,23,42,0.06);
+  backdrop-filter: blur(6px);
+}
+.rk-card h1{margin:0 0 8px; font-size:26px}
+.lead{color:var(--muted); margin-bottom:18px; line-height:1.4; font-size:15px}
+
+/* Form */
+.rk-form input{
+  width:100%;
+  padding:12px 14px;
+  border-radius:10px;
+  border:1px solid rgba(15,23,42,0.06);
+  margin-bottom:12px;
+  font-size:15px;
+  outline:none;
+  background:transparent;
+}
+.password-wrapper{position:relative}
+.password-wrapper .eye-btn{
+  position:absolute;
+  right:8px;
+  top:6px;
+  background:transparent;
+  border:none;
+  padding:6px 10px;
+  cursor:pointer;
+  color:var(--muted);
+  font-weight:600;
+}
+
+/* Row with button and forgot link */
+.form-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-top:6px;
+}
+.btn-login{
+  background:var(--accent);
+  color:white;
+  padding:10px 18px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+}
+.forgot{color:var(--muted); font-size:13px; text-decoration:underline; margin-left:6px;}
+
+/* Decorative artwork on the right */
+.rk-art{
+  width:480px;
+  height:360px;
+  position:relative;
+}
+.rk-art::before{
+  content:"";
+  position:absolute;
+  right:0;
+  top:10%;
+  width:360px;
+  height:360px;
+  border-radius:50%;
+  background: radial-gradient(circle at 25% 20%, #ffffff 0%, #f4fbff 20%, #e4f4fb 50%, transparent 70%);
+  box-shadow: 0 40px 80px rgba(12,74,110,0.08);
+}
+.rk-art::after{
+  content:"";
+  position:absolute;
+  right:70px;
+  bottom:10%;
+  width:180px;
+  height:180px;
+  border-radius:50%;
+  background: radial-gradient(circle at 35% 30%, #ffffff 0%, #eaf6fb 20%, #d3ecf8 60%, transparent 100%);
+  transform:translateZ(0);
+}
+
+/* small helpers */
+.sr-only{position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}
+@media (max-width: 900px) {
+  .rk-content{flex-direction:column; padding:30px}
+  .rk-art{order:-1; margin-bottom:20px; transform:scale(.9)}
+  .rk-card{width:100%; max-width:560px}
+  .rk-header{padding:12px 20px}
+  .rk-content{gap:24px}
+}
