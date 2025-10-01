@@ -1,5 +1,5 @@
 // src/App.js
-import Login from "./components/Login";
+import Login from "./components/auth/Login";
 import "./index.css"; // global styles (or App.css)
 
 function App() {
@@ -11,3 +11,4 @@ function App() {
 }
 
 export default App;
+  

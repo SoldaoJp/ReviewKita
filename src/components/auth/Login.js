@@ -1,7 +1,7 @@
-// src/components/Login.js
+// src/components/auth/Login.js
 import React, { useState } from "react";
 import "./Login.css";
-import logo from "../assets/logo.svg"; // ✅ import SVG file directly
+import logo from "../../assets/logo.svg"; // ✅ correct path
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Login() {
