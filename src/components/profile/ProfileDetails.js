@@ -2,8 +2,9 @@ import React from "react";
 
 function ProfileDetails() {
   return (
-    <div className="profile-actions">
-      <button className="edit-btn">Edit Profile</button>
+    <div className="mt-4">
+      <p className="text-sm text-gray-400">Location: Manila, PH</p>
+      <p className="text-sm text-gray-400">Joined: Jan 2025</p>
     </div>
   );
 }
