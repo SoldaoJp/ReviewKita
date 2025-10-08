@@ -1,10 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Logo from "../../assets/logo.svg"; // adjust path if needed
 import { useNavigate } from "react-router-dom";
+import authController from "../../controllers/authController.js";
+import { useAuth } from "../../context/AuthContext.js";
+// import BackendDiagnostic from "../common/BackendDiagnostic.js";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/profile');
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (error) setError('');
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await authController.handleLogin(formData, navigate, setError, setLoading);
+  };
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-hero-start via-hero-mid to-hero-end">
@@ -54,20 +85,37 @@ export default function Login() {
             study smarter every day.
           </p>
 
-          <form className="space-y-4">
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+
+          <form className="space-y-4" onSubmit={handleSubmit}>
             {/* Email */}
             <input
               type="email"
+              name="email"
               placeholder="Email"
-              className="w-full rounded-md px-4 py-3 bg-white border border-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              value={formData.email}
+              onChange={handleInputChange}
+              disabled={loading}
+              className="w-full rounded-md px-4 py-3 bg-white border border-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50"
+              required
             />
 
             {/* Password */}
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
+                name="password"
                 placeholder="Password"
-                className="w-full rounded-md px-4 py-3 bg-white border border-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                value={formData.password}
+                onChange={handleInputChange}
+                disabled={loading}
+                className="w-full rounded-md px-4 py-3 bg-white border border-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50"
+                required
               />
               <button
                 type="button"
@@ -126,16 +174,17 @@ export default function Login() {
             {/* Submit + Forgot Password */}
             <div className="flex items-center justify-between">
               <button
-                className="px-6 py-2 rounded-full bg-slate-900 text-white hover:bg-slate-800 transition"
-                type="button"
-                onClick={() => navigate("/profile")}
+                className="px-6 py-2 rounded-full bg-slate-900 text-white hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                type="submit"
+                disabled={loading}
               >
-                Log in
+                {loading ? 'Logging in...' : 'Log in'}
               </button>
               <button
                 type="button"
                 onClick={() => navigate("/forgot-password")}
                 className="text-sm text-slate-500 hover:text-slate-700 underline underline-offset-2"
+                disabled={loading}
               >
                 Forgot Password?
               </button>
@@ -143,6 +192,8 @@ export default function Login() {
           </form>
         </div>
       </main>
+
+  {/* Diagnostic removed for production use */}
     </div>
   );
 }

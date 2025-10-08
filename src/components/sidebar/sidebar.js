@@ -1,5 +1,6 @@
 // src/components/sidebar/Sidebar.js
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext.js";
 import Logo from "../../assets/logo.svg";
 import Search from "../../assets/Search.svg";
 import Plus from "../../assets/Plus.svg";
@@ -38,6 +39,13 @@ const subjects = [
 ];
 
 function Sidebar() {
+	const { logout } = useAuth();
+	const navigate = useNavigate();
+
+	const handleLogout = () => {
+		logout();
+		navigate('/login');
+	};
 	return (
 		<div className="w-64 h-screen bg-white shadow-md flex flex-col justify-between">
 			{/* Top: Logo + Main links */}
@@ -153,7 +161,10 @@ function Sidebar() {
 
             {/* Bottom: Logout */}
             <div className="px-6 py-4 border-t">
-                <button className="w-full py-2 px-4 bg-red-400 text-white rounded hover:bg-red-500">
+                <button 
+                    className="w-full py-2 px-4 bg-red-400 text-white rounded hover:bg-red-500 transition-colors"
+                    onClick={handleLogout}
+                >
                     Logout
                 </button>
             </div>
