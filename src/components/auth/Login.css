@@ -88,38 +88,48 @@ body {
 
 /* Card */
 .rk-card {
-  width: 480px;
-  background: rgba(255, 255, 255, 0.15);   /* ✅ semi-transparent */
-  border-radius: 18px;
-  padding: 34px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(16px);              /* ✅ frosted glass */
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 540px;
+  background: rgba(255, 255, 255, 0.55);   /* more visible frosted glass */
+  border-radius: 32px;
+  padding: 48px 40px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.10);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .rk-card h1 { 
-  margin: 0 0 8px; 
-  font-size: 26px; 
+  margin: 0 0 12px;
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
 .lead {
   color: var(--muted);
-  margin-bottom: 18px;
-  line-height: 1.4;
-  font-size: 15px;
+  margin-bottom: 22px;
+  line-height: 1.45;
+  font-size: 0.98rem;
 }
 
 /* Form */
 .rk-form input {
-  width: 100%;
-  padding: 12px 14px;
+  width: 420px;
+  max-width: 100%;
+display: flex;
+flex-direction: column;
+align-items: center;
+  padding: 13px 15px;
   border-radius: 10px;
-  border: 1px solid rgba(15,23,42,0.06);
-  margin-bottom: 12px;
-  font-size: 15px;
+  border: 1px solid #dbeafe;
+  margin-bottom: 15px;
+  font-size: 0.97rem;
   outline: none;
-  background: transparent;
+  background: rgba(255,255,255,0.85);
 }
 
 /* Password + Eye Icon */
@@ -151,9 +161,9 @@ body {
 /* Row with button + forgot password */
 .form-row {
   display: flex;
-  justify-content: space-between;  /* ✅ pushes Forgot Password to right */
+  justify-content: space-between;
   align-items: center;
-  margin-top: 6px;
+  margin-top: 18px;
 }
 
 .btn-login {
@@ -222,21 +232,13 @@ body {
 @media (max-width: 900px) {
   .rk-content { 
     flex-direction: column; 
-    padding: 30px; 
-  }
-  .rk-art { 
-    order: -1; 
-    margin-bottom: 20px; 
-    transform: scale(.9); 
+    padding: 24px; 
+    min-height: unset;
   }
   .rk-card { 
     width: 100%; 
-    max-width: 560px; 
-  }
-  .rk-header { 
-    padding: 12px 20px; 
-  }
-  .rk-content { 
-    gap: 24px; 
+    max-width: 98vw; 
+    padding: 32px 12px;
+    border-radius: 18px;
   }
 }
