@@ -1,17 +1,25 @@
 import React from "react";
 
 function ProfilePosts() {
+  const posts = [
+    { id: 1, text: "This is my first post 🎉" },
+    { id: 2, text: "Excited to share my project updates 🚀" },
+  ];
+
   return (
-    <div className="profile-posts">
-      <h3>My Posts</h3>
-      <div className="post">
-        <p>This is my first post 🎉</p>
-      </div>
-      <div className="post">
-        <p>Just updated my profile picture 😎</p>
-      </div>
+    <div className="space-y-4">
+      {posts.map((post) => (
+        <div
+          key={post.id}
+          className="bg-neutral-800 p-4 rounded-lg border border-cyan-400"
+        >
+          <p>{post.text}</p>
+        </div>
+      ))}
     </div>
   );
 }
 
 export default ProfilePosts;
+import ProfileNavbar from "./ProfileNavbar";
+import ProfileHeader from "./ProfileHeader";
