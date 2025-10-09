@@ -1,6 +1,6 @@
 // src/components/auth/Signup.js
 import React, { useState } from "react";
-import Logo from "../../assets/logo.svg"; // adjust path if needed
+import Logo from "../../assets/logo.png"; // adjust path if needed
 import { useNavigate } from "react-router-dom";
 import authController from "../../controllers/authController.js";
 

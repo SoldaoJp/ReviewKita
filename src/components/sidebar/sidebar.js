@@ -66,7 +66,7 @@ function Sidebar() {
 						   <img
 							   src={Logo}
 							   alt="ReviewKita Logo"
-							   className="h-7 w-7"
+							   className="h-10 w-10 object-contain"
 						   />
 						   <span className="font-bold text-base text-gray-800">ReviewKita</span>
 					   </div>

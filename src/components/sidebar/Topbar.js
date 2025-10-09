@@ -1,7 +1,28 @@
+
 import { FaSearch, FaUser } from "react-icons/fa";
 import { FiChevronDown } from "react-icons/fi";
+import { useEffect, useState } from "react";
+import { getUserProfile } from "../../services/userService";
 
 export default function Topbar() {
+  const [profilePic, setProfilePic] = useState(null);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const user = await getUserProfile();
+        if (user?.profile_picture) {
+          setProfilePic(`http://localhost:5000/${user.profile_picture}`);
+        } else {
+          setProfilePic(null);
+        }
+      } catch {
+        setProfilePic(null);
+      }
+    }
+    fetchProfile();
+  }, []);
+
   return (
     <div className="flex items-center justify-between mb-6 px-4">
       {/* 🔍 Search Bar */}
@@ -14,15 +35,16 @@ export default function Topbar() {
         />
       </div>
 
-      {/* 👤 Profile (Placeholder Only) */}
+      {/* 👤 Profile Picture or Icon */}
       <div className="flex items-center gap-2 cursor-pointer">
-        {/* White person icon in gray circle */}
-        <div className="w-12 h-12 flex items-center justify-center bg-gray-300 rounded-full">
-          <FaUser className="text-white text-lg" />
+        <div className="w-8 h-8 flex items-center justify-center bg-gray-300 rounded-full overflow-hidden">
+          {profilePic ? (
+            <img src={profilePic} alt="Profile" className="w-full h-full object-cover rounded-full" />
+          ) : (
+            <FaUser className="text-white text-base" />
+          )}
         </div>
-
-        {/* Dropdown arrow */}
-        <FiChevronDown className="text-gray-600 text-sm" />
+        <FiChevronDown className="text-gray-600 text-xs" />
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Logo from "../../assets/logo.svg"; // adjust path if needed
+import Logo from "../../assets/logo.png"; // adjust path if needed
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.js";
 import authService from '../../services/authService.js';
