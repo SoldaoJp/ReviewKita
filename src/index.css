@@ -1,7 +1,7 @@
 /* src/index.css - small base plus helpers */
 html, body, #root { height: 100%; margin: 0; }
 body {
-  background: #eaf6fb;
+  background: #e3f2fd;
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

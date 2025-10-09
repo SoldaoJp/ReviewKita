@@ -4,12 +4,14 @@ import Sidebar from "./sidebar";
 
 function Layout({ children }) {
   return (
-    <div className="flex">
-      {/* Sidebar */}
-      <Sidebar />
+    <div className="flex h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 overflow-hidden">
+      {/* Sidebar - Fixed */}
+      <div className="flex-shrink-0">
+        <Sidebar />
+      </div>
 
-      {/* Page Content */}
-      <main className="flex-1 p-6 bg-gray-50 min-h-screen">{children}</main>
+      {/* Page Content - Scrollable */}
+      <main className="flex-1 overflow-y-auto">{children}</main>
     </div>
   );
 }

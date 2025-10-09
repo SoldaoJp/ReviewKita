@@ -1,25 +1,13 @@
 import React, { useState } from "react";
+import Topbar from "../sidebar/Topbar";
 
 function ProfilePage() {
   const [showModal, setShowModal] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-gray-100 text-gray-800 font-sans">
-      {/* Main Content */}
-      <main className="flex-1 p-6">
-        {/* Top Navbar */}
-        <div className="flex justify-between items-center mb-6">
-          <input
-            type="text"
-            placeholder="Search"
-            className="px-4 py-2 border rounded-lg w-1/3 focus:ring-2 focus:ring-cyan-400"
-          />
-          <img
-            src="" /* Add profile picture URL */
-            alt="User"
-            className="w-10 h-10 rounded-full border border-gray-300"
-          />
-        </div>
+    <div className="p-8">
+      {/* Topbar copied from dashboard */}
+      <Topbar />
 
         {/* Profile Card */}
         <div className="bg-white p-6 rounded-lg shadow-md flex items-center justify-between mb-6">
@@ -69,19 +57,21 @@ function ProfilePage() {
             <span>Accuracy: 0%</span>
           </div>
         </div>
-      </main>
 
-      {/* Right Sidebar */}
-      <aside className="w-72 bg-white p-6 shadow-md border-l">
-        <h3 className="text-lg font-bold mb-4">Streak and Badges</h3>
-        <div className="mb-4">
-          <p className="text-gray-600">Current Streak: <b></b></p>
-          <p className="text-gray-600">Longest Streak: <b></b></p>
-          <p className="text-gray-600">Achievement: <b></b></p>
+        {/* Streak and Badges */}
+        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+          <h3 className="text-lg font-bold mb-4">Streak and Badges</h3>
+          <div className="mb-4">
+            <p className="text-gray-600">Current Streak: <b></b></p>
+            <p className="text-gray-600">Longest Streak: <b></b></p>
+            <p className="text-gray-600">Achievement: <b></b></p>
+          </div>
         </div>
 
-        <h3 className="text-lg font-bold mb-4">Mastery</h3>
-        <div className="space-y-3">
+        {/* Mastery */}
+        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+          <h3 className="text-lg font-bold mb-4">Mastery</h3>
+          <div className="space-y-3">
           {[
             { label: "Data Scalability", color: "bg-blue-500", width: "w-4/5" },
             { label: "Quantitative Methods", color: "bg-pink-500", width: "w-2/3" },
@@ -98,7 +88,7 @@ function ProfilePage() {
             </div>
           ))}
         </div>
-      </aside>
+      </div>
 
       {/* Floating Edit Profile Modal */}
       {showModal && (
