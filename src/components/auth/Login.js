@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Logo from "../../assets/logo.svg"; // adjust path if needed
 import { useNavigate } from "react-router-dom";
-import authController from "../../controllers/authController.js";
 import { useAuth } from "../../context/AuthContext.js";
+import authService from '../../services/authService.js';
 // import BackendDiagnostic from "../common/BackendDiagnostic.js";
 
 export default function Login() {
@@ -14,7 +14,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, login } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -34,7 +34,24 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await authController.handleLogin(formData, navigate, setError, setLoading);
+    setLoading(true);
+    setError('');
+    try {
+      const success = await login(formData.email, formData.password);
+      if (success) {
+        // Ensure auth token/data was persisted before navigating.
+        if (authService.isAuthenticated()) {
+          navigate('/profile');
+        }
+        // Otherwise, the useEffect watching isAuthenticated will handle navigation after context updates.
+      } else {
+        setError('Login failed. Please check your credentials.');
+      }
+    } catch (err) {
+      setError(err.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -174,8 +191,8 @@ export default function Login() {
             {/* Submit + Forgot Password */}
             <div className="flex items-center justify-between">
               <button
-                className="px-6 py-2 rounded-full bg-slate-900 text-white hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 type="submit"
+                className="px-6 py-2 rounded-full bg-slate-900 text-white hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={loading}
               >
                 {loading ? 'Logging in...' : 'Log in'}
