@@ -1,14 +1,12 @@
-// src/App.js
-import Login from "./components/auth/Login";
-import "./index.css"; // global styles (or App.css)
+import Dashboard from "../src/components/dashboard/DashBoard";
+
 
 function App() {
   return (
     <div className="App">
-      <Login />
+      <Dashboard />
     </div>
   );
 }
 
 export default App;
-  
