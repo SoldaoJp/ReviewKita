@@ -1,5 +1,4 @@
 // src/components/dashboard/Dashboard.js
-import Sidebar from "../sidebar/Sidebar";
 import Topbar from "../sidebar/Topbar";
 import ProgressTracker from "./ProgressTracker";
 import RightPanel from "./RightPanel";
@@ -8,9 +7,8 @@ import WelcomeCard from "./WelcomeCard";
 
 export default function Dashboard() {
   return (
-    <div className="min-h-screen flex bg-[#eaf6fb]">
-      <Sidebar />
-      <main className="flex-1 p-8">
+    <div className="flex-1 bg-[#eaf6fb]">
+      <div className="p-8">
         <Topbar />
         <div className="mb-6">
           
@@ -42,7 +40,7 @@ export default function Dashboard() {
             <RightPanel />
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

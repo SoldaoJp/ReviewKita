@@ -1,6 +1,7 @@
 // src/components/layout/Layout.js
 import "../../index.css";
-import Sidebar from "../sidebar/sidebar";
+import Sidebar from "./sidebar";
+
 function Layout({ children }) {
   return (
     <div className="flex">

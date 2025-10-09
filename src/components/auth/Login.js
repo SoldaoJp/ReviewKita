@@ -18,7 +18,7 @@ export default function Login() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/profile');
+      navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
 
@@ -41,7 +41,7 @@ export default function Login() {
       if (success) {
         // Ensure auth token/data was persisted before navigating.
         if (authService.isAuthenticated()) {
-          navigate('/profile');
+          navigate('/dashboard');
         }
         // Otherwise, the useEffect watching isAuthenticated will handle navigation after context updates.
       } else {
