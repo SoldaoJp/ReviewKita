@@ -15,25 +15,25 @@ export default function Sidebar() {
     <aside className="w-72 bg-white p-6 rounded-r-3xl shadow-md flex flex-col">
       {/* Logo Section */}
       <div className="flex items-center gap-3 mb-4">
-        <img src={logo} alt="ReviewKita Logo" className="w-11 h-11 object-contain" /> {/* pinalaki */}
-        <h2 className="font-semibold text-xl text-gray-800 tracking-wide">ReviewKita</h2> {/* mas malinaw at malaki */}
+        <img src={logo} alt="ReviewKita Logo" className="w-12 h-12 object-contain" /> {/* pinalaki */}
+        <h2 className="font-bold text-l text-gray-800 tracking-wide">ReviewKita</h2> {/* mas malinaw at malaki */}
       </div>
 
       {/* Overview Label */}
-      <p className="text-xs text-gray-400 tracking-wide mb-2 ml-[3.2rem]">OVERVIEW</p>
+      <p className=" font-semibold text-xs text-gray-400 tracking-wide mb-2 ml-[3.2rem]">OVERVIEW</p>
 
       {/* Navigation */}
       <nav className="space-y-1 mb-6">
         <button className="w-full flex items-center gap-3 px-4 py-2 rounded-xl bg-blue-50 text-blue-600 font-medium">
-          <FiGrid size={18} />
+          <FiGrid size={20} />
           Dashboard
         </button>
         <button className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-gray-100 font-medium">
-          <FiFileText size={18} />
+          <FiFileText size={20} />
           Reviewer
         </button>
         <button className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-gray-100 font-medium">
-          <FiUser size={18} />
+          <FiUser size={20} />
           Profile
         </button>
       </nav>
@@ -41,10 +41,10 @@ export default function Sidebar() {
       <hr className="border-gray-200 mb-4" />
 
       {/* My Reviewers Header */}
-      <div className="flex items-center justify-between text-xs font-bold text-gray-700 mb-3">
+      <div className="flex items-center justify-between text-xl font-bold text-gray-700 mb-3">
         <span>My Reviewers</span>
         <button className="text-gray-400 hover:text-gray-600">
-          <FiPlus size={14} />
+          <FiPlus size={20} />
         </button>
       </div>
 

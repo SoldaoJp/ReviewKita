@@ -10,16 +10,14 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen flex bg-[#eaf6fb]">
       <Sidebar />
-
       <main className="flex-1 p-8">
         <Topbar />
         <div className="mb-6">
           
           <WelcomeCard />
           
-  
+        
         </div>
-
         <div className="grid grid-cols-12 gap-6">
           <div className="col-span-12 lg:col-span-8 space-y-6">
             {/* Charts Section */}

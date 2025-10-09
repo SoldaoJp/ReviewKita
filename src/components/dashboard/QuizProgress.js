@@ -20,7 +20,7 @@ export default function QuizProgress({ quizzes = [] }) {
   return (
     <div className="space-y-3">
       <div className="bg-[#fbfdff] rounded-2xl p-4 shadow-sm border border-[#eef3fb]">
-        <div className="text-sm font-semibold text-gray-700">Quiz Progress</div>
+        <div className="text-sm font-bold text-gray-700">Quiz Progress</div>
       </div>
 
       {quizzes.map((q) => (

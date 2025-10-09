@@ -4,7 +4,7 @@ export default function WelcomeCard({ user }) {
     <div className="bg-[#fbfdff] rounded-2xl p-6 shadow-sm border border-[#eef3fb]">
       <div className="flex items-start justify-between gap-6">
         <div className="flex-1">
-          <h2 className="text-2xl leading-tight font-semibold text-gray-900">
+          <h2 className="text-2xl leading-tight font-bold text-gray-900">
             Welcome Back,
             <br />
             <span className="block">{user?.name ?? "Ahron"}</span>
@@ -17,8 +17,8 @@ export default function WelcomeCard({ user }) {
         </div>
 
         {/* small decorative control / illustration aligned to top right like sample */}
-        <div className="w-14 h-14 bg-[#f3f9ff] rounded-lg flex items-center justify-center">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+        <div className="w-20 h-20 bg-[#f3f9ff] rounded-lg flex items-center justify-center">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
             <rect x="4.5" y="6" width="15" height="10" rx="2" stroke="#3B82F6" strokeWidth="1.25" />
             <path d="M8 10h8" stroke="#3B82F6" strokeWidth="1.25" strokeLinecap="round" />
           </svg>

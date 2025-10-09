@@ -3,17 +3,17 @@ import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
 export default function SubjectTracker({ data }) {
   const items = data ?? [
-    { name: "Data Scalability", value: 55, color: "#3B82F6" },
-    { name: "Quantitative Methods", value: 20, color: "#EC4899" },
-    { name: "Advanced Database", value: 15, color: "#7C3AED" },
-    { name: "Networking 2", value: 10, color: "#10B981" },
+    { name: "Data Scalability", value: 60, color: "#3B82F6" },
+    { name: "Quantitative Methods", value: 30, color: "#EC4899" },
+    { name: "Advanced Database", value: 25, color: "#7C3AED" },
+    { name: "Networking 2", value: 15, color: "#10B981" },
   ];
 
   const mainPct = items[0]?.value ?? 0;
 
   return (
     <div className="bg-white rounded-2xl p-4 shadow-sm border border-[#eef3fb]">
-      <h3 className="font-semibold text-gray-700 mb-3 text-sm">Subject Tracker</h3>
+      <h3 className="font-bold text-gray-700 mb-3 text-sm">Subject Tracker</h3>
 
       <div className="bg-[#fbfdff] rounded-xl p-4 flex flex-col items-center">
         <div className="relative w-44 h-44">
