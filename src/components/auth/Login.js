@@ -18,7 +18,9 @@ export default function Login() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      const stored = localStorage.getItem('user');
+      const u = stored ? JSON.parse(stored) : null;
+      if (u?.role === 'admin') navigate('/admin'); else navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
 
@@ -41,7 +43,9 @@ export default function Login() {
       if (success) {
         // Ensure auth token/data was persisted before navigating.
         if (authService.isAuthenticated()) {
-          navigate('/dashboard');
+          const stored = localStorage.getItem('user');
+          const u = stored ? JSON.parse(stored) : null;
+          if (u?.role === 'admin') navigate('/admin'); else navigate('/dashboard');
         }
         // Otherwise, the useEffect watching isAuthenticated will handle navigation after context updates.
       } else {

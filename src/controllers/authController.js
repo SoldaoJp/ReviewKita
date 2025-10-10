@@ -33,9 +33,10 @@ class AuthController {
       console.log('AuthController: Login response received:', response);
       
       if (response.token) {
-        // Login successful
-        console.log('AuthController: Login successful, redirecting to profile');
-        navigate('/profile');
+        // Login successful; prefer backend user role for routing
+        const role = response?.user?.role || 'user';
+        console.log('AuthController: Login successful, role:', role);
+        navigate(role === 'admin' ? '/admin' : '/dashboard');
         return true;
       } else {
         setError('Login failed: No authentication token received');

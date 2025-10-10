@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import authService from '../services/authService.js';
 import UserModel from '../models/userModel.js';
+import userService from '../services/userService.js';
 
 const AuthContext = createContext();
 
@@ -20,15 +21,30 @@ export const AuthProvider = ({ children }) => {
 
 	useEffect(() => {
 		// Check if user is already authenticated on app start
-		const checkAuth = () => {
+		const checkAuth = async () => {
 			try {
 				const isAuth = authService.isAuthenticated();
 				const userData = authService.getCurrentUser();
-        
-				if (isAuth && userData) {
-					const userModel = new UserModel(userData);
-					setUser(userModel);
-					setIsAuthenticated(true);
+				if (isAuth) {
+					// Try to load full profile (to get role, username, etc.)
+					try {
+						const profile = await userService.getUserProfile();
+						const apiUser = profile?.user || profile;
+						const userModel = UserModel.fromApiResponse(apiUser || {});
+						setUser(userModel);
+						setIsAuthenticated(true);
+						// persist enriched user
+						localStorage.setItem('user', JSON.stringify(userModel.toPlainObject()));
+					} catch (err) {
+						// Fallback to stored minimal user if available
+						if (userData) {
+							const userModel = new UserModel(userData);
+							setUser(userModel);
+							setIsAuthenticated(true);
+						} else {
+							authService.logout();
+						}
+					}
 				}
 			} catch (error) {
 				console.error('Error checking authentication:', error);
@@ -45,15 +61,29 @@ export const AuthProvider = ({ children }) => {
 	const login = async (email, password) => {
 		try {
 			const response = await authService.login(email, password);
-      
+
 			if (response.token) {
-				const userData = {
-					email: email,
-					isAuthenticated: true
-				};
-				const userModel = new UserModel(userData);
-				setUser(userModel);
-				setIsAuthenticated(true);
+				// After login, fetch profile for role and details
+				try {
+					// Prefer user from login response if available
+					const immediateUser = response.user ? UserModel.fromApiResponse(response.user) : null;
+					let userModel;
+					try {
+						const profile = await userService.getUserProfile();
+						const apiUser = profile?.user || profile;
+						userModel = UserModel.fromApiResponse(apiUser || { email });
+					} catch {
+						userModel = immediateUser || new UserModel({ email, isAuthenticated: true });
+					}
+					setUser(userModel);
+					setIsAuthenticated(true);
+					localStorage.setItem('user', JSON.stringify(userModel.toPlainObject()));
+				} catch (e) {
+					// Fallback minimal user if profile fails
+					const userModel = new UserModel({ email, isAuthenticated: true });
+					setUser(userModel);
+					setIsAuthenticated(true);
+				}
 				return true;
 			}
 			return false;

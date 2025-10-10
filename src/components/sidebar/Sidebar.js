@@ -24,7 +24,7 @@ const colors = [
 ];
 
 function Sidebar() {
-	const { logout } = useAuth();
+	const { logout, user } = useAuth();
 	const navigate = useNavigate();
 	const [reviewers, setReviewers] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -110,7 +110,7 @@ function Sidebar() {
 							   <span className={window.location.pathname === '/reviewer' ? 'text-black' : ''}>Reviewer</span>
 						   </NavLink>
 
-						   <NavLink
+				           <NavLink
 							   to="/profile"
 							   className={({ isActive }) =>
 								   `flex items-center px-4 py-2 rounded-xl transition-all text-sm ${
@@ -127,7 +127,9 @@ function Sidebar() {
 								   style={window.location.pathname === '/profile' ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}}
 							   />
 							   <span className={window.location.pathname === '/profile' ? 'text-black' : ''}>Profile</span>
-						   </NavLink>
+				           </NavLink>
+
+
 					   </nav>
 
 					{/* My Reviewers */}

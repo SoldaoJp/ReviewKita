@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./controllers/AuthContext";
+import { AuthProvider, useAuth } from "./controllers/AuthContext";
 import Layout from "./views/sidebar/layout";
 import Dashboard from "./views/dashboard/DashBoard";
 import ReviewerPage from "./views/reviewer/ReviewerPage";
@@ -10,6 +10,17 @@ import Signup from "./views/auth/signup";
 import ForgotPassword from "./views/auth/ForgotPassword";
 import ResetPassword from "./views/auth/ResetPassword";
 import ConfirmReset from "./views/auth/ConfirmReset";
+import AdminUsersView from "./views/admin/Users";
+import AdminLlmConfigsView from "./views/admin/LlmConfigs";
+import AdminDashboard from "./views/admin/Dashboard";
+
+function AdminRoute({ children }) {
+  const { user, isAuthenticated, loading } = useAuth();
+  if (loading) return null;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!user?.isAdmin?.() && user?.role !== 'admin') return <Navigate to="/dashboard" replace />;
+  return children;
+}
 
 function App() {
   return (
@@ -27,6 +38,11 @@ function App() {
           <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
           <Route path="/reviewer" element={<Layout><ReviewerPage title="Reviewer" /></Layout>} />
           <Route path="/profile" element={<Layout><ProfilePage /></Layout>} />
+
+          {/* Admin routes */}
+          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route path="/admin/users" element={<AdminRoute><AdminUsersView /></AdminRoute>} />
+          <Route path="/admin/llm-configs" element={<AdminRoute><AdminLlmConfigsView /></AdminRoute>} />
 
           {/* Reviewer detail - without Layout (full screen) */}
           <Route path="/reviewer/:id" element={<ReviewerDetailPage />} />

@@ -63,13 +63,26 @@ class AuthService {
         throw new Error(data.error || `Server error: ${response.status}`);
       }
 
-      // Store token in localStorage
+      // Store token and user in localStorage
       if (data.token) {
         localStorage.setItem('authToken', data.token);
-        localStorage.setItem('user', JSON.stringify({
-          email: email,
-          isAuthenticated: true
-        }));
+        // Prefer backend-provided user payload when available (includes role)
+        if (data.user) {
+          const storedUser = {
+            id: data.user.id || data.user._id,
+            username: data.user.username,
+            email: data.user.email || email,
+            role: data.user.role || 'user',
+            isAuthenticated: true,
+            createdAt: data.user.createdAt,
+          };
+          localStorage.setItem('user', JSON.stringify(storedUser));
+        } else {
+          localStorage.setItem('user', JSON.stringify({
+            email: email,
+            isAuthenticated: true
+          }));
+        }
         console.log('Login successful, token stored');
       } else {
         console.warn('No token received from server');
