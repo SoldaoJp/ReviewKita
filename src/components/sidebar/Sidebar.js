@@ -1,6 +1,6 @@
 // src/components/sidebar/Sidebar.js
 import { NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext.js";
+import { useAuth } from "../../controllers/AuthContext.js";
 import { useState, useEffect } from "react";
 import { getAllReviewers } from "../../services/reviewerService.js";
 import Logo from "../../assets/logo.png";

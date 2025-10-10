@@ -73,10 +73,23 @@ export const deleteReviewer = async (id) => {
     }
 };
 
+// Re-enhance reviewer content using current model (or provided model_id)
+export const reenhanceReviewerContent = async (id, { revisionNotes = '', model_id } = {}) => {
+    try {
+        const payload = { revisionNotes };
+        if (model_id) payload.model_id = model_id;
+        const response = await httpService.post(`/reviewers/${id}/reenhanceContent`, payload);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export default {
     getAllReviewers,
     getReviewerById,
     createReviewer,
     updateReviewer,
     deleteReviewer,
+    reenhanceReviewerContent,
 };

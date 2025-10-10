@@ -1,7 +1,7 @@
 // src/components/common/RedirectIfAuthenticated.js
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext.js';
+import { useAuth } from '../../controllers/AuthContext.js';
 
 const RedirectIfAuthenticated = ({ children, redirectTo = '/profile' }) => {
   const { isAuthenticated, loading } = useAuth();

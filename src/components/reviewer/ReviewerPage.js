@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Topbar from "../sidebar/Topbar";
 import { getAllReviewers, createReviewer, deleteReviewer } from "../../services/reviewerService";
+import { getAvailableLlmModelsReviewer } from "../../services/llmConfigService";
 import { useNavigate } from "react-router-dom";
 
 // Color palette for reviewer cards
@@ -33,11 +34,34 @@ function ReviewerPage({ title }) {
     file: null,
   });
   const [submitting, setSubmitting] = useState(false);
+  const [llmModels, setLlmModels] = useState([]);
+  const [modelsLoading, setModelsLoading] = useState(false);
+  const [selectedModelId, setSelectedModelId] = useState("");
 
   // Fetch reviewers on component mount
   useEffect(() => {
     fetchReviewers();
   }, []);
+
+  // Load available LLM models when the Add modal is opened
+  useEffect(() => {
+    const loadModels = async () => {
+      if (!showAddModal) return;
+      try {
+        setModelsLoading(true);
+        const res = await getAvailableLlmModelsReviewer();
+        const models = Array.isArray(res?.models) ? res.models : [];
+        setLlmModels(models);
+        setSelectedModelId(models[0]?.id || "");
+      } catch (err) {
+        console.error("Error loading LLM models:", err);
+        setLlmModels([]);
+      } finally {
+        setModelsLoading(false);
+      }
+    };
+    loadModels();
+  }, [showAddModal]);
 
   const fetchReviewers = async () => {
     try {
@@ -91,19 +115,26 @@ function ReviewerPage({ title }) {
       alert("Please fill in all fields and select a file.");
       return;
     }
+    if (!selectedModelId) {
+      alert("Please select a model.");
+      return;
+    }
 
     try {
       setSubmitting(true);
       const data = new FormData();
       data.append("title", formData.title);
       data.append("description", formData.description);
-      data.append("file", formData.file);
+  data.append("file", formData.file);
+  // Backend expects snake_case key
+  data.append("model_id", selectedModelId);
 
       const response = await createReviewer(data);
       if (response.success) {
         alert(response.message);
         setShowAddModal(false);
         setFormData({ title: "", description: "", file: null });
+        setSelectedModelId("");
         fetchReviewers(); // Refresh the list
       }
     } catch (err) {
@@ -260,6 +291,33 @@ function ReviewerPage({ title }) {
               rows="3"
             />
 
+            {/* LLM Model Dropdown */}
+            <label className="block mb-2 text-sm font-medium">LLM Model</label>
+            <div className="mb-4">
+              <div className="relative">
+                <select
+                  className="w-full appearance-none rounded border bg-white px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                  value={selectedModelId}
+                  onChange={(e) => setSelectedModelId(e.target.value)}
+                  disabled={modelsLoading}
+                >
+                  {modelsLoading && <option>Loading models...</option>}
+                  {!modelsLoading && llmModels.length === 0 && (
+                    <option value="" disabled>No models available</option>
+                  )}
+                  {!modelsLoading && llmModels.length > 0 && (
+                    llmModels.map((m) => (
+                      <option key={m.id} value={m.id}>{m.model_name}</option>
+                    ))
+                  )}
+                </select>
+                <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">▼</span>
+              </div>
+              {selectedModelId && (
+                <p className="mt-1 text-xs text-gray-500">Selected: {llmModels.find(m => m.id === selectedModelId)?.model_name}</p>
+              )}
+            </div>
+
             <label className="block mb-2 text-sm font-medium">Import File (PDF, DOC, DOCX, TXT)</label>
             <div className="w-full border border-dashed border-gray-300 rounded p-4 mb-4 text-center">
               <input 
@@ -279,6 +337,7 @@ function ReviewerPage({ title }) {
                 onClick={() => {
                   setShowAddModal(false);
                   setFormData({ title: "", description: "", file: null });
+                  setSelectedModelId("");
                 }}
                 className="px-4 py-2 border rounded hover:bg-gray-100"
                 disabled={submitting}
@@ -298,6 +357,7 @@ function ReviewerPage({ title }) {
               onClick={() => {
                 setShowAddModal(false);
                 setFormData({ title: "", description: "", file: null });
+                setSelectedModelId("");
               }}
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg"
               disabled={submitting}
@@ -353,16 +413,15 @@ function ReviewerPage({ title }) {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && selectedReviewer && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white rounded-2xl shadow-xl w-[360px] px-6 py-5 relative">
+          <div className="bg-white rounded-2xl shadow-xl w-[380px] px-6 py-5 relative">
             <h2 className="text-lg font-semibold text-gray-900 mb-2">
-              Confirm deletion
+              Delete reviewer
             </h2>
-            <p className="text-gray-600 text-sm mb-6">
-              Do you want to permanently remove{" "}
-              <span className="text-blue-600 font-medium">
-                {selectedReviewer.title}
-              </span>{" "}
-              reviewer?
+            <p className="text-gray-600 text-sm mb-1">
+              Are you sure you want to delete this reviewer?
+            </p>
+            <p className="text-gray-700 text-sm mb-6">
+              <span className="font-medium">{selectedReviewer.title}</span>
             </p>
 
             <div className="flex justify-end gap-3">

@@ -1,7 +1,7 @@
 // src/components/reviewer/ReviewerDetailPage.js
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getReviewerById, deleteReviewer, updateReviewer } from "../../services/reviewerService";
+import { getReviewerById, deleteReviewer, updateReviewer, reenhanceReviewerContent } from "../../services/reviewerService";
 
 function ReviewerDetailPage() {
   const { id } = useParams();
@@ -61,7 +61,8 @@ function ReviewerDetailPage() {
   const handleSave = async () => {
     try {
       setSaving(true);
-      const response = await updateReviewer(id, { originalContent: editedContent });
+      // Include current model_id with originalContent for sync enhancement
+      const response = await updateReviewer(id, { originalContent: editedContent, model_id: reviewer.modelId });
       if (response.success) {
         // Update the local reviewer state with new content
         const updatedReviewer = {
@@ -85,7 +86,7 @@ function ReviewerDetailPage() {
   const handleReEnhance = async () => {
     try {
       setReEnhancing(true);
-      const response = await updateReviewer(id, { originalContent: reviewer.originalContent });
+      const response = await reenhanceReviewerContent(id, { revisionNotes: '', model_id: reviewer.modelId });
       if (response.success) {
         setReviewer(prev => ({
           ...prev,
@@ -106,40 +107,135 @@ function ReviewerDetailPage() {
     return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
   };
 
-  // Parse content to extract sections (assuming content has headings)
+  // Parse content supporting the new tagged format:
+  // [SECTION: KEY]\n[Human Title]\n...content...\n[END_SECTION]
+  // Falls back to heuristic parsing if no tags are found
   const parseContentSections = (content) => {
     if (!content) return [];
-    
-    // Split by common heading patterns (lines starting with uppercase or numbers)
     const lines = content.split('\n');
     const sections = [];
-    let currentSection = { title: 'Introduction', content: [] };
-    
-    lines.forEach(line => {
-      const trimmedLine = line.trim();
-      
-      // Check if line looks like a heading (all caps, or starts with number, or ends with colon)
-      const isHeading = 
-        /^[A-Z][A-Z\s]+$/.test(trimmedLine) || 
-        /^\d+\.\s+[A-Z]/.test(trimmedLine) ||
-        /^[A-Z][^.!?]*:$/.test(trimmedLine) ||
-        (trimmedLine.length > 0 && trimmedLine.length < 50 && /^[A-Z]/.test(trimmedLine) && !trimmedLine.includes('.'));
-      
-      if (isHeading && trimmedLine.length > 0) {
-        if (currentSection.content.length > 0) {
-          sections.push(currentSection);
+    let i = 0;
+    let foundTagged = false;
+
+    while (i < lines.length) {
+      const line = lines[i].trim();
+      const m = line.match(/^\[SECTION:\s*([A-Z0-9_]+)\]/);
+      if (m) {
+        foundTagged = true;
+        const key = m[1];
+        let j = i + 1;
+        let title = key.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+        if (j < lines.length) {
+          const next = lines[j].trim();
+          const tm = next.match(/^\[([^\]]+)\]/);
+          if (tm) {
+            title = tm[1];
+            j++;
+          }
         }
-        currentSection = { title: trimmedLine.replace(/^#+\s*/, '').replace(/:$/, ''), content: [] };
-      } else if (trimmedLine.length > 0) {
-        currentSection.content.push(line);
+        const contentLines = [];
+        while (j < lines.length && !/^\[END_SECTION\]/.test(lines[j].trim())) {
+          const curr = lines[j];
+          if (curr.trim().length > 0) contentLines.push(curr);
+          j++;
+        }
+        // advance past END_SECTION if present
+        i = j + 1;
+        sections.push({ key, title, content: contentLines });
+        continue;
       }
-    });
-    
-    if (currentSection.content.length > 0) {
-      sections.push(currentSection);
+      i++;
     }
-    
-    return sections.length > 0 ? sections : [{ title: 'Content', content: content.split('\n') }];
+
+    if (foundTagged) return sections;
+
+    // Fallback heuristic parsing (legacy content)
+    const result = [];
+    let current = { title: 'Content', content: [] };
+    for (const raw of lines) {
+      const t = raw.trim();
+      const isHeading =
+        /^[A-Z][A-Z\s]+$/.test(t) ||
+        /^\d+\.\s+[A-Z]/.test(t) ||
+        /^[A-Z][^.!?]*:$/.test(t) ||
+        (t.length > 0 && t.length < 50 && /^[A-Z]/.test(t) && !t.includes('.'));
+      if (isHeading && t.length > 0) {
+        if (current.content.length > 0) result.push(current);
+        current = { title: t.replace(/:$/, ''), content: [] };
+      } else if (t.length > 0) {
+        current.content.push(raw);
+      }
+    }
+    if (current.content.length > 0) result.push(current);
+    return result.length > 0 ? result : [{ title: 'Content', content: lines }];
+  };
+
+  // Render content with bullet list and inline **bold** support
+  const renderSectionContent = (contentLines) => {
+    const blocks = [];
+    let i = 0;
+
+    const isBullet = (l) => /^\s*[-*]\s+/.test(l);
+    const stripBullet = (l) => l.replace(/^\s*[-*]\s+/, '');
+    const isBoldOnly = (l) => /^\s*\*\*([^*].*?)\*\*\s*$/.test(l);
+    const extractBoldOnly = (l) => (l.match(/^\s*\*\*([^*].*?)\*\*\s*$/) || [,''])[1];
+
+    const renderInline = (text) => {
+      const parts = String(text).split(/(\*\*[^*]+\*\*)/g);
+      return parts.map((part, idx) => {
+        const m = part.match(/^\*\*(.+)\*\*$/);
+        return m ? <strong key={idx}>{m[1]}</strong> : <span key={idx}>{part}</span>;
+      });
+    };
+
+    while (i < contentLines.length) {
+      const line = contentLines[i];
+      if (isBullet(line)) {
+        const items = [];
+        while (i < contentLines.length && isBullet(contentLines[i])) {
+          items.push(stripBullet(contentLines[i]));
+          i++;
+        }
+        blocks.push({ type: 'ul', items });
+        continue;
+      }
+
+      if (isBoldOnly(line)) {
+        blocks.push({ type: 'h3', text: extractBoldOnly(line) });
+        i++;
+        continue;
+      }
+
+      const t = String(line).trim();
+      if (t.length > 0) {
+        blocks.push({ type: 'p', text: line });
+      }
+      i++;
+    }
+
+    return (
+      <div className="prose max-w-none">
+        {blocks.map((b, idx) => {
+          if (b.type === 'ul') {
+            return (
+              <ul key={idx} className="list-disc ml-6 mb-4 text-gray-700">
+                {b.items.map((it, ii) => (
+                  <li key={ii} className="mb-1">{renderInline(it)}</li>
+                ))}
+              </ul>
+            );
+          }
+          if (b.type === 'h3') {
+            return (
+              <h3 key={idx} className="mt-4 mb-2 font-semibold text-gray-800">{renderInline(b.text)}</h3>
+            );
+          }
+          return (
+            <p key={idx} className="mb-4 text-gray-700 leading-relaxed">{renderInline(b.text)}</p>
+          );
+        })}
+      </div>
+    );
   };
 
   const scrollToSection = (index) => {
@@ -202,6 +298,9 @@ function ReviewerDetailPage() {
           <div>
             <h1 className="text-2xl font-bold">{reviewer.title}</h1>
             <p className="text-sm text-gray-500">Last updated: {formatDate(reviewer.extractedDate)}</p>
+            {reviewer.modelName && (
+              <p className="text-xs text-gray-500 mt-0.5">Generated by {reviewer.modelName}</p>
+            )}
           </div>
         </div>
         
@@ -274,22 +373,27 @@ function ReviewerDetailPage() {
       <div className="flex-1 flex gap-6 overflow-hidden mb-6">
         {/* Left Sidebar - Table of Contents */}
         <div className="w-64 flex flex-col gap-3">
-          <div className="rounded-lg p-4 overflow-y-auto flex-1">
+          <div className="rounded-lg p-4 flex-1">
             <h2 className="font-semibold mb-4 text-sm text-gray-600">TABLE OF CONTENTS</h2>
             <div className="flex flex-col gap-1">
-              {sections.map((section, index) => (
-                <button
-                  key={index}
-                  onClick={() => scrollToSection(index)}
-                  className={`text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                    activeSection === index
-                      ? "bg-blue-100 text-blue-600 font-medium"
-                      : "text-gray-700 hover:bg-white/50"
-                  }`}
-                >
-                  {section.title}
-                </button>
-              ))}
+              {sections.map((section, index) => {
+                const tocLabel = section.key
+                  ? String(section.key).replace(/^\s*SECTION:\s*/i, '').replace(/_/g, ' ').trim()
+                  : section.title;
+                return (
+                  <button
+                    key={index}
+                    onClick={() => scrollToSection(index)}
+                    className={`text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                      activeSection === index
+                        ? "bg-blue-100 text-blue-600 font-medium"
+                        : "text-gray-700 hover:bg-white/50"
+                    }`}
+                  >
+                    <span className="block w-full truncate">{tocLabel}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
           
@@ -323,14 +427,13 @@ function ReviewerDetailPage() {
                 ref={el => sectionRefs.current[index] = el}
                 className="mb-12"
               >
-                <h2 className="text-2xl font-bold mb-6">{section.title}</h2>
-                <div className="prose max-w-none">
-                  {section.content.map((line, idx) => (
-                    <p key={idx} className="mb-4 text-gray-700 leading-relaxed">
-                      {line}
-                    </p>
-                  ))}
+                <div className="flex items-baseline gap-3 mb-4">
+                  <h2 className="text-2xl font-bold">{section.title}</h2>
+                  {section.key && (
+                    <span className="text-xs uppercase bg-gray-100 text-gray-600 px-2 py-0.5 rounded">{String(section.key).replace(/^\s*SECTION:\s*/i, '').replace(/_/g, ' ').trim()}</span>
+                  )}
                 </div>
+                {renderSectionContent(section.content)}
               </div>
             ))
           )}

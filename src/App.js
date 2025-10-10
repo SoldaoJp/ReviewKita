@@ -1,15 +1,15 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import Layout from "./components/sidebar/layout";
-import Dashboard from "./components/dashboard/DashBoard";
-import ReviewerPage from "./components/reviewer/ReviewerPage";
-import ReviewerDetailPage from "./components/reviewer/ReviewerDetailPage";
-import ProfilePage from "./components/profile/ProfilePage";
-import Login from "./components/auth/Login";
-import Signup from "./components/auth/signup";
-import ForgotPassword from "./components/auth/ForgotPassword";
-import ResetPassword from "./components/auth/ResetPassword";
-import ConfirmReset from "./components/auth/ConfirmReset";
+import { AuthProvider } from "./controllers/AuthContext";
+import Layout from "./views/sidebar/layout";
+import Dashboard from "./views/dashboard/DashBoard";
+import ReviewerPage from "./views/reviewer/ReviewerPage";
+import ReviewerDetailPage from "./views/reviewer/ReviewerDetailPage";
+import ProfilePage from "./views/profile/ProfilePage";
+import Login from "./views/auth/Login";
+import Signup from "./views/auth/signup";
+import ForgotPassword from "./views/auth/ForgotPassword";
+import ResetPassword from "./views/auth/ResetPassword";
+import ConfirmReset from "./views/auth/ConfirmReset";
 
 function App() {
   return (
