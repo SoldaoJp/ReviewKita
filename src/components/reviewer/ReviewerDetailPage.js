@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getReviewerById, deleteReviewer, updateReviewer, reenhanceReviewerContent, reportReviewer } from "../../services/reviewerService";
+import { getAvailableLlmModels, recommendLlmConfig } from "../../services/llmConfigService";
 
 function ReviewerDetailPage() {
   const { id } = useParams();
@@ -20,10 +21,98 @@ function ReviewerDetailPage() {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportIssue, setReportIssue] = useState("");
   const [reportDetails, setReportDetails] = useState("");
+  const [showModelSelectionModal, setShowModelSelectionModal] = useState(false);
+  const [availableModels, setAvailableModels] = useState([]);
+  const [selectedModelId, setSelectedModelId] = useState(null);
+  const [loadingModels, setLoadingModels] = useState(false);
+  const [recommending, setRecommending] = useState(false);
 
   useEffect(() => {
     fetchReviewerDetail();
   }, [id]);
+
+  const fetchAvailableModels = async () => {
+    try {
+      setLoadingModels(true);
+      const response = await getAvailableLlmModels('reviewer');
+      if (response.models) {
+        setAvailableModels(response.models);
+      }
+    } catch (err) {
+      console.error("Error fetching models:", err);
+      alert("Failed to load AI models. Please try again.");
+    } finally {
+      setLoadingModels(false);
+    }
+  };
+
+  const handleEnhancedTabClick = () => {
+    // Always show model selection modal when clicking Enhanced tab
+    // This allows users to choose/change the AI model
+    setShowModelSelectionModal(true);
+    fetchAvailableModels();
+  };
+
+  const handleModelSelect = async () => {
+    if (!selectedModelId) {
+      alert("Please select an AI model.");
+      return;
+    }
+    
+    try {
+      setShowModelSelectionModal(false);
+      setReEnhancing(true);
+      
+      // Call the re-enhance endpoint with the selected model
+      const response = await reenhanceReviewerContent(id, { 
+        revisionNotes: '', 
+        model_id: selectedModelId 
+      });
+      
+      if (response.success) {
+        // Update the reviewer with new enhanced content and model info
+        setReviewer(prev => ({
+          ...prev,
+          enhancedContentByAI: response.data.enhancedContentByAI,
+          modelId: selectedModelId,
+          modelName: availableModels.find(m => m.id === selectedModelId)?.model_name || prev.modelName
+        }));
+        
+        // Switch to enhanced view
+        setActiveView("enhanced");
+        alert("Content enhanced successfully with the selected model!");
+      }
+    } catch (err) {
+      console.error("Error enhancing content:", err);
+      alert(err.response?.data?.message || "Failed to enhance content. Please try again.");
+    } finally {
+      setReEnhancing(false);
+      setSelectedModelId(null);
+    }
+  };
+
+  const handleCancelModelSelection = () => {
+    setShowModelSelectionModal(false);
+    setSelectedModelId(null);
+  };
+
+  const handleRecommendModel = async () => {
+    if (!reviewer.modelId) {
+      alert("No model associated with this reviewer.");
+      return;
+    }
+
+    try {
+      setRecommending(true);
+      await recommendLlmConfig(reviewer.modelId, false);
+      alert("Model recommended successfully!");
+    } catch (err) {
+      console.error("Error recommending model:", err);
+      alert("Failed to recommend model. Please try again.");
+    } finally {
+      setRecommending(false);
+    }
+  };
 
   const fetchReviewerDetail = async () => {
     try {
@@ -390,6 +479,13 @@ function ReviewerDetailPage() {
               >
                 🚩 Report
               </button>
+              <button 
+                onClick={handleRecommendModel}
+                className="px-4 py-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors text-sm"
+                disabled={recommending || !reviewer.modelId}
+              >
+                {recommending ? "Processing..." : "👍 Recommend this model"}
+              </button>
             </>
           )}
           <button 
@@ -411,10 +507,7 @@ function ReviewerDetailPage() {
                 ? "bg-black text-white" 
                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
             }`}
-            onClick={() => {
-              setActiveView("enhanced");
-              setIsEditing(false);
-            }}
+            onClick={handleEnhancedTabClick}
           >
             Enhanced
           </button>
@@ -464,7 +557,13 @@ function ReviewerDetailPage() {
         </div>
 
         {/* Right Content Area - Display all sections */}
-        <div className="flex-1 bg-white rounded-lg shadow-sm p-8 overflow-y-auto">
+        <div className="flex-1 bg-white rounded-lg shadow-sm p-8 overflow-y-auto relative">
+          {reEnhancing && (
+            <div className="absolute inset-0 bg-white bg-opacity-80 flex flex-col items-center justify-center z-20">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+              <p className="text-lg text-blue-600 font-semibold">Enhancing reviewer content...</p>
+            </div>
+          )}
           {isEditing ? (
             <textarea
               value={editedContent}
@@ -482,7 +581,7 @@ function ReviewerDetailPage() {
                 <div className="flex items-baseline gap-3 mb-4">
                   <h2 className="text-2xl font-bold">{section.title}</h2>
                   {section.key && (
-                    <span className="text-xs uppercase bg-gray-100 text-gray-600 px-2 py-0.5 rounded">{String(section.key).replace(/^\s*SECTION:\s*/i, '').replace(/_/g, ' ').trim()}</span>
+                    <span className="text-xs uppercase bg-gray-100 text-gray-600 px-2 py-0.5 rounded">{String(section.key).replace(/^*SECTION:\s*/i, '').replace(/_/g, ' ').trim()}</span>
                   )}
                 </div>
                 {renderSectionContent(section.content)}
@@ -590,6 +689,94 @@ function ReviewerDetailPage() {
 
             <button
               onClick={handleReportCancel}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-lg"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Model Selection Modal */}
+      {showModelSelectionModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4 relative max-h-[80vh] overflow-y-auto">
+            <h3 className="text-xl font-semibold mb-4">Select AI Model</h3>
+            
+            {loadingModels ? (
+              <div className="text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                <p className="mt-4 text-gray-600">Loading available models...</p>
+              </div>
+            ) : availableModels.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-600">No models available at the moment.</p>
+              </div>
+            ) : (
+              <>
+                <p className="text-sm text-gray-600 mb-4">
+                  Choose an AI model to enhance your reviewer content:
+                </p>
+                
+                <div className="space-y-3 mb-6">
+                  {availableModels.map((model) => (
+                    <label
+                      key={model.id}
+                      className={`flex items-start p-4 border rounded-lg cursor-pointer transition-all ${
+                        selectedModelId === model.id
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-300 hover:border-gray-400'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="model"
+                        value={model.id}
+                        checked={selectedModelId === model.id}
+                        onChange={(e) => setSelectedModelId(e.target.value)}
+                        className="mt-1 mr-3"
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-900">{model.model_name}</div>
+                        {model.use_case && (
+                          <div className="text-sm text-gray-500 mt-1">
+                            Use case: {model.use_case}
+                          </div>
+                        )}
+                        {model.recommends > 0 && (
+                          <div className="text-sm text-green-600 mt-1">
+                            👍 {model.recommends} recommendation{model.recommends !== 1 ? 's' : ''}
+                          </div>
+                        )}
+                      </div>
+                    </label>
+                  ))}
+                </div>
+
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={handleCancelModelSelection}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-800 hover:bg-gray-100"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleModelSelect}
+                    disabled={!selectedModelId}
+                    className={`px-4 py-2 rounded-lg ${
+                      selectedModelId
+                        ? 'bg-black text-white hover:bg-gray-800'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    Select Model
+                  </button>
+                </div>
+              </>
+            )}
+
+            <button
+              onClick={handleCancelModelSelection}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-lg"
             >
               ×

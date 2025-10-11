@@ -13,6 +13,7 @@ import ConfirmReset from "./views/auth/ConfirmReset";
 import AdminUsersView from "./views/admin/Users";
 import AdminLlmConfigsView from "./views/admin/LlmConfigs";
 import AdminDashboard from "./views/admin/Dashboard";
+import AdminProfile from "./views/admin/Profile";
 
 function AdminRoute({ children }) {
   const { user, isAuthenticated, loading } = useAuth();
@@ -43,6 +44,7 @@ function App() {
           <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/users" element={<AdminRoute><AdminUsersView /></AdminRoute>} />
           <Route path="/admin/llm-configs" element={<AdminRoute><AdminLlmConfigsView /></AdminRoute>} />
+          <Route path="/admin/profile" element={<AdminRoute><AdminProfile /></AdminRoute>} />
 
           {/* Reviewer detail - without Layout (full screen) */}
           <Route path="/reviewer/:id" element={<ReviewerDetailPage />} />

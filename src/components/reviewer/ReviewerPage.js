@@ -115,26 +115,19 @@ function ReviewerPage({ title }) {
       alert("Please fill in all fields and select a file.");
       return;
     }
-    if (!selectedModelId) {
-      alert("Please select a model.");
-      return;
-    }
 
     try {
       setSubmitting(true);
       const data = new FormData();
       data.append("title", formData.title);
       data.append("description", formData.description);
-  data.append("file", formData.file);
-  // Backend expects snake_case key
-  data.append("model_id", selectedModelId);
+      data.append("file", formData.file);
 
       const response = await createReviewer(data);
       if (response.success) {
         alert(response.message);
         setShowAddModal(false);
         setFormData({ title: "", description: "", file: null });
-        setSelectedModelId("");
         fetchReviewers(); // Refresh the list
       }
     } catch (err) {
@@ -291,32 +284,6 @@ function ReviewerPage({ title }) {
               rows="3"
             />
 
-            {/* LLM Model Dropdown */}
-            <label className="block mb-2 text-sm font-medium">LLM Model</label>
-            <div className="mb-4">
-              <div className="relative">
-                <select
-                  className="w-full appearance-none rounded border bg-white px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                  value={selectedModelId}
-                  onChange={(e) => setSelectedModelId(e.target.value)}
-                  disabled={modelsLoading}
-                >
-                  {modelsLoading && <option>Loading models...</option>}
-                  {!modelsLoading && llmModels.length === 0 && (
-                    <option value="" disabled>No models available</option>
-                  )}
-                  {!modelsLoading && llmModels.length > 0 && (
-                    llmModels.map((m) => (
-                      <option key={m.id} value={m.id}>{m.model_name}</option>
-                    ))
-                  )}
-                </select>
-                <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">▼</span>
-              </div>
-              {selectedModelId && (
-                <p className="mt-1 text-xs text-gray-500">Selected: {llmModels.find(m => m.id === selectedModelId)?.model_name}</p>
-              )}
-            </div>
 
             <label className="block mb-2 text-sm font-medium">Import File (PDF, DOC, DOCX, TXT)</label>
             <div className="w-full border border-dashed border-gray-300 rounded p-4 mb-4 text-center">
