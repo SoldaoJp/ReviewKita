@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import Topbar from "../sidebar/Topbar";
 import { getUserProfile, updateProfilePicture, changeUsername, changePassword } from "../../services/userService";
 import { getAllReviewers } from "../../services/reviewerService";
+import { useAuth } from "../../controllers/AuthContext";
 
 function ProfilePage() {
+  const { refreshUser } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -90,7 +92,8 @@ function ProfilePage() {
 
       alert('Profile updated successfully!');
       setShowModal(false);
-      fetchUserProfile(); // Refresh profile data
+      await fetchUserProfile(); // Refresh profile data
+      await refreshUser(); // Refresh user context for topbar and other components
       setFormData(prev => ({ ...prev, currentPassword: '', newPassword: '' }));
       setProfilePicFile(null);
       setProfilePicPreview(null);

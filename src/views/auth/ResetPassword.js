@@ -1,1 +1,2 @@
-export { default } from "../../components/auth/ResetPassword";
+import ResetPassword from "../../components/auth/ResetPassword";
+export default ResetPassword;

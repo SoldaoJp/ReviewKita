@@ -107,13 +107,28 @@ export const AuthProvider = ({ children }) => {
 		setIsAuthenticated(false);
 	};
 
+	const refreshUser = async () => {
+		try {
+			const profile = await userService.getUserProfile();
+			const apiUser = profile?.user || profile?.data || profile;
+			const userModel = UserModel.fromApiResponse(apiUser || {});
+			setUser(userModel);
+			localStorage.setItem('user', JSON.stringify(userModel.toPlainObject()));
+			return userModel;
+		} catch (error) {
+			console.error('Error refreshing user:', error);
+			throw error;
+		}
+	};
+
 	const value = {
 		user,
 		isAuthenticated,
 		loading,
 		login,
 		register,
-		logout
+		logout,
+		refreshUser
 	};
 
 	return (

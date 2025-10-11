@@ -1,48 +1,59 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../assets/logo.png"; // use same logo as signup
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Reset link sent to:", email);
-    navigate("/reset-password");
+    setSuccess("");
+    setError("");
+    setLoading(true);
+    
+    // Simulate API call since backend routes don't exist yet
+    // TODO: Replace with actual API call when backend is implemented
+    try {
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mock successful response
+      setSuccess("A reset link has been sent to your email address. (Demo mode - backend not implemented)");
+      
+      // Uncomment below when backend is ready:
+      // await axios.post("/api/auth/forgot-password", { email });
+      // setSuccess("A reset link has been sent to your email address.");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to send reset link. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-hero-start via-hero-mid to-hero-end">
-      {/* Decorative background shapes (same as signup) */}
-      <div className="absolute -top-32 -right-32 w-[500px] h-[500px] bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-40 z-0"></div>
-      <div className="absolute bottom-[-100px] left-[-100px] w-[400px] h-[400px] bg-blue-200 rounded-full mix-blend-multiply filter blur-2xl opacity-40 z-0"></div>
+      {/* ===== Decorative circles (same as Login/Signup) ===== */}
+      <div className="hidden md:block absolute z-10 right-24 top-20 w-[420px] h-[420px] rounded-full bg-white/90 drop-shadow-2xl rotate-6"></div>
+      <div className="hidden md:block absolute z-20 right-8 top-52 w-[240px] h-[240px] rounded-full bg-white/60 drop-shadow-xl"></div>
+      <div className="hidden md:block absolute z-0 right-0 bottom-[-60px] w-[300px] h-[300px] rounded-full bg-white/70 drop-shadow-2xl"></div>
 
-      {/* Header (same style as signup) */}
-      <header className="relative flex justify-between items-center px-6 py-4 bg-white/80 backdrop-blur-sm shadow-md z-10">
-        <div className="flex items-center space-x-2">
-          <img src={Logo} alt="ReviewKita Logo" className="h-8 w-8" />
-          <span className="font-bold text-gray-800">ReviewKita</span>
-        </div>
-
-        <div className="flex space-x-3">
-          <button
-            className="px-4 py-2 border rounded-md hover:bg-gray-100 transition"
-            onClick={() => navigate("/login")}
-          >
-            Log in
-          </button>
-          <button
-            className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition"
-            onClick={() => navigate("/signup")}
-          >
-            Sign up
-          </button>
+      {/* Topbar (no signup/login buttons) */}
+      <header className="relative z-10">
+        <div className="fixed w-full top-0 left-0">
+          <div className="max-w-7xl mx-auto">
+            {/* Use AuthTopbar with showButtons={false} */}
+            {require('./AuthTopbar').default({ showButtons: false })}
+          </div>
         </div>
       </header>
 
       {/* Center Card */}
-      <div className="flex-1 flex justify-center items-center relative z-10">
+      <div className="flex-1 flex justify-center items-center relative z-10 pt-24">
         <div className="relative z-10 bg-white/40 backdrop-blur-xl p-10 rounded-2xl shadow-lg w-full max-w-md mx-4">
           <button
             onClick={() => navigate(-1)}
@@ -57,7 +68,6 @@ function ForgotPassword() {
           <p className="text-gray-600 text-sm mb-6">
             Enter your registered email and we’ll send a secure link to reset your password.
           </p>
-
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="email"
@@ -66,14 +76,18 @@ function ForgotPassword() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+              disabled={loading}
             />
             <button
               type="submit"
               className="w-full py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition"
+              disabled={loading}
             >
-              Send link
+              {loading ? "Sending..." : "Send link"}
             </button>
           </form>
+          {success && <p className="text-green-600 mt-4">{success}</p>}
+          {error && <p className="text-red-600 mt-4">{error}</p>}
         </div>
       </div>
     </div>

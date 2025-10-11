@@ -1,6 +1,7 @@
 // src/components/auth/Signup.js
 import React, { useState } from "react";
 import Logo from "../../assets/logo.png"; // adjust path if needed
+import AuthTopbar from "./AuthTopbar";
 import { useNavigate } from "react-router-dom";
 import authController from "../../controllers/authController.js";
 
@@ -40,31 +41,7 @@ function Signup() {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-hero-start via-hero-mid to-hero-end">
-      {/* ===== Navbar/Header ===== */}
-      <header className="w-full bg-white shadow-sm fixed top-0 left-0 z-50">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
-          {/* Logo + Brand */}
-          <div className="flex items-center gap-2 -ml-4">
-            <img src={Logo} alt="ReviewKita Logo" className="h-8 w-auto" />
-            <span className="font-semibold text-slate-900 text-lg">
-              ReviewKita
-            </span>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex gap-3">
-            <button
-              className="px-4 py-1.5 rounded-md bg-black text-white text-sm hover:bg-gray-800"
-              onClick={() => navigate("/login")}
-            >
-              Log in
-            </button>
-            <button className="px-4 py-1.5 rounded-md border border-gray-400 text-sm text-slate-800 hover:bg-gray-100">
-              Sign up
-            </button>
-          </div>
-        </div>
-      </header>
+      <AuthTopbar showButtons={true} />
 
       {/* ===== Decorative circles ===== */}
       <div className="hidden md:block absolute z-10 right-24 top-20 w-[420px] h-[420px] rounded-full bg-white/90 drop-shadow-2xl rotate-6"></div>

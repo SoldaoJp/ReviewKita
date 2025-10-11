@@ -19,7 +19,7 @@ class UserModel {
       email: apiData.email,
       role: apiData.role,
       isVerified: apiData.isVerified,
-      profilePicture: apiData.profilePicture,
+      profilePicture: apiData.profilePicture || apiData.profile_picture,
       createdAt: apiData.createdAt,
       isAuthenticated: true
     });

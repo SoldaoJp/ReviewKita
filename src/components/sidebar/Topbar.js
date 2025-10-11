@@ -1,27 +1,15 @@
 
 import { FaSearch, FaUser } from "react-icons/fa";
 import { FiChevronDown } from "react-icons/fi";
-import { useEffect, useState } from "react";
-import { getUserProfile } from "../../services/userService";
+import { useAuth } from "../../controllers/AuthContext";
 
 export default function Topbar() {
-  const [profilePic, setProfilePic] = useState(null);
+  const { user } = useAuth();
 
-  useEffect(() => {
-    async function fetchProfile() {
-      try {
-        const user = await getUserProfile();
-        if (user?.profile_picture) {
-          setProfilePic(`http://localhost:5000/${user.profile_picture}`);
-        } else {
-          setProfilePic(null);
-        }
-      } catch {
-        setProfilePic(null);
-      }
-    }
-    fetchProfile();
-  }, []);
+  // Get profile picture from user context
+  const profilePic = user?.profilePicture 
+    ? `http://localhost:5000/${user.profilePicture}` 
+    : null;
 
   return (
     <div className="flex items-center justify-between mb-6 px-4">

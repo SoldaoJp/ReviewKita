@@ -10,24 +10,23 @@ export default function ConfirmReset() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-100 to-blue-300">
-      {/* Header */}
-      <div className="flex items-center p-6">
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-            R
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-hero-start via-hero-mid to-hero-end">
+      {/* ===== Decorative circles (same as Login/Signup) ===== */}
+      <div className="hidden md:block absolute z-10 right-24 top-20 w-[420px] h-[420px] rounded-full bg-white/90 drop-shadow-2xl rotate-6"></div>
+      <div className="hidden md:block absolute z-20 right-8 top-52 w-[240px] h-[240px] rounded-full bg-white/60 drop-shadow-xl"></div>
+      <div className="hidden md:block absolute z-0 right-0 bottom-[-60px] w-[300px] h-[300px] rounded-full bg-white/70 drop-shadow-2xl"></div>
+
+      {/* Topbar (no signup/login buttons) */}
+      <header className="relative z-10">
+        <div className="fixed w-full top-0 left-0">
+          <div className="max-w-7xl mx-auto">
+            {require('./AuthTopbar').default({ showButtons: false })}
           </div>
-          <span className="font-semibold text-lg text-gray-800">ReviewKita</span>
         </div>
-      </div>
+      </header>
 
-      {/* Main */}
-      <div className="flex-1 flex justify-center items-center relative overflow-hidden">
-        {/* Background shapes */}
-        <div className="absolute right-0 w-[600px] h-[600px] bg-blue-200 rounded-full blur-3xl opacity-50 translate-x-32 -translate-y-20"></div>
-        <div className="absolute right-20 bottom-20 w-[300px] h-[300px] bg-blue-300 rounded-full blur-2xl opacity-60"></div>
-
-        {/* Confirmation Box */}
+      {/* Center Card */}
+      <div className="flex-1 flex justify-center items-center relative z-10 pt-24">
         <div className="relative z-10 bg-white/40 backdrop-blur-xl p-10 rounded-2xl shadow-lg w-full max-w-md mx-4 text-left">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">
             Your password has been reset.
