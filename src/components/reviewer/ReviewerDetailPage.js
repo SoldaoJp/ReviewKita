@@ -1,7 +1,7 @@
 // src/components/reviewer/ReviewerDetailPage.js
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getReviewerById, deleteReviewer, updateReviewer, reenhanceReviewerContent } from "../../services/reviewerService";
+import { getReviewerById, deleteReviewer, updateReviewer, reenhanceReviewerContent, reportReviewer } from "../../services/reviewerService";
 
 function ReviewerDetailPage() {
   const { id } = useParams();
@@ -17,6 +17,9 @@ function ReviewerDetailPage() {
   const [editedContent, setEditedContent] = useState("");
   const [saving, setSaving] = useState(false);
   const [reEnhancing, setReEnhancing] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportIssue, setReportIssue] = useState("");
+  const [reportDetails, setReportDetails] = useState("");
 
   useEffect(() => {
     fetchReviewerDetail();
@@ -100,6 +103,47 @@ function ReviewerDetailPage() {
     } finally {
       setReEnhancing(false);
     }
+  };
+
+  const handleReportSubmit = async () => {
+    if (!reportIssue) {
+      alert("Please select an issue type.");
+      return;
+    }
+    if (!reportDetails.trim()) {
+      alert("Please provide details about the issue.");
+      return;
+    }
+
+    try {
+      const reportData = {
+        issueType: reportIssue,
+        details: reportDetails.trim(),
+        reviewerId: id,
+        reviewerTitle: reviewer.title,
+        reportedAt: new Date().toISOString()
+      };
+
+      const response = await reportReviewer(id, reportData);
+      
+      if (response.success) {
+        alert("Report submitted successfully. Thank you for helping improve our content!");
+        
+        // Reset and close modal
+        setReportIssue("");
+        setReportDetails("");
+        setShowReportModal(false);
+      }
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      alert(error.message || "Failed to submit report. Please try again.");
+    }
+  };
+
+  const handleReportCancel = () => {
+    setReportIssue("");
+    setReportDetails("");
+    setShowReportModal(false);
   };
 
   const formatDate = (dateString) => {
@@ -332,13 +376,21 @@ function ReviewerDetailPage() {
               </button>
             )
           ) : (
-            <button 
-              onClick={handleReEnhance}
-              className="px-4 py-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors text-sm"
-              disabled={reEnhancing}
-            >
-              {reEnhancing ? "Re-enhancing..." : "✨ Re-enhance"}
-            </button>
+            <>
+              <button 
+                onClick={handleReEnhance}
+                className="px-4 py-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors text-sm"
+                disabled={reEnhancing}
+              >
+                {reEnhancing ? "Re-enhancing..." : "✨ Re-enhance"}
+              </button>
+              <button 
+                onClick={() => setShowReportModal(true)}
+                className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors text-sm"
+              >
+                🚩 Report
+              </button>
+            </>
           )}
           <button 
             className={`px-4 py-2 rounded-lg text-sm transition-colors ${
@@ -472,6 +524,72 @@ function ReviewerDetailPage() {
 
             <button
               onClick={() => setShowDeleteModal(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-lg"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Report Modal */}
+      {showReportModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+          <div className="bg-white rounded-2xl shadow-xl w-[480px] px-6 py-5 relative">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Report Enhanced Content
+            </h2>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Issue Type
+              </label>
+              <select
+                value={reportIssue}
+                onChange={(e) => setReportIssue(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Select an issue...</option>
+                <option value="inaccurate_information">Inaccurate information</option>
+                <option value="incomplete_content">Incomplete content</option>
+                <option value="poor_formatting">Poor formatting/structure</option>
+                <option value="misleading_explanations">Misleading explanations</option>
+                <option value="irrelevant_content">Irrelevant content</option>
+                <option value="grammatical_errors">Grammatical errors</option>
+                <option value="others">Others</option>
+              </select>
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Details
+              </label>
+              <textarea
+                value={reportDetails}
+                onChange={(e) => setReportDetails(e.target.value)}
+                placeholder="Please provide more details about the issue..."
+                rows={6}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              />
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={handleReportCancel}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-800 hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReportSubmit}
+                className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+              >
+                Submit
+              </button>
+            </div>
+
+            <button
+              onClick={handleReportCancel}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-lg"
             >
               ×

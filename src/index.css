@@ -10,3 +10,10 @@ body {
 
 /* small helper shadow (used in components) */
 .card-shadow { box-shadow: 0 8px 24px rgba(15,23,42,0.06); }
+
+/* Highlighted search result */
+.search-highlight {
+  outline: 4px solid rgba(59,130,246,0.25);
+  transition: outline-offset 160ms ease-in-out;
+  outline-offset: 2px;
+}

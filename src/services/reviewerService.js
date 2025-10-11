@@ -85,6 +85,16 @@ export const reenhanceReviewerContent = async (id, { revisionNotes = '', model_i
     }
 };
 
+// Report enhanced content issues
+export const reportReviewer = async (id, reportData) => {
+    try {
+        const response = await httpService.post(`/reviewers/${id}/report`, reportData);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export default {
     getAllReviewers,
     getReviewerById,
@@ -92,4 +102,5 @@ export default {
     updateReviewer,
     deleteReviewer,
     reenhanceReviewerContent,
+    reportReviewer,
 };
