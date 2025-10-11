@@ -28,10 +28,30 @@ function ReviewerDetailPage() {
   const [selectedModelId, setSelectedModelId] = useState(null);
   const [loadingModels, setLoadingModels] = useState(false);
   const [recommending, setRecommending] = useState(false);
+  const [notification, setNotification] = useState(null); // { type: 'success' | 'error', message: string }
 
   useEffect(() => {
     fetchReviewerDetail();
   }, [id]);
+
+  // Auto-hide notification after 5 seconds
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
+
+  const showNotification = (type, message) => {
+    setNotification({ type, message });
+  };
+
+  const handleCancelEnhancing = () => {
+    setReEnhancing(false);
+    showNotification('error', 'Enhancement cancelled by user.');
+  };
 
   const fetchAvailableModels = async () => {
     try {
@@ -57,7 +77,7 @@ function ReviewerDetailPage() {
 
   const handleModelSelect = async () => {
     if (!selectedModelId) {
-      alert("Please select an AI model.");
+      showNotification('error', 'Please select an AI model.');
       return;
     }
     
@@ -82,11 +102,11 @@ function ReviewerDetailPage() {
         
         // Switch to enhanced view
         setActiveView("enhanced");
-        alert("Content enhanced successfully with the selected model!");
+        showNotification('success', 'Content enhanced successfully with the selected model!');
       }
     } catch (err) {
       console.error("Error enhancing content:", err);
-      alert(err.response?.data?.message || "Failed to enhance content. Please try again.");
+      showNotification('error', err.response?.data?.message || 'Failed to enhance content. Please try again.');
     } finally {
       setReEnhancing(false);
       setSelectedModelId(null);
@@ -168,11 +188,11 @@ function ReviewerDetailPage() {
         setReviewer(updatedReviewer);
         setIsEditing(false);
         setEditedContent("");
-        alert("Reviewer updated successfully!");
+        showNotification('success', 'Reviewer updated successfully!');
       }
     } catch (err) {
       console.error("Error updating reviewer:", err);
-      alert(err.response?.data?.message || "Failed to update reviewer. Please try again.");
+      showNotification('error', err.response?.data?.message || 'Failed to update reviewer. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -187,11 +207,11 @@ function ReviewerDetailPage() {
           ...prev,
           enhancedContentByAI: response.data.enhancedContentByAI
         }));
-        alert("Content re-enhanced successfully!");
+        showNotification('success', 'Content re-enhanced successfully!');
       }
     } catch (err) {
       console.error("Error re-enhancing reviewer:", err);
-      alert(err.response?.data?.message || "Failed to re-enhance content. Please try again.");
+      showNotification('error', err.response?.data?.message || 'Failed to re-enhance content. Please try again.');
     } finally {
       setReEnhancing(false);
     }
@@ -521,9 +541,9 @@ function ReviewerDetailPage() {
       <div className="flex-1 flex gap-6 overflow-hidden mb-6">
         {/* Left Sidebar - Table of Contents */}
         <div className="w-64 flex flex-col gap-3">
-          <div className="rounded-lg p-4 flex-1">
+          <div className="rounded-lg p-4 flex-1 overflow-hidden flex flex-col">
             <h2 className="font-semibold mb-4 text-sm text-gray-600">TABLE OF CONTENTS</h2>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 overflow-y-auto flex-1 pr-2">
               {sections.map((section, index) => {
                 const tocLabel = section.key
                   ? String(section.key).replace(/^\s*SECTION:\s*/i, '').replace(/_/g, ' ').trim()
@@ -561,12 +581,6 @@ function ReviewerDetailPage() {
 
         {/* Right Content Area - Display all sections */}
         <div className="flex-1 bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-8 overflow-y-auto relative">
-          {reEnhancing && (
-            <div className="absolute inset-0 bg-white bg-opacity-80 flex flex-col items-center justify-center z-20">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-              <p className="text-lg text-blue-600 font-semibold">Enhancing reviewer content...</p>
-            </div>
-          )}
           {isEditing ? (
             <textarea
               value={editedContent}
@@ -784,6 +798,85 @@ function ReviewerDetailPage() {
             >
               ×
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Notification Popup */}
+      {notification && (
+        <div className="fixed top-4 right-4 z-50 animate-slide-in">
+          <div className={`rounded-lg shadow-lg p-4 min-w-[300px] max-w-[400px] ${
+            notification.type === 'success' 
+              ? 'bg-green-50 border border-green-200' 
+              : 'bg-red-50 border border-red-200'
+          }`}>
+            <div className="flex items-start gap-3">
+              <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
+                notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+              }`}>
+                {notification.type === 'success' ? (
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                )}
+              </div>
+              <div className="flex-1">
+                <p className={`text-sm font-medium ${
+                  notification.type === 'success' ? 'text-green-800' : 'text-red-800'
+                }`}>
+                  {notification.type === 'success' ? 'Success!' : 'Error'}
+                </p>
+                <p className={`text-sm mt-1 ${
+                  notification.type === 'success' ? 'text-green-700' : 'text-red-700'
+                }`}>
+                  {notification.message}
+                </p>
+              </div>
+              <button
+                onClick={() => setNotification(null)}
+                className={`flex-shrink-0 ${
+                  notification.type === 'success' ? 'text-green-400 hover:text-green-600' : 'text-red-400 hover:text-red-600'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Loading Notification */}
+      {reEnhancing && (
+        <div className="fixed top-4 right-4 z-50 animate-slide-in">
+          <div className="rounded-lg shadow-lg p-4 min-w-[300px] bg-blue-50 border border-blue-200">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-blue-800">
+                  Enhancing Content
+                </p>
+                <p className="text-sm mt-1 text-blue-700">
+                  Please wait while we enhance your reviewer content with AI...
+                </p>
+              </div>
+              <button
+                onClick={handleCancelEnhancing}
+                className="flex-shrink-0 text-blue-400 hover:text-blue-600 transition-colors"
+                title="Cancel enhancement"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       )}
