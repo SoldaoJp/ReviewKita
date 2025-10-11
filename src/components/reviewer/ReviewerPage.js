@@ -220,7 +220,7 @@ function ReviewerPage({ title }) {
             return (
               <div 
                 key={reviewer._id} 
-                className="bg-white p-4 rounded-lg shadow-md relative cursor-pointer hover:shadow-lg transition-shadow"
+                className="bg-white/50 rounded-2xl p-4 shadow-sm border border-[#eef3fb] relative cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => handleOpenReviewer(reviewer._id)}
               >
                 <div

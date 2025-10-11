@@ -116,88 +116,149 @@ function ProfilePage() {
 
   return (
     <div className="p-8">
-      {/* Topbar copied from dashboard */}
+      {/* Topbar */}
       <Topbar />
 
-        {/* Profile Card */}
-        <div className="bg-white p-6 rounded-lg shadow-md flex items-center justify-between mb-6">
-          <div className="flex items-center">
-            <img
-              src={userData?.profile_picture ? `http://localhost:5000/${userData.profile_picture}` : "https://via.placeholder.com/96"}
-              alt="Profile"
-              className="w-24 h-24 rounded-full border-4 border-cyan-400 object-cover"
-            />
-            <div className="ml-6">
-              <h2 className="text-2xl font-bold">{userData?.username || 'User'}</h2>
-              <p className="text-gray-500">{userData?.email || 'No email'}</p>
+      <div className="flex gap-6 mt-6">
+        {/* Left Panel - Main Content */}
+        <div className="flex-1">
+          {/* Profile Card - Like Welcome Card */}
+          <div className="bg-white/50 rounded-2xl p-6 shadow-sm border border-[#eef3fb] mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <img
+                  src={userData?.profile_picture ? `http://localhost:5000/${userData.profile_picture}` : "https://via.placeholder.com/96"}
+                  alt="Profile"
+                  className="w-24 h-24 rounded-full border-4 border-cyan-400 object-cover"
+                />
+                <div className="ml-6">
+                  <h2 className="text-2xl font-bold">{userData?.username || 'User'}</h2>
+                  <p className="text-gray-500">{userData?.email || 'No email'}</p>
+                </div>
+              </div>
               <button
                 onClick={() => setShowModal(true)}
-                className="mt-3 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition"
+                className="px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition"
               >
-                Edit Profile
+                ✏️ Edit Profile
               </button>
             </div>
           </div>
-        </div>
 
-        {/* Stats Section */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-green-100 p-4 rounded-lg shadow">
-            <h3 className="text-lg font-bold">Total Reviewers</h3>
-            <p className="text-2xl font-bold text-green-700">{reviewerCount}</p>
+          {/* Stats Section - Three Cards */}
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="bg-green-100 p-4 rounded-lg">
+              <h3 className="text-xs font-semibold text-gray-600 mb-1">Total Reviewers</h3>
+              <p className="text-2xl font-bold text-green-700">{reviewerCount}</p>
+              <p className="text-xs text-gray-500 mt-1">No. of reviewers</p>
+            </div>
+            <div className="bg-yellow-100 p-4 rounded-lg">
+              <h3 className="text-xs font-semibold text-gray-600 mb-1">Total Quizzes</h3>
+              <p className="text-2xl font-bold text-yellow-700">{quizCount}</p>
+              <p className="text-xs text-gray-500 mt-1">No. of generated quizzes</p>
+            </div>
+            <div className="bg-pink-100 p-4 rounded-lg">
+              <h3 className="text-xs font-semibold text-gray-600 mb-1">Mastered</h3>
+              <p className="text-2xl font-bold text-pink-700">{masteredCount}</p>
+              <p className="text-xs text-gray-500 mt-1">Reviewer</p>
+            </div>
           </div>
-          <div className="bg-yellow-100 p-4 rounded-lg shadow">
-            <h3 className="text-lg font-bold">Total Quizzes</h3>
-            <p className="text-2xl font-bold text-yellow-700">{quizCount}</p>
-          </div>
-          <div className="bg-pink-100 p-4 rounded-lg shadow">
-            <h3 className="text-lg font-bold">Mastered</h3>
-            <p className="text-2xl font-bold text-pink-700">{masteredCount}</p>
-          </div>
-        </div>
 
-        {/* Progress Over Time */}
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-          <h3 className="text-lg font-bold mb-4">Progress over time</h3>
-          <div className="h-48 flex items-center justify-center text-gray-400">
-            Chart Placeholder
-          </div>
-          <div className="flex justify-between mt-4 text-sm text-gray-500">
-            <span>Minutes Studied: 0</span>
-            <span>Questions Answered: 0</span>
-            <span>Accuracy: 0%</span>
-          </div>
-        </div>
-
-        {/* Streak and Badges */}
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-          <h3 className="text-lg font-bold mb-4">Streak and Badges</h3>
-          <div className="mb-4">
-            <p className="text-gray-600">Current Streak: <b></b></p>
-            <p className="text-gray-600">Longest Streak: <b></b></p>
-            <p className="text-gray-600">Achievement: <b></b></p>
-          </div>
-        </div>
-
-        {/* Mastery */}
-        <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-          <h3 className="text-lg font-bold mb-4">Mastery</h3>
-          <div className="space-y-3">
-          {[
-            { label: "Data Scalability", color: "bg-blue-500", width: "w-4/5" },
-            { label: "Quantitative Methods", color: "bg-pink-500", width: "w-2/3" },
-            { label: "Advanced Database", color: "bg-purple-500", width: "w-1/2" },
-            { label: "Networking 2", color: "bg-green-500", width: "w-3/5" },
-            { label: "Advanced Programming", color: "bg-orange-500", width: "w-1/3" },
-            { label: "IAS", color: "bg-red-500", width: "w-1/4" },
-          ].map((item, idx) => (
-            <div key={idx}>
-              <p className="text-sm text-gray-600">{item.label}</p>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className={`${item.color} ${item.width} h-2 rounded-full`}></div>
+          {/* Progress Over Time */}
+          <div className="bg-white/50 rounded-2xl p-6 shadow-sm border border-[#eef3fb] mb-6">
+            <h3 className="text-lg font-bold mb-4">Progress over time</h3>
+            <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200">
+              <div className="text-center">
+                <div className="text-4xl mb-2">📊</div>
+                <p className="text-gray-400">Chart Placeholder</p>
               </div>
             </div>
-          ))}
+            <div className="flex justify-around mt-6 pt-4 border-t border-gray-200">
+              <div className="text-center">
+                <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mb-2 mx-auto">
+                  <span className="text-blue-600 text-xl">⏱️</span>
+                </div>
+                <p className="text-xs text-gray-500">Minutes Studied</p>
+                <p className="text-lg font-bold">350</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center w-10 h-10 bg-purple-100 rounded-full mb-2 mx-auto">
+                  <span className="text-purple-600 text-xl">❓</span>
+                </div>
+                <p className="text-xs text-gray-500">Questions Answered</p>
+                <p className="text-lg font-bold">115</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full mb-2 mx-auto">
+                  <span className="text-green-600 text-xl">✓</span>
+                </div>
+                <p className="text-xs text-gray-500">Accuracy</p>
+                <p className="text-lg font-bold">82%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Panel - Streak and Mastery */}
+        <div className="w-80">
+          {/* Streak and Badges */}
+          <div className="bg-white/50 rounded-2xl p-6 shadow-sm border border-[#eef3fb] mb-6">
+            <h3 className="text-lg font-bold mb-4">Streak and Badges</h3>
+            <div className="space-y-4">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-2xl">🔥</span>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Current Streak</p>
+                  <p className="text-lg font-bold">5 days</p>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-2xl">📅</span>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Longest Streak</p>
+                  <p className="text-lg font-bold">7 days</p>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-2xl">🏆</span>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Achievement</p>
+                  <p className="text-lg font-bold">Over Achiever</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mastery */}
+          <div className="bg-white/50 rounded-2xl p-6 shadow-sm border border-[#eef3fb]">
+            <h3 className="text-lg font-bold mb-4">Mastery</h3>
+            <div className="space-y-4">
+              {[
+                { label: "Data Scalability", color: "bg-blue-500", width: "w-4/5" },
+                { label: "Quantitative Meth...", color: "bg-pink-500", width: "w-2/3" },
+                { label: "Advanced Databa...", color: "bg-purple-500", width: "w-1/2" },
+                { label: "Networking 2", color: "bg-green-500", width: "w-3/5" },
+                { label: "Advanced Progra...", color: "bg-orange-500", width: "w-1/3" },
+                { label: "IAS", color: "bg-red-500", width: "w-1/4" },
+              ].map((item, idx) => (
+                <div key={idx}>
+                  <div className="flex items-center mb-1">
+                    <div className={`w-3 h-3 ${item.color} rounded-full mr-2`}></div>
+                    <p className="text-sm text-gray-700">{item.label}</p>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className={`${item.color} ${item.width} h-2 rounded-full`}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 

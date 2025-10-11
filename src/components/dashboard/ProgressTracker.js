@@ -27,7 +27,7 @@ export default function ProgressTracker({ series }) {
   ];
 
   return (
-    <div className="bg-white rounded-2xl p-4 shadow-sm border border-[#eef3fb]">
+    <div className="bg-white/50 rounded-2xl p-4 shadow-sm border border-[#eef3fb]">
       <h3 className="font-bold text-gray-700 mb-3 text-sm">Progress Tracker</h3>
 
       <div className="bg-[#fbfdff] rounded-xl p-4">

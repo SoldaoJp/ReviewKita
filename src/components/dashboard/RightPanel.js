@@ -8,7 +8,7 @@ export default function RightPanel({ data }) {
   return (
     <div className="space-y-6">
       {/* Days Streak (top small card) */}
-      <div className="bg-[#fbfdff] rounded-2xl p-5 shadow-sm border border-[#eef3fb]">
+      <div className="bg-white/50 rounded-2xl p-5 shadow-sm border border-[#eef3fb]">
         <div className="text-center">
           <div className="text-2xl font-semibold text-gray-900">{streak?.days ?? 5}</div>
           <div className="text-xs text-gray-400">Days Streak</div>

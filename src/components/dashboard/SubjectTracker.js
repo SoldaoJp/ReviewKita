@@ -12,7 +12,7 @@ export default function SubjectTracker({ data }) {
   const mainPct = items[0]?.value ?? 0;
 
   return (
-    <div className="bg-white rounded-2xl p-4 shadow-sm border border-[#eef3fb]">
+    <div className="bg-white/50 rounded-2xl p-4 shadow-sm border border-[#eef3fb]">
       <h3 className="font-bold text-gray-700 mb-3 text-sm">Subject Tracker</h3>
 
       <div className="bg-[#fbfdff] rounded-xl p-4 flex flex-col items-center">

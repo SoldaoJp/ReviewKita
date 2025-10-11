@@ -560,7 +560,7 @@ function ReviewerDetailPage() {
         </div>
 
         {/* Right Content Area - Display all sections */}
-        <div className="flex-1 bg-white rounded-lg shadow-sm p-8 overflow-y-auto relative">
+        <div className="flex-1 bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-8 overflow-y-auto relative">
           {reEnhancing && (
             <div className="absolute inset-0 bg-white bg-opacity-80 flex flex-col items-center justify-center z-20">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>

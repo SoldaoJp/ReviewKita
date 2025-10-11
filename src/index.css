@@ -1,7 +1,8 @@
 /* src/index.css - small base plus helpers */
 html, body, #root { height: 100%; margin: 0; }
 body {
-  background: #e3f2fd;
+  background: linear-gradient(to bottom, #F3F4F6, #E0F2FE);
+  background-attachment: fixed;
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

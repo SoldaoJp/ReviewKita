@@ -3,10 +3,12 @@ import { FaSearch, FaUser } from "react-icons/fa";
 import { FiChevronDown } from "react-icons/fi";
 import { useAuth } from "../../controllers/AuthContext";
 import { useSearch } from "../../context/SearchContext";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Topbar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const {
     searchQuery,
     searchResults,
@@ -19,6 +21,8 @@ export default function Topbar() {
   } = useSearch();
 
   const searchRef = useRef(null);
+  const profileRef = useRef(null);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
   // Get profile picture from user context
   const profilePic = user?.profilePicture
@@ -31,6 +35,9 @@ export default function Topbar() {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setShowResults(false);
       }
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setShowProfileDropdown(false);
+      }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -42,6 +49,16 @@ export default function Topbar() {
 
   const handleClearSearch = () => {
     clearSearch();
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  const handleViewAccount = () => {
+    setShowProfileDropdown(false);
+    navigate('/profile');
   };
 
   const formatDate = (dateString) => {
@@ -62,9 +79,9 @@ export default function Topbar() {
   }, {});
 
   return (
-    <div className="flex items-center justify-between mb-6 px-4">
+    <div className="flex items-center justify-between mb-6">
       {/* Search Bar */}
-      <div className="relative w-[90%]" ref={searchRef}>
+      <div className="relative flex-1 mr-4" ref={searchRef}>
         <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
         <input
           type="text"
@@ -72,7 +89,7 @@ export default function Topbar() {
           value={searchQuery}
           onChange={handleInputChange}
           onFocus={() => handleSearch('')}
-          className="w-full pl-10 pr-10 py-2.5 rounded-full bg-white shadow-sm border border-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 transition"
+          className="w-full pl-10 pr-10 py-2.5 rounded-full bg-white/50 shadow-sm border border-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 transition"
         />
 
         {searchQuery && (
@@ -137,15 +154,47 @@ export default function Topbar() {
       </div>
 
       {/* Profile picture */}
-      <div className="flex items-center gap-2 cursor-pointer">
-        <div className="w-8 h-8 flex items-center justify-center bg-gray-300 rounded-full overflow-hidden">
-          {profilePic ? (
-            <img src={profilePic} alt="Profile" className="w-full h-full object-cover rounded-full" />
-          ) : (
-            <FaUser className="text-white text-base" />
-          )}
+      <div className="relative" ref={profileRef}>
+        <div 
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+        >
+          <div className="w-8 h-8 flex items-center justify-center bg-gray-300 rounded-full overflow-hidden">
+            {profilePic ? (
+              <img src={profilePic} alt="Profile" className="w-full h-full object-cover rounded-full" />
+            ) : (
+              <FaUser className="text-white text-base" />
+            )}
+          </div>
+          <FiChevronDown className="text-gray-600 text-xs" />
         </div>
-        <FiChevronDown className="text-gray-600 text-xs" />
+
+        {/* Dropdown Menu */}
+        {showProfileDropdown && (
+          <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+            {/* User Info */}
+            <div className="px-4 py-3 border-b border-gray-200">
+              <p className="font-semibold text-gray-900 text-sm">{user?.username || 'User'}</p>
+              <p className="text-xs text-gray-500 mt-1">{user?.email || 'email@example.com'}</p>
+            </div>
+
+            {/* View Account Link */}
+            <button
+              onClick={handleViewAccount}
+              className="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-100"
+            >
+              View Account
+            </button>
+
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="w-full px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50 transition-colors rounded-b-lg"
+            >
+              Logout
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

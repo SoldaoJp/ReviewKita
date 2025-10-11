@@ -23,7 +23,7 @@ export default function WelcomeCard({ user }) {
   }, []);
 
   return (
-    <div className="bg-[#fbfdff] rounded-2xl p-6 shadow-sm border border-[#eef3fb]">
+    <div className="bg-white/50 rounded-2xl p-6 shadow-sm border border-[#eef3fb]">
       <div className="flex items-start justify-between gap-6">
         <div className="flex-1">
           <h2 className="text-2xl leading-tight font-bold text-gray-900">
