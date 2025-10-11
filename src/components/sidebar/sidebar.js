@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../controllers/AuthContext.js";
 import { useState, useEffect } from "react";
 import { getAllReviewers } from "../../services/reviewerService.js";
+import { useReviewerContext } from "../../context/ReviewerContext.js";
 import Logo from "../../assets/logo.png";
 import Search from "../../assets/Search.svg";
 import Plus from "../../assets/Plus.svg";
@@ -28,11 +29,12 @@ function Sidebar() {
 	const navigate = useNavigate();
 	const [reviewers, setReviewers] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const { reviewerUpdateTrigger } = useReviewerContext();
 
-	// Fetch reviewers on component mount
+	// Fetch reviewers on component mount and when reviewerUpdateTrigger changes
 	useEffect(() => {
 		fetchReviewers();
-	}, []);
+	}, [reviewerUpdateTrigger]);
 
 	const fetchReviewers = async () => {
 		try {

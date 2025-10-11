@@ -3,10 +3,12 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getReviewerById, deleteReviewer, updateReviewer, reenhanceReviewerContent, reportReviewer } from "../../services/reviewerService";
 import { getAvailableLlmModels, recommendLlmConfig } from "../../services/llmConfigService";
+import { useReviewerContext } from "../../context/ReviewerContext";
 
 function ReviewerDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { triggerReviewerUpdate } = useReviewerContext();
   const [reviewer, setReviewer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -133,6 +135,7 @@ function ReviewerDetailPage() {
   const handleDelete = async () => {
     try {
       await deleteReviewer(id);
+      triggerReviewerUpdate(); // Notify sidebar to refresh
       navigate("/reviewer");
     } catch (err) {
       console.error("Error deleting reviewer:", err);

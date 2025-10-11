@@ -4,6 +4,7 @@ import Topbar from "../sidebar/Topbar";
 import { getAllReviewers, createReviewer, deleteReviewer } from "../../services/reviewerService";
 import { getAvailableLlmModelsReviewer } from "../../services/llmConfigService";
 import { useNavigate } from "react-router-dom";
+import { useReviewerContext } from "../../context/ReviewerContext";
 
 // Color palette for reviewer cards
 const colors = [
@@ -19,6 +20,7 @@ const colors = [
 
 function ReviewerPage({ title }) {
   const navigate = useNavigate();
+  const { triggerReviewerUpdate } = useReviewerContext();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showLearnModal, setShowLearnModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -88,6 +90,7 @@ function ReviewerPage({ title }) {
     try {
       await deleteReviewer(selectedReviewer._id);
       setReviewers((prev) => prev.filter((r) => r._id !== selectedReviewer._id));
+      triggerReviewerUpdate(); // Notify sidebar to refresh
       setShowDeleteModal(false);
       setSelectedReviewer(null);
     } catch (err) {
@@ -129,6 +132,7 @@ function ReviewerPage({ title }) {
         setShowAddModal(false);
         setFormData({ title: "", description: "", file: null });
         fetchReviewers(); // Refresh the list
+        triggerReviewerUpdate(); // Notify sidebar to refresh
       }
     } catch (err) {
       console.error("Error creating reviewer:", err);
