@@ -23,7 +23,6 @@ function ReviewerDetailPage() {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportIssue, setReportIssue] = useState("");
   const [reportDetails, setReportDetails] = useState("");
-  const [showModelSelectionModal, setShowModelSelectionModal] = useState(false);
   const [availableModels, setAvailableModels] = useState([]);
   const [selectedModelId, setSelectedModelId] = useState(null);
   const [loadingModels, setLoadingModels] = useState(false);
@@ -33,6 +32,13 @@ function ReviewerDetailPage() {
   useEffect(() => {
     fetchReviewerDetail();
   }, [id]);
+
+  // Fetch available models when reviewer is loaded
+  useEffect(() => {
+    if (reviewer) {
+      fetchAvailableModels();
+    }
+  }, [reviewer?.modelId]);
 
   // Auto-hide notification after 5 seconds
   useEffect(() => {
@@ -59,36 +65,38 @@ function ReviewerDetailPage() {
       const response = await getAvailableLlmModels('reviewer');
       if (response.models) {
         setAvailableModels(response.models);
+        // Set the current model as selected if not already set
+        if (reviewer?.modelId && !selectedModelId) {
+          setSelectedModelId(reviewer.modelId.toString());
+        }
       }
     } catch (err) {
       console.error("Error fetching models:", err);
-      alert("Failed to load AI models. Please try again.");
+      showNotification('error', 'Failed to load AI models. Please try again.');
     } finally {
       setLoadingModels(false);
     }
   };
 
   const handleEnhancedTabClick = () => {
-    // Always show model selection modal when clicking Enhanced tab
-    // This allows users to choose/change the AI model
-    setShowModelSelectionModal(true);
-    fetchAvailableModels();
+    // Simply switch to enhanced view
+    setActiveView("enhanced");
   };
 
-  const handleModelSelect = async () => {
-    if (!selectedModelId) {
-      showNotification('error', 'Please select an AI model.');
+  const handleModelChange = async (newModelId) => {
+    if (!newModelId || newModelId === selectedModelId) {
       return;
     }
     
+    setSelectedModelId(newModelId);
+    
     try {
-      setShowModelSelectionModal(false);
       setReEnhancing(true);
       
       // Call the re-enhance endpoint with the selected model
       const response = await reenhanceReviewerContent(id, { 
         revisionNotes: '', 
-        model_id: selectedModelId 
+        model_id: newModelId 
       });
       
       if (response.success) {
@@ -96,26 +104,20 @@ function ReviewerDetailPage() {
         setReviewer(prev => ({
           ...prev,
           enhancedContentByAI: response.data.enhancedContentByAI,
-          modelId: selectedModelId,
-          modelName: availableModels.find(m => m.id === selectedModelId)?.model_name || prev.modelName
+          modelId: newModelId,
+          modelName: availableModels.find(m => m.id === newModelId)?.model_name || prev.modelName
         }));
         
-        // Switch to enhanced view
-        setActiveView("enhanced");
-        showNotification('success', 'Content enhanced successfully with the selected model!');
+        showNotification('success', 'Content re-enhanced successfully with the selected model!');
       }
     } catch (err) {
       console.error("Error enhancing content:", err);
       showNotification('error', err.response?.data?.message || 'Failed to enhance content. Please try again.');
+      // Revert to previous model on error
+      setSelectedModelId(reviewer?.modelId?.toString() || '');
     } finally {
       setReEnhancing(false);
-      setSelectedModelId(null);
     }
-  };
-
-  const handleCancelModelSelection = () => {
-    setShowModelSelectionModal(false);
-    setSelectedModelId(null);
   };
 
   const handleRecommendModel = async () => {
@@ -567,6 +569,35 @@ function ReviewerDetailPage() {
           
           {/* Action Buttons */}
           <div className="flex flex-col gap-2">
+            {/* LLM Model Dropdown - Only show in Enhanced view */}
+            {activeView === "enhanced" && (
+              <div>
+                <label className="block mb-2 text-xs font-semibold text-gray-600">AI MODEL</label>
+                {loadingModels ? (
+                  <div className="w-full px-3 py-2 border rounded-lg text-gray-500 text-xs bg-gray-50">
+                    Loading models...
+                  </div>
+                ) : availableModels.length === 0 ? (
+                  <div className="w-full px-3 py-2 border rounded-lg text-red-500 text-xs bg-red-50">
+                    No models available
+                  </div>
+                ) : (
+                  <select
+                    value={selectedModelId || ''}
+                    onChange={(e) => handleModelChange(e.target.value)}
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 text-sm"
+                    disabled={reEnhancing}
+                  >
+                    {availableModels.map((model) => (
+                      <option key={model.id} value={model.id}>
+                        {model.model_name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            )}
+            
             <button className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">
               Generate Quiz
             </button>
@@ -706,94 +737,6 @@ function ReviewerDetailPage() {
 
             <button
               onClick={handleReportCancel}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-lg"
-            >
-              ×
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Model Selection Modal */}
-      {showModelSelectionModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4 relative max-h-[80vh] overflow-y-auto">
-            <h3 className="text-xl font-semibold mb-4">Select AI Model</h3>
-            
-            {loadingModels ? (
-              <div className="text-center py-8">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                <p className="mt-4 text-gray-600">Loading available models...</p>
-              </div>
-            ) : availableModels.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-600">No models available at the moment.</p>
-              </div>
-            ) : (
-              <>
-                <p className="text-sm text-gray-600 mb-4">
-                  Choose an AI model to enhance your reviewer content:
-                </p>
-                
-                <div className="space-y-3 mb-6">
-                  {availableModels.map((model) => (
-                    <label
-                      key={model.id}
-                      className={`flex items-start p-4 border rounded-lg cursor-pointer transition-all ${
-                        selectedModelId === model.id
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-300 hover:border-gray-400'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="model"
-                        value={model.id}
-                        checked={selectedModelId === model.id}
-                        onChange={(e) => setSelectedModelId(e.target.value)}
-                        className="mt-1 mr-3"
-                      />
-                      <div className="flex-1">
-                        <div className="font-medium text-gray-900">{model.model_name}</div>
-                        {model.use_case && (
-                          <div className="text-sm text-gray-500 mt-1">
-                            Use case: {model.use_case}
-                          </div>
-                        )}
-                        {model.recommends > 0 && (
-                          <div className="text-sm text-green-600 mt-1">
-                            👍 {model.recommends} recommendation{model.recommends !== 1 ? 's' : ''}
-                          </div>
-                        )}
-                      </div>
-                    </label>
-                  ))}
-                </div>
-
-                <div className="flex justify-end gap-3">
-                  <button
-                    onClick={handleCancelModelSelection}
-                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-800 hover:bg-gray-100"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleModelSelect}
-                    disabled={!selectedModelId}
-                    className={`px-4 py-2 rounded-lg ${
-                      selectedModelId
-                        ? 'bg-black text-white hover:bg-gray-800'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                  >
-                    Select Model
-                  </button>
-                </div>
-              </>
-            )}
-
-            <button
-              onClick={handleCancelModelSelection}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-lg"
             >
               ×
