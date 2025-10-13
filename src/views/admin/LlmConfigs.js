@@ -143,9 +143,9 @@ export default function AdminLlmConfigsView() {
 
         {showModal && (
           <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-lg w-[900px] max-w-[95vw] p-6 relative">
-              <h2 className="text-lg font-semibold mb-4">{editing ? 'Edit Config' : 'New Config'}</h2>
-              <div className="space-y-3">
+            <div className="bg-white rounded-xl shadow-lg w-[900px] max-w-[95vw] max-h-[90vh] flex flex-col relative">
+              <h2 className="text-lg font-semibold mb-4 px-6 pt-6">{editing ? 'Edit Config' : 'New Config'}</h2>
+              <div className="space-y-3 overflow-y-auto px-6 pb-6 flex-1">
                 {!editing && (
                   <>
                     <label className="block text-sm font-medium">Model Name</label>
@@ -234,7 +234,7 @@ export default function AdminLlmConfigsView() {
                   <input type="checkbox" checked={form.is_active} onChange={(e)=>setForm({...form, is_active: e.target.checked})} /> Active
                 </label>
               </div>
-              <div className="flex justify-end gap-2 mt-6">
+              <div className="flex justify-end gap-2 mt-6 px-6 pb-6 border-t pt-4">
                 <button onClick={()=>setShowModal(false)} className="px-4 py-2 border rounded hover:bg-gray-100">Cancel</button>
                 <button onClick={saveConfig} className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800">Save</button>
               </div>
