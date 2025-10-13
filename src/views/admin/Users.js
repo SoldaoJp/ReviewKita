@@ -8,6 +8,8 @@ export default function AdminUsersView() {
   const [error, setError] = useState('');
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState({}); // userId -> bool
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   useEffect(() => {
     const load = async () => {
@@ -60,13 +62,19 @@ export default function AdminUsersView() {
 
   const toggleExpand = (id) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
 
-  const onDelete = async (u) => {
+  const onDeleteClick = (u) => {
     if (u.role === 'admin') return; // safety
-    if (!window.confirm(`Delete user ${u.email}? This will also delete their reviewers.`)) return;
+    setUserToDelete(u);
+    setShowDeleteModal(true);
+  };
+
+  const onDelete = async () => {
+    if (!userToDelete) return;
     try {
       setLoading(true);
-      const res = await adminDeleteUser(u._id);
-      // Optionally show deletedReviewers count
+      const res = await adminDeleteUser(userToDelete._id);
+      setShowDeleteModal(false);
+      setUserToDelete(null);
       await onClearSearch();
       if (res?.deletedReviewers !== undefined) {
         alert(`Deleted. Reviewers removed: ${res.deletedReviewers}`);
@@ -89,16 +97,16 @@ export default function AdminUsersView() {
               value={query}
               onChange={(e)=>setQuery(e.target.value)}
               placeholder="Search by email"
-              className="border rounded px-3 py-2 w-72"
+              className="border border-gray-300 rounded-lg px-4 py-2 w-72 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-            <button type="submit" className="px-3 py-2 bg-black text-white rounded">Search</button>
-            <button type="button" onClick={onClearSearch} className="px-3 py-2 border rounded">Clear</button>
+            <button type="submit" className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition">Search</button>
+            <button type="button" onClick={onClearSearch} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Clear</button>
           </form>
         </div>
         {loading && <p className="text-gray-500">Loading users...</p>}
         {error && <p className="text-red-500">{error}</p>}
         {!loading && !error && (
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] overflow-hidden">
             <table className="min-w-full text-sm">
               <thead className="bg-gray-50 text-gray-600">
                 <tr>
@@ -127,7 +135,7 @@ export default function AdminUsersView() {
                       <td className="px-4 py-3">{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '-'}</td>
                       <td className="px-4 py-3 space-x-2">
                         {u.role !== 'admin' && (
-                          <button onClick={()=>onDelete(u)} className="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200">Delete</button>
+                          <button onClick={()=>onDeleteClick(u)} className="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200">Delete</button>
                         )}
                       </td>
                     </tr>
@@ -170,6 +178,35 @@ export default function AdminUsersView() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && userToDelete && (
+          <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl shadow-lg p-6 max-w-md w-full mx-4 relative">
+              <h3 className="text-lg font-semibold mb-2">localhost:3000 says</h3>
+              <p className="text-gray-700 mb-6">
+                Delete user {userToDelete.email}? This will also delete their reviewers.
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setUserToDelete(null);
+                  }}
+                  className="px-6 py-2 border border-gray-300 rounded-lg text-gray-800 hover:bg-gray-100 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={onDelete}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

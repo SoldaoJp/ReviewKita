@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../controllers/AuthContext';
 import Logo from '../../assets/logo.png';
 import DashboardIcon from '../../assets/Dashboard.svg';
+import ProfileIcon from '../../assets/Profile.svg';
 
 function AdminSidebar() {
   const { logout } = useAuth();
@@ -32,8 +33,17 @@ function AdminSidebar() {
                 }`
               }
             >
-              <img src={DashboardIcon} alt="Dashboard" className="h-4 w-4 mr-2" />
-              <span>Dashboard</span>
+              {({ isActive }) => (
+                <>
+                  <img 
+                    src={DashboardIcon} 
+                    alt="Dashboard" 
+                    className="h-4 w-4 mr-2" 
+                    style={isActive ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}}
+                  />
+                  <span className={isActive ? 'text-black' : ''}>Dashboard</span>
+                </>
+              )}
             </NavLink>
 
             <NavLink
@@ -44,8 +54,12 @@ function AdminSidebar() {
                 }`
               }
             >
-              <span className="h-4 w-4 mr-2">👥</span>
-              <span>Users</span>
+              {({ isActive }) => (
+                <>
+                  <span className="h-4 w-4 mr-2" style={isActive ? { filter: 'brightness(0) saturate(100%) invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}}>👥</span>
+                  <span className={isActive ? 'text-black' : ''}>Users</span>
+                </>
+              )}
             </NavLink>
 
             <NavLink
@@ -56,8 +70,17 @@ function AdminSidebar() {
                 }`
               }
             >
-              <span className="h-4 w-4 mr-2">👤</span>
-              <span>Profile</span>
+              {({ isActive }) => (
+                <>
+                  <img 
+                    src={ProfileIcon} 
+                    alt="Profile" 
+                    className="h-4 w-4 mr-2" 
+                    style={isActive ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}}
+                  />
+                  <span className={isActive ? 'text-black' : ''}>Profile</span>
+                </>
+              )}
             </NavLink>
 
             <NavLink
@@ -68,8 +91,12 @@ function AdminSidebar() {
                 }`
               }
             >
-              <span className="h-4 w-4 mr-2">🧠</span>
-              <span>LLM Configs</span>
+              {({ isActive }) => (
+                <>
+                  <span className="h-4 w-4 mr-2" style={isActive ? { filter: 'brightness(0) saturate(100%) invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}}>🧠</span>
+                  <span className={isActive ? 'text-black' : ''}>LLM Configs</span>
+                </>
+              )}
             </NavLink>
           </nav>
         </div>

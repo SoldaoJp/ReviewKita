@@ -15,6 +15,8 @@ export default function AdminLlmConfigsView() {
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [configToDelete, setConfigToDelete] = useState(null);
   const [form, setForm] = useState({
     model_name: '',
     system_prompt: '',
@@ -86,14 +88,21 @@ export default function AdminLlmConfigsView() {
     }
   };
 
-  const deleteConfig = async (cfg) => {
-    if (!window.confirm(`Delete LLM config ${cfg.model_name}?`)) return;
+  const deleteConfig = async () => {
+    if (!configToDelete) return;
     try {
-      await adminDeleteLlmConfig(cfg._id);
+      await adminDeleteLlmConfig(configToDelete._id);
+      setShowDeleteModal(false);
+      setConfigToDelete(null);
       await loadConfigs();
     } catch (e) {
       alert(e.message || 'Failed to delete config');
     }
+  };
+
+  const onDeleteClick = (cfg) => {
+    setConfigToDelete(cfg);
+    setShowDeleteModal(true);
   };
 
   return (
@@ -106,7 +115,7 @@ export default function AdminLlmConfigsView() {
         {loading && <p className="text-gray-500">Loading LLM configs...</p>}
         {error && <p className="text-red-500">{error}</p>}
         {!loading && !error && (
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] overflow-hidden">
             <table className="min-w-full text-sm">
               <thead className="bg-gray-50 text-gray-600">
                 <tr>
@@ -132,7 +141,7 @@ export default function AdminLlmConfigsView() {
                     <td className="px-4 py-3">{c.api_config?.top_p ?? '-'}</td>
                     <td className="px-4 py-3 space-x-2">
                       <button onClick={() => openEdit(c)} className="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200">Edit</button>
-                      <button onClick={() => deleteConfig(c)} className="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200">Delete</button>
+                      <button onClick={() => onDeleteClick(c)} className="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200">Delete</button>
                     </td>
                   </tr>
                 ))}
@@ -239,6 +248,35 @@ export default function AdminLlmConfigsView() {
                 <button onClick={saveConfig} className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800">Save</button>
               </div>
               <button onClick={()=>setShowModal(false)} className="absolute top-2 right-3 text-gray-400 hover:text-gray-600 text-lg">×</button>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && configToDelete && (
+          <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl shadow-lg p-6 max-w-md w-full mx-4 relative">
+              <h3 className="text-lg font-semibold mb-2">localhost:3000 says</h3>
+              <p className="text-gray-700 mb-6">
+                Delete LLM config {configToDelete.model_name}?
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setConfigToDelete(null);
+                  }}
+                  className="px-6 py-2 border border-gray-300 rounded-lg text-gray-800 hover:bg-gray-100 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={deleteConfig}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                >
+                  OK
+                </button>
+              </div>
             </div>
           </div>
         )}
