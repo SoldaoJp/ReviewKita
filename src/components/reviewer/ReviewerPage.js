@@ -39,6 +39,21 @@ function ReviewerPage({ title }) {
   const [llmModels, setLlmModels] = useState([]);
   const [modelsLoading, setModelsLoading] = useState(false);
   const [selectedModelId, setSelectedModelId] = useState("");
+  const [notification, setNotification] = useState(null); // { type: 'success' | 'error' | 'loading', message: string }
+
+  // Auto-hide notification after 5 seconds (except for loading)
+  useEffect(() => {
+    if (notification && notification.type !== 'loading') {
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
+
+  const showNotification = (type, message) => {
+    setNotification({ type, message });
+  };
 
   // Fetch reviewers on component mount
   useEffect(() => {
@@ -115,28 +130,37 @@ function ReviewerPage({ title }) {
 
   const handleAddReviewer = async () => {
     if (!formData.title || !formData.description || !formData.file) {
-      alert("Please fill in all fields and select a file.");
+      showNotification('error', 'Please fill in all fields and select a file.');
+      return;
+    }
+
+    if (!selectedModelId) {
+      showNotification('error', 'Please select an AI model.');
       return;
     }
 
     try {
       setSubmitting(true);
+      showNotification('loading', 'Creating reviewer...');
+      
       const data = new FormData();
       data.append("title", formData.title);
       data.append("description", formData.description);
       data.append("file", formData.file);
+      data.append("model_id", selectedModelId);
 
       const response = await createReviewer(data);
       if (response.success) {
-        alert(response.message);
+        showNotification('success', 'Reviewer added successfully!');
         setShowAddModal(false);
         setFormData({ title: "", description: "", file: null });
+        setSelectedModelId("");
         fetchReviewers(); // Refresh the list
         triggerReviewerUpdate(); // Notify sidebar to refresh
       }
     } catch (err) {
       console.error("Error creating reviewer:", err);
-      alert(err.response?.data?.message || "Failed to create reviewer. Please try again.");
+      showNotification('error', err.response?.data?.message || 'Failed to create reviewer. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -288,6 +312,29 @@ function ReviewerPage({ title }) {
               rows="3"
             />
 
+            <label className="block mb-2 text-sm font-medium">AI Model</label>
+            {modelsLoading ? (
+              <div className="w-full px-3 py-2 border rounded mb-4 text-gray-500 text-sm">
+                Loading models...
+              </div>
+            ) : llmModels.length === 0 ? (
+              <div className="w-full px-3 py-2 border rounded mb-4 text-red-500 text-sm">
+                No models available
+              </div>
+            ) : (
+              <select
+                value={selectedModelId}
+                onChange={(e) => setSelectedModelId(e.target.value)}
+                className="w-full px-3 py-2 border rounded mb-4 focus:ring-2 focus:ring-cyan-400"
+              >
+                <option value="">Select an AI model</option>
+                {llmModels.map((model) => (
+                  <option key={model.id} value={model.id}>
+                    {model.model_name} - {model.provider}
+                  </option>
+                ))}
+              </select>
+            )}
 
             <label className="block mb-2 text-sm font-medium">Import File (PDF, DOC, DOCX, TXT)</label>
             <div className="w-full border border-dashed border-gray-300 rounded p-4 mb-4 text-center">
@@ -416,6 +463,76 @@ function ReviewerPage({ title }) {
             >
               ×
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Notification Popups */}
+      {notification && notification.type !== 'loading' && (
+        <div className="fixed top-4 right-4 z-50 animate-slide-in">
+          <div className={`rounded-lg shadow-lg p-4 min-w-[300px] max-w-[400px] ${
+            notification.type === 'success' 
+              ? 'bg-green-50 border border-green-200' 
+              : 'bg-red-50 border border-red-200'
+          }`}>
+            <div className="flex items-start gap-3">
+              <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
+                notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+              }`}>
+                {notification.type === 'success' ? (
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                )}
+              </div>
+              <div className="flex-1">
+                <p className={`text-sm font-medium ${
+                  notification.type === 'success' ? 'text-green-800' : 'text-red-800'
+                }`}>
+                  {notification.type === 'success' ? 'Success!' : 'Error'}
+                </p>
+                <p className={`text-sm mt-1 ${
+                  notification.type === 'success' ? 'text-green-700' : 'text-red-700'
+                }`}>
+                  {notification.message}
+                </p>
+              </div>
+              <button
+                onClick={() => setNotification(null)}
+                className={`flex-shrink-0 ${
+                  notification.type === 'success' ? 'text-green-400 hover:text-green-600' : 'text-red-400 hover:text-red-600'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Loading Notification */}
+      {notification && notification.type === 'loading' && (
+        <div className="fixed top-4 right-4 z-50 animate-slide-in">
+          <div className="rounded-lg shadow-lg p-4 min-w-[300px] bg-blue-50 border border-blue-200">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-blue-800">
+                  Processing
+                </p>
+                <p className="text-sm mt-1 text-blue-700">
+                  {notification.message}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       )}
