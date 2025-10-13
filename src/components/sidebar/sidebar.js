@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../controllers/AuthContext.js";
 import { useState, useEffect } from "react";
 import { getAllReviewers } from "../../services/reviewerService.js";
+import { getAvailableLlmModelsReviewer } from "../../services/llmConfigService.js";
 import { useReviewerContext } from "../../context/ReviewerContext.js";
 import Logo from "../../assets/logo.png";
 import Search from "../../assets/Search.svg";
@@ -36,6 +37,20 @@ function Sidebar() {
 	const [filteredReviewers, setFilteredReviewers] = useState([]);
 	const [formData, setFormData] = useState({ title: "", description: "", file: null });
 	const [submitting, setSubmitting] = useState(false);
+	const [notification, setNotification] = useState(null); // { type: 'success' | 'error' | 'loading', message: string }
+	const [availableModels, setAvailableModels] = useState([]);
+	const [loadingModels, setLoadingModels] = useState(false);
+	const [selectedModelId, setSelectedModelId] = useState("");
+
+	// Auto-hide notification after 5 seconds (except loading)
+	useEffect(() => {
+		if (notification && notification.type !== 'loading') {
+			const timer = setTimeout(() => {
+				setNotification(null);
+			}, 5000);
+			return () => clearTimeout(timer);
+		}
+	}, [notification]);
 
 	// Fetch reviewers on component mount and when reviewerUpdateTrigger changes
 	useEffect(() => {
@@ -93,9 +108,29 @@ function Sidebar() {
 	};
 
 	// Add reviewer functionality
-	const handleAddClick = () => {
+	const handleAddClick = async () => {
 		setShowAddModal(true);
 		setFormData({ title: "", description: "", file: null });
+		setSelectedModelId("");
+		
+		// Fetch available models
+		try {
+			setLoadingModels(true);
+			const response = await getAvailableLlmModelsReviewer();
+			if (response && response.models) {
+				setAvailableModels(response.models);
+				setSelectedModelId(response.models[0]?.id || "");
+			}
+		} catch (error) {
+			console.error('Error fetching models:', error);
+			setAvailableModels([]);
+		} finally {
+			setLoadingModels(false);
+		}
+	};
+
+	const showNotification = (type, message) => {
+		setNotification({ type, message });
 	};
 
 	const handleInputChange = (e) => {
@@ -110,36 +145,50 @@ function Sidebar() {
 
 	const handleAddReviewer = async () => {
 		if (!formData.title.trim()) {
-			alert('Please enter a title');
+			showNotification('error', 'Please enter a title');
+			return;
+		}
+
+		if (!formData.description.trim()) {
+			showNotification('error', 'Please enter a description');
 			return;
 		}
 
 		if (!formData.file) {
-			alert('Please select a file');
+			showNotification('error', 'Please select a file');
+			return;
+		}
+
+		if (!selectedModelId) {
+			showNotification('error', 'Please select an AI model');
 			return;
 		}
 
 		try {
 			setSubmitting(true);
+			showNotification('loading', 'Creating reviewer...');
+			
 			const formDataToSend = new FormData();
 			formDataToSend.append('title', formData.title);
 			formDataToSend.append('description', formData.description);
 			formDataToSend.append('file', formData.file);
+			formDataToSend.append('model_id', selectedModelId);
 
 			const { createReviewer } = await import('../../services/reviewerService.js');
 			const response = await createReviewer(formDataToSend);
 
 			if (response.success) {
-				alert('Reviewer created successfully!');
+				showNotification('success', 'Reviewer added successfully!');
 				setShowAddModal(false);
 				setFormData({ title: "", description: "", file: null });
+				setSelectedModelId("");
 				triggerReviewerUpdate(); // Refresh sidebar list
 			} else {
-				alert(response.message || 'Failed to create reviewer');
+				showNotification('error', response.message || 'Failed to create reviewer');
 			}
 		} catch (error) {
 			console.error('Error creating reviewer:', error);
-			alert(error.message || 'An error occurred while creating the reviewer');
+			showNotification('error', error.message || 'An error occurred while creating the reviewer');
 		} finally {
 			setSubmitting(false);
 		}
@@ -382,6 +431,30 @@ function Sidebar() {
 							rows="3"
 						/>
 
+						<label className="block mb-2 text-sm font-medium">AI Model</label>
+						{loadingModels ? (
+							<div className="w-full px-3 py-2 border rounded mb-4 text-gray-500 text-sm">
+								Loading models...
+							</div>
+						) : availableModels.length === 0 ? (
+							<div className="w-full px-3 py-2 border rounded mb-4 text-red-500 text-sm">
+								No models available
+							</div>
+						) : (
+							<select
+								value={selectedModelId}
+								onChange={(e) => setSelectedModelId(e.target.value)}
+								className="w-full px-3 py-2 border rounded mb-4 focus:ring-2 focus:ring-cyan-400"
+							>
+								<option value="">Select an AI model</option>
+								{availableModels.map((model) => (
+									<option key={model.id} value={model.id}>
+										{model.model_name} - {model.provider}
+									</option>
+								))}
+							</select>
+						)}
+
 						<label className="block mb-2 text-sm font-medium">Import File (PDF, DOC, DOCX, TXT)</label>
 						<div className="w-full border border-dashed border-gray-300 rounded p-4 mb-4 text-center">
 							<input 
@@ -401,6 +474,7 @@ function Sidebar() {
 								onClick={() => {
 									setShowAddModal(false);
 									setFormData({ title: "", description: "", file: null });
+									setSelectedModelId("");
 								}}
 								className="px-4 py-2 border rounded hover:bg-gray-100"
 								disabled={submitting}
@@ -420,6 +494,7 @@ function Sidebar() {
 							onClick={() => {
 								setShowAddModal(false);
 								setFormData({ title: "", description: "", file: null });
+								setSelectedModelId("");
 							}}
 							className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg"
 							disabled={submitting}
@@ -427,6 +502,59 @@ function Sidebar() {
 							×
 						</button>
 					</div>
+				</div>
+			)}
+
+			{/* Notification Popups */}
+			{notification && (
+				<div className="fixed top-4 right-4 z-50 animate-slide-in">
+					{notification.type === 'loading' ? (
+						<div className="bg-white rounded-lg shadow-lg p-4 min-w-[300px] max-w-[400px] border border-gray-200">
+							<div className="flex items-center gap-3">
+								<div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900"></div>
+								<span className="text-gray-700">{notification.message}</span>
+							</div>
+						</div>
+					) : (
+						<div className={`rounded-lg shadow-lg p-4 min-w-[300px] max-w-[400px] ${
+							notification.type === 'success' 
+								? 'bg-green-50 border border-green-200' 
+								: 'bg-red-50 border border-red-200'
+						}`}>
+							<div className="flex items-start gap-3">
+								<div className={`flex-shrink-0 ${
+									notification.type === 'success' ? 'text-green-600' : 'text-red-600'
+								}`}>
+									{notification.type === 'success' ? (
+										<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+											<path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+										</svg>
+									) : (
+										<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+											<path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+										</svg>
+									)}
+								</div>
+								<div className="flex-1">
+									<p className={`text-sm font-medium ${
+										notification.type === 'success' ? 'text-green-800' : 'text-red-800'
+									}`}>
+										{notification.message}
+									</p>
+								</div>
+								<button
+									onClick={() => setNotification(null)}
+									className={`flex-shrink-0 ${
+										notification.type === 'success' ? 'text-green-600 hover:text-green-800' : 'text-red-600 hover:text-red-800'
+									}`}
+								>
+									<svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+										<path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+									</svg>
+								</button>
+							</div>
+						</div>
+					)}
 				</div>
 			)}
 		</div>

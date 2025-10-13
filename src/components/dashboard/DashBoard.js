@@ -6,12 +6,14 @@ import RightPanel from "./RightPanel";
 import SubjectTracker from "./SubjectTracker";
 import WelcomeCard from "./WelcomeCard";
 import { getAllReviewers } from "../../services/reviewerService";
+import { useReviewerContext } from "../../context/ReviewerContext";
 
 export default function Dashboard() {
   // State for selected month/year
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [reviewers, setReviewers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { reviewerUpdateTrigger } = useReviewerContext();
   
   // Get month and year from selected date
   const monthName = selectedDate.toLocaleString('default', { month: 'long' });
@@ -61,7 +63,7 @@ export default function Dashboard() {
     };
 
     fetchReviewers();
-  }, []);
+  }, [reviewerUpdateTrigger]); // Re-fetch when reviewers are updated
 
   // Calculate quiz progress data
   const getQuizProgressData = () => {
@@ -87,6 +89,86 @@ export default function Dashboard() {
       };
     });
   };
+
+  // Calculate progress tracker data (quiz scores over time)
+  const getProgressTrackerData = () => {
+    if (loading || reviewers.length === 0) {
+      return { data: [], legends: [] };
+    }
+
+    // Get unique dates from reviewers
+    const dates = reviewers
+      .map(r => new Date(r.extractedDate || r.createdAt))
+      .sort((a, b) => a - b);
+
+    // Create 5 data points spanning the date range
+    const dataPoints = [];
+    if (dates.length > 0) {
+      const firstDate = dates[0];
+      const lastDate = dates[dates.length - 1] || firstDate;
+      const timeSpan = lastDate - firstDate || 1;
+
+      for (let i = 0; i < 5; i++) {
+        const pointDate = new Date(firstDate.getTime() + (timeSpan * i / 4));
+        const formattedDate = `${(pointDate.getMonth() + 1).toString().padStart(2, '0')}/${pointDate.getDate().toString().padStart(2, '0')}`;
+        
+        const dataPoint = { date: formattedDate };
+        
+        // For each reviewer, add quiz score (0 for now since quiz not implemented)
+        reviewers.slice(0, 4).forEach((reviewer, idx) => {
+          const key = `reviewer${idx}`;
+          dataPoint[key] = 0; // Will be actual quiz score when implemented
+        });
+        
+        dataPoints.push(dataPoint);
+      }
+    }
+
+    // Create color palette
+    const colors = ['#3B82F6', '#EC4899', '#7C3AED', '#10B981'];
+    
+    // Create legends from reviewers
+    const legends = reviewers.slice(0, 4).map((reviewer, idx) => ({
+      key: `reviewer${idx}`,
+      name: reviewer.title,
+      color: colors[idx % colors.length],
+      value: 0 // Will be actual quiz score when implemented
+    }));
+
+    return { data: dataPoints, legends };
+  };
+
+  // Calculate subject tracker data (time spent on each reviewer)
+  const getSubjectTrackerData = () => {
+    if (loading || reviewers.length === 0) {
+      return [];
+    }
+
+    // For now, we'll use a placeholder calculation
+    // In the future, you can track actual time spent when user opens reviewers
+    // This could be stored in a separate analytics collection or user activity log
+
+    const colors = ['#3B82F6', '#EC4899', '#7C3AED', '#10B981'];
+    
+    // Calculate percentage based on number of reviewers (placeholder logic)
+    // You'll want to replace this with actual time tracking data
+    const total = reviewers.length;
+    
+    return reviewers.slice(0, 4).map((reviewer, idx) => {
+      // Placeholder: assign decreasing percentages
+      // In reality, this should come from time tracking data
+      const basePercentage = Math.max(10, 60 - (idx * 10));
+      
+      return {
+        name: reviewer.title,
+        value: basePercentage,
+        color: colors[idx % colors.length]
+      };
+    });
+  };
+
+  const progressTrackerData = getProgressTrackerData();
+  const subjectTrackerData = getSubjectTrackerData();
   
   return (
     <div className="p-8 max-w-[1800px] mx-auto">
@@ -98,8 +180,8 @@ export default function Dashboard() {
         <div className="col-span-12 lg:col-span-8 flex flex-col justify-between" data-search-section="welcome">
           <WelcomeCard />
           <div className="grid grid-cols-2 gap-2 mt-1">
-            <div data-search-section="progress"><ProgressTracker /></div>
-            <div data-search-section="subjects"><SubjectTracker /></div>
+            <div data-search-section="progress"><ProgressTracker data={progressTrackerData.data} legends={progressTrackerData.legends} /></div>
+            <div data-search-section="subjects"><SubjectTracker data={subjectTrackerData} /></div>
           </div>
           <div className="grid grid-cols-2 gap-2 mt-1" data-search-section="quick-actions">
             <button className="w-full bg-white/50 rounded-xl p-4 card-shadow font-medium hover:bg-white/60 transition text-gray-700 flex items-center justify-center gap-2">
@@ -207,7 +289,7 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-          <div className="bg-white/50 rounded-2xl p-4 shadow-sm border border-[#eef3fb] flex-1">
+          <div className="bg-white/50 rounded-2xl p-4 shadow-sm border border-[#eef3fb] flex flex-col">
             <h3 className="font-bold text-gray-700 mb-3 text-sm">Quiz Progress</h3>
             {loading ? (
               <div className="text-center py-4">
@@ -218,7 +300,7 @@ export default function Dashboard() {
                 <p className="text-xs text-gray-500">No reviewers yet</p>
               </div>
             ) : (
-              <div className="space-y-2.5">
+              <div className="space-y-2.5 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent" style={{ maxHeight: '180px' }}>
                 {getQuizProgressData().map((quiz, idx) => (
                   <div key={idx} className={`bg-${quiz.colorClass}-50 border border-${quiz.colorClass}-200 rounded-lg p-2.5`}>
                     <div className="flex items-center gap-2.5">
