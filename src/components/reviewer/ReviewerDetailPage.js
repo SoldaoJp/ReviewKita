@@ -3,7 +3,9 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getReviewerById, deleteReviewer, updateReviewer, reenhanceReviewerContent, reportReviewer } from "../../services/reviewerService";
 import { getAvailableLlmModels, recommendLlmConfig } from "../../services/llmConfigService";
+import { createQuiz } from "../../services/quizService";
 import { useReviewerContext } from "../../context/ReviewerContext";
+import QuizGenerationModal from "./QuizGenerationModal";
 
 function ReviewerDetailPage() {
   const { id } = useParams();
@@ -14,6 +16,7 @@ function ReviewerDetailPage() {
   const [error, setError] = useState(null);
   const [activeView, setActiveView] = useState("original"); // "original" or "enhanced"
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showQuizModal, setShowQuizModal] = useState(false);
   const [activeSection, setActiveSection] = useState(0);
   const sectionRefs = useRef([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -258,6 +261,18 @@ function ReviewerDetailPage() {
     setReportIssue("");
     setReportDetails("");
     setShowReportModal(false);
+  };
+
+  const handleGenerateQuiz = async (quizData) => {
+    try {
+      showNotification('loading', 'Generating quiz...');
+      await createQuiz(quizData);
+      showNotification('success', 'Quiz generated successfully!');
+      setShowQuizModal(false);
+    } catch (error) {
+      console.error('Error generating quiz:', error);
+      showNotification('error', error.response?.data?.error || 'Failed to generate quiz. Please try again.');
+    }
   };
 
   const formatDate = (dateString) => {
@@ -598,7 +613,10 @@ function ReviewerDetailPage() {
               </div>
             )}
             
-            <button className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">
+            <button 
+              onClick={() => setShowQuizModal(true)}
+              className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+            >
               Generate Quiz
             </button>
             <button 
@@ -746,7 +764,7 @@ function ReviewerDetailPage() {
       )}
 
       {/* Notification Popup */}
-      {notification && (
+      {notification && notification.type !== 'loading' && (
         <div className="fixed top-4 right-4 z-50 animate-slide-in">
           <div className={`rounded-lg shadow-lg p-4 min-w-[300px] max-w-[400px] ${
             notification.type === 'success' 
@@ -794,7 +812,7 @@ function ReviewerDetailPage() {
         </div>
       )}
 
-      {/* Loading Notification */}
+      {/* Loading Notification for Re-enhancing */}
       {reEnhancing && (
         <div className="fixed top-4 right-4 z-50 animate-slide-in">
           <div className="rounded-lg shadow-lg p-4 min-w-[300px] bg-blue-50 border border-blue-200">
@@ -823,6 +841,35 @@ function ReviewerDetailPage() {
           </div>
         </div>
       )}
+
+      {/* Loading Notification for Quiz Generation */}
+      {notification && notification.type === 'loading' && (
+        <div className="fixed top-4 right-4 z-50 animate-slide-in">
+          <div className="rounded-lg shadow-lg p-4 min-w-[300px] bg-blue-50 border border-blue-200">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-blue-800">
+                  Processing
+                </p>
+                <p className="text-sm mt-1 text-blue-700">
+                  {notification.message}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quiz Generation Modal */}
+      <QuizGenerationModal
+        isOpen={showQuizModal}
+        onClose={() => setShowQuizModal(false)}
+        onGenerate={handleGenerateQuiz}
+        reviewerId={id}
+      />
     </div>
   );
 }

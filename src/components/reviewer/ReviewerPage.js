@@ -3,8 +3,10 @@ import { useState, useEffect } from "react";
 import Topbar from "../sidebar/Topbar";
 import { getAllReviewers, createReviewer, deleteReviewer } from "../../services/reviewerService";
 import { getAvailableLlmModelsReviewer } from "../../services/llmConfigService";
+import { createQuiz } from "../../services/quizService";
 import { useNavigate } from "react-router-dom";
 import { useReviewerContext } from "../../context/ReviewerContext";
+import QuizGenerationModal from "./QuizGenerationModal";
 
 // Color palette for reviewer cards
 const colors = [
@@ -24,6 +26,7 @@ function ReviewerPage({ title }) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showLearnModal, setShowLearnModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showQuizModal, setShowQuizModal] = useState(false);
   const [selectedReviewer, setSelectedReviewer] = useState(null);
   const [reviewers, setReviewers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -170,6 +173,24 @@ function ReviewerPage({ title }) {
     navigate(`/reviewer/${reviewerId}`);
   };
 
+  const handleGenerateQuizClick = (reviewer) => {
+    setSelectedReviewer(reviewer);
+    setShowQuizModal(true);
+  };
+
+  const handleGenerateQuiz = async (quizData) => {
+    try {
+      showNotification('loading', 'Generating quiz...');
+      await createQuiz(quizData);
+      showNotification('success', 'Quiz generated successfully!');
+      setShowQuizModal(false);
+      setSelectedReviewer(null);
+    } catch (error) {
+      console.error('Error generating quiz:', error);
+      showNotification('error', error.response?.data?.error || 'Failed to generate quiz. Please try again.');
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
@@ -259,8 +280,7 @@ function ReviewerPage({ title }) {
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
-                      // TODO: Implement generate quiz functionality
-                      alert("Generate Quiz functionality coming soon!");
+                      handleGenerateQuizClick(reviewer);
                     }}
                     className="px-3 py-1 bg-cyan-500 text-white text-sm rounded hover:bg-cyan-600"
                   >
@@ -536,6 +556,17 @@ function ReviewerPage({ title }) {
           </div>
         </div>
       )}
+
+      {/* Quiz Generation Modal */}
+      <QuizGenerationModal
+        isOpen={showQuizModal}
+        onClose={() => {
+          setShowQuizModal(false);
+          setSelectedReviewer(null);
+        }}
+        onGenerate={handleGenerateQuiz}
+        reviewerId={selectedReviewer?._id}
+      />
     </div>
   );
 }
