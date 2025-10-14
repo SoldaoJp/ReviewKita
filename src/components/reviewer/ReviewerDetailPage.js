@@ -354,10 +354,24 @@ function ReviewerDetailPage() {
     const extractBoldOnly = (l) => (l.match(/^\s*\*\*([^*].*?)\*\*\s*$/) || [,''])[1];
 
     const renderInline = (text) => {
-      const parts = String(text).split(/(\*\*[^*]+\*\*)/g);
+      // Supports existing **bold** syntax and also bolds words enclosed in [brackets]
+      const parts = String(text).split(/(\*\*[^*]+\*\*|\[[^\]]+\])/g);
       return parts.map((part, idx) => {
-        const m = part.match(/^\*\*(.+)\*\*$/);
-        return m ? <strong key={idx}>{m[1]}</strong> : <span key={idx}>{part}</span>;
+        // Markdown-style bold
+        const boldMatch = part.match(/^\*\*(.+)\*\*$/);
+        if (boldMatch) {
+          return <strong key={idx}>{boldMatch[1]}</strong>;
+        }
+        // Bracketed text: render brackets normally and bold the inner content
+        const bracketMatch = part.match(/^\[([^\]]+)\]$/);
+        if (bracketMatch) {
+          const inner = bracketMatch[1];
+          return (
+            <span key={idx}>[<strong>{inner}</strong>]</span>
+          );
+        }
+        // Plain text
+        return <span key={idx}>{part}</span>;
       });
     };
 

@@ -8,6 +8,7 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId }) {
     timerMinutes: 0,
     difficulty: 'medium',
     provideScenarios: false,
+    scheduledAt: '', // ISO-less local string from datetime-local input
   });
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -46,6 +47,8 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId }) {
         timerMinutes: formData.timerMinutes,
         difficulty: formData.difficulty,
         provideScenarios: formData.provideScenarios,
+        // Optional scheduling info; backend may ignore if not supported
+        scheduledAt: formData.scheduledAt ? new Date(formData.scheduledAt).toISOString() : undefined,
       });
       // Reset form
       setFormData({
@@ -54,6 +57,7 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId }) {
         timerMinutes: 0,
         difficulty: 'medium',
         provideScenarios: false,
+        scheduledAt: '',
       });
       onClose();
     } catch (error) {
@@ -67,7 +71,7 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white w-[500px] rounded-xl shadow-lg relative animate-fade-in">
+      <div className="bg-white w-[500px] max-h-[85vh] rounded-xl shadow-lg relative animate-fade-in flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold">Generate Quiz</h2>
@@ -80,8 +84,8 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId }) {
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
+        {/* Scrollable Form Content */}
+        <div className="px-6 py-4 space-y-4 overflow-y-auto flex-1">
           {/* Number of Questions */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -152,6 +156,22 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId }) {
             </select>
           </div>
 
+          {/* Schedule (optional) */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Schedule (optional)
+            </label>
+            <input
+              type="datetime-local"
+              name="scheduledAt"
+              value={formData.scheduledAt}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+              disabled={isGenerating}
+            />
+            <p className="text-xs text-gray-500 mt-1">If set, we’ll remember when you plan to take this quiz.</p>
+          </div>
+
           {/* Provide Scenarios Toggle */}
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium text-gray-700">
@@ -172,26 +192,27 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId }) {
               />
             </button>
           </div>
+        </div>
 
-          {/* Buttons */}
-          <div className="flex justify-end gap-2 pt-4 border-t border-gray-200">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
-              disabled={isGenerating}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={isGenerating}
-            >
-              {isGenerating ? 'Generating...' : 'Generate Quiz'}
-            </button>
-          </div>
-        </form>
+        {/* Fixed Footer Buttons */}
+        <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+            disabled={isGenerating}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isGenerating}
+          >
+            {isGenerating ? 'Generating...' : 'Generate Quiz'}
+          </button>
+        </div>
       </div>
     </div>
   );
