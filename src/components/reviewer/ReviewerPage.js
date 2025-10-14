@@ -181,13 +181,31 @@ function ReviewerPage({ title }) {
   const handleGenerateQuiz = async (quizData) => {
     try {
       showNotification('loading', 'Generating quiz...');
-      await createQuiz(quizData);
-      showNotification('success', 'Quiz generated successfully!');
+      const response = await createQuiz(quizData);
+      console.log('Quiz created successfully:', response);
+      showNotification('success', 'Quiz generated successfully! Redirecting...');
       setShowQuizModal(false);
-      setSelectedReviewer(null);
+      
+      // Navigate to quiz page after a brief delay
+      setTimeout(() => {
+        navigate(`/quiz/${selectedReviewer._id}`);
+      }, 1500);
     } catch (error) {
       console.error('Error generating quiz:', error);
-      showNotification('error', error.response?.data?.error || 'Failed to generate quiz. Please try again.');
+      console.error('Error details:', error.response?.data);
+      
+      // Extract detailed error message
+      let errorMessage = 'Failed to generate quiz. Please try again.';
+      if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        errorMessage = error.response.data.errors.map(e => e.msg).join(', ');
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      showNotification('error', errorMessage);
+      setSelectedReviewer(null);
     }
   };
 
@@ -538,7 +556,7 @@ function ReviewerPage({ title }) {
 
       {/* Loading Notification */}
       {notification && notification.type === 'loading' && (
-        <div className="fixed top-4 right-4 z-50 animate-slide-in">
+        <div className="fixed top-4 right-4 z-[60] animate-slide-in">
           <div className="rounded-lg shadow-lg p-4 min-w-[300px] bg-blue-50 border border-blue-200">
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0">

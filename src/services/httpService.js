@@ -31,7 +31,10 @@ class HttpService {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || data.message || 'Request failed');
+        // Create error object with response data
+        const error = new Error(data.error || data.message || 'Request failed');
+        error.response = { data, status: response.status };
+        throw error;
       }
 
       return data;

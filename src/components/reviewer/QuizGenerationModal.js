@@ -40,16 +40,24 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId }) {
 
     try {
       setIsGenerating(true);
-      await onGenerate({
-        reviewerId,
-        numQuestions: formData.numQuestions,
-        questionTypes: [formData.questionType],
-        timerMinutes: formData.timerMinutes,
-        difficulty: formData.difficulty,
-        provideScenarios: formData.provideScenarios,
-        // Optional scheduling info; backend may ignore if not supported
-        scheduledAt: formData.scheduledAt ? new Date(formData.scheduledAt).toISOString() : undefined,
-      });
+      
+      // Ensure all data types match backend expectations
+      const quizPayload = {
+        reviewerId: String(reviewerId), // Ensure string
+        numQuestions: parseInt(formData.numQuestions), // Ensure integer
+        questionTypes: [formData.questionType], // Array of strings
+        timerMinutes: parseInt(formData.timerMinutes), // Ensure integer
+        difficulty: formData.difficulty, // String enum
+        provideScenarios: Boolean(formData.provideScenarios), // Ensure boolean
+      };
+      
+      // Only add scheduledAt if provided
+      if (formData.scheduledAt) {
+        quizPayload.scheduledAt = new Date(formData.scheduledAt).toISOString();
+      }
+      
+      await onGenerate(quizPayload);
+      
       // Reset form
       setFormData({
         numQuestions: 10,
@@ -62,6 +70,8 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId }) {
       onClose();
     } catch (error) {
       console.error('Error generating quiz:', error);
+      // Let the parent component handle the error notification
+      throw error;
     } finally {
       setIsGenerating(false);
     }

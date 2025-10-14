@@ -266,12 +266,30 @@ function ReviewerDetailPage() {
   const handleGenerateQuiz = async (quizData) => {
     try {
       showNotification('loading', 'Generating quiz...');
-      await createQuiz(quizData);
-      showNotification('success', 'Quiz generated successfully!');
+      const response = await createQuiz(quizData);
+      console.log('Quiz created successfully:', response);
+      showNotification('success', 'Quiz generated successfully! Redirecting...');
       setShowQuizModal(false);
+      
+      // Navigate to quiz page after a brief delay
+      setTimeout(() => {
+        navigate(`/quiz/${id}`);
+      }, 1500);
     } catch (error) {
       console.error('Error generating quiz:', error);
-      showNotification('error', error.response?.data?.error || 'Failed to generate quiz. Please try again.');
+      console.error('Error details:', error.response?.data);
+      
+      // Extract detailed error message
+      let errorMessage = 'Failed to generate quiz. Please try again.';
+      if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        errorMessage = error.response.data.errors.map(e => e.msg).join(', ');
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      showNotification('error', errorMessage);
     }
   };
 

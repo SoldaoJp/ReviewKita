@@ -16,6 +16,7 @@ import AdminDashboard from "./views/admin/Dashboard";
 import AdminProfile from "./views/admin/Profile";
 import Flashcards from "./components/reviewer/Flashcards";
 import IdentificationCard from "./components/reviewer/IdentificationCard";
+import QuizPage from "./views/reviewer/QuizPage";
 
 function AdminRoute({ children }) {
   const { user, isAuthenticated, loading } = useAuth();
@@ -50,6 +51,7 @@ function App() {
 
           {/* Reviewer detail - without Layout (full screen) */}
           <Route path="/reviewer/:id" element={<ReviewerDetailPage />} />
+          <Route path="/quiz/:reviewerId" element={<QuizPage />} />
           <Route path="/flashcards" element={<Flashcards />} />
           <Route path="/identificationcard" element={<IdentificationCard />} />
 
