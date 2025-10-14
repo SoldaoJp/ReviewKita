@@ -12,17 +12,20 @@ import DashboardIcon from "../../assets/Dashboard.svg";
 import ReviewerIcon from "../../assets/reviewer.svg";
 import ProfileIcon from "../../assets/Profile.svg";
 import ForwardIcon from "../../assets/Forward.svg";
+import HistoryIcon from "../../assets/Clock.svg";
 
 // Color palette for reviewer items
 const colors = [
 	"bg-blue-500",
-	"bg-pink-500",
-	"bg-purple-500",
 	"bg-green-500",
-	"bg-orange-500",
-	"bg-red-500",
 	"bg-yellow-500",
+	"bg-purple-500",
+	"bg-pink-500",
 	"bg-indigo-500",
+	"bg-red-500",
+	"bg-teal-500",
+	"bg-orange-500",
+	"bg-gray-500"
 ];
 
 function Sidebar() {
@@ -37,7 +40,7 @@ function Sidebar() {
 	const [filteredReviewers, setFilteredReviewers] = useState([]);
 	const [formData, setFormData] = useState({ title: "", description: "", file: null });
 	const [submitting, setSubmitting] = useState(false);
-	const [notification, setNotification] = useState(null); // { type: 'success' | 'error' | 'loading', message: string }
+	const [notification, setNotification] = useState(null); // { type, message }
 	const [availableModels, setAvailableModels] = useState([]);
 	const [loadingModels, setLoadingModels] = useState(false);
 	const [selectedModelId, setSelectedModelId] = useState("");
@@ -45,9 +48,7 @@ function Sidebar() {
 	// Auto-hide notification after 5 seconds (except loading)
 	useEffect(() => {
 		if (notification && notification.type !== 'loading') {
-			const timer = setTimeout(() => {
-				setNotification(null);
-			}, 5000);
+			const timer = setTimeout(() => setNotification(null), 5000);
 			return () => clearTimeout(timer);
 		}
 	}, [notification]);
@@ -245,6 +246,25 @@ function Sidebar() {
 								   style={window.location.pathname === '/reviewer' ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}}
 							   />
 							   <span className={window.location.pathname === '/reviewer' ? 'text-black' : ''}>Reviewer</span>
+						   </NavLink>
+
+						   <NavLink
+						   	   to="/quiz-history"
+						   	   className={({ isActive }) =>
+						   	   	`flex items-center px-4 py-2 rounded-xl transition-all text-sm ${
+						   	   	   isActive 
+						   	   	   	 ? "bg-[#0062FF]/[0.05] font-semibold" 
+						   	   	   	 : "text-gray-700 hover:bg-white/50"
+						   	   	   }`
+						   	   }
+						   >
+							   <img
+								   src={HistoryIcon || ForwardIcon}
+						   	   	   alt="Quiz History"
+						   	   	   className={`h-4 w-4 mr-2 ${window.location.pathname === '/quiz-history' ? 'text-[#2472B5] filter-blue' : ''}`}
+						   	   	   style={window.location.pathname === '/quiz-history' ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}}
+						   	   />
+						   	   <span className={window.location.pathname === '/quiz-history' ? 'text-black' : ''}>Quiz History</span>
 						   </NavLink>
 
 				           <NavLink

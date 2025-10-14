@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getReviewerById, deleteReviewer, updateReviewer, reenhanceReviewerContent, reportReviewer } from "../../services/reviewerService";
+import { logUserActivity } from "../../services/userActivityService";
 import { getAvailableLlmModels, recommendLlmConfig } from "../../services/llmConfigService";
 import { createQuiz } from "../../services/quizService";
 import { useReviewerContext } from "../../context/ReviewerContext";
@@ -33,8 +34,20 @@ function ReviewerDetailPage() {
   const [notification, setNotification] = useState(null); // { type: 'success' | 'error', message: string }
 
   useEffect(() => {
-    fetchReviewerDetail();
-  }, [id]);
+      fetchReviewerDetail();
+      // Log activity only if the user stays on the page for at least 60 seconds
+      let timerId;
+      if (id) {
+        timerId = setTimeout(() => {
+          logUserActivity('open_reviewer', id).catch((err) => {
+            console.error('Failed to log user activity:', err);
+          });
+        }, 60_000); // 60 seconds
+      }
+      return () => {
+        if (timerId) clearTimeout(timerId);
+      };
+    }, [id]);
 
   // Fetch available models when reviewer is loaded
   useEffect(() => {

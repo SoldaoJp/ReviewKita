@@ -6,6 +6,7 @@ import RightPanel from "./RightPanel";
 import SubjectTracker from "./SubjectTracker";
 import WelcomeCard from "./WelcomeCard";
 import { getAllReviewers } from "../../services/reviewerService";
+import { getUserActivityDays } from "../../services/userActivityService";
 import { useReviewerContext } from "../../context/ReviewerContext";
 
 export default function Dashboard() {
@@ -23,8 +24,9 @@ export default function Dashboard() {
   const firstDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1).getDay();
   const daysInMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0).getDate();
   
-  // Sample active days (days when user opened a reviewer)
-  const activeDays = [2, 5, 9, 12, 13, 14, 17, 23, 25];
+  // Active days (days when user opened a reviewer)
+  // Map of day number to activity count
+  const [activeDayCounts, setActiveDayCounts] = useState({});
   
   // Get current date for comparison
   const today = new Date();
@@ -44,9 +46,9 @@ export default function Dashboard() {
     setSelectedDate(new Date());
   };
 
-  // Fetch reviewers
+  // Fetch reviewers and user activity days
   useEffect(() => {
-    const fetchReviewers = async () => {
+    const fetchReviewersAndActivity = async () => {
       try {
         setLoading(true);
         const response = await getAllReviewers(1, 1000);
@@ -55,15 +57,58 @@ export default function Dashboard() {
         } else if (Array.isArray(response)) {
           setReviewers(response);
         }
+        // Fetch user activity days for calendar
+        const activityRes = await getUserActivityDays();
+        // activityRes should be array of YYYY-MM-DD strings
+        // Count occurrences per day in current month
+        const dayCounts = {};
+        if (Array.isArray(activityRes)) {
+          activityRes.forEach(dateStr => {
+            // Expect format YYYY-MM-DD; avoid local timezone offset by parsing parts
+            const [y, m, d] = String(dateStr).split('-').map(Number);
+            if (!y || !m || !d) return;
+            const monthIdx = m - 1; // JS months 0-11
+            if (monthIdx === selectedDate.getMonth() && y === selectedDate.getFullYear()) {
+              dayCounts[d] = (dayCounts[d] || 0) + 1;
+            }
+          });
+        }
+        console.log('Active day counts for calendar:', dayCounts, 'Raw activity:', activityRes);
+        setActiveDayCounts(dayCounts);
       } catch (error) {
-        console.error('Error fetching reviewers:', error);
+        console.error('Error fetching reviewers or activity days:', error);
       } finally {
         setLoading(false);
       }
     };
+    fetchReviewersAndActivity();
 
-    fetchReviewers();
-  }, [reviewerUpdateTrigger]); // Re-fetch when reviewers are updated
+    // Listen for real-time activity logging and refresh calendar
+    const onActivityLogged = () => {
+      // Only refresh the activity days quickly (avoid reloading reviewers list)
+      (async () => {
+        try {
+          const activityRes = await getUserActivityDays();
+          const dayCounts = {};
+          if (Array.isArray(activityRes)) {
+            activityRes.forEach(dateStr => {
+              const [y, m, d] = String(dateStr).split('-').map(Number);
+              if (!y || !m || !d) return;
+              const monthIdx = m - 1;
+              if (monthIdx === selectedDate.getMonth() && y === selectedDate.getFullYear()) {
+                dayCounts[d] = (dayCounts[d] || 0) + 1;
+              }
+            });
+          }
+          setActiveDayCounts(dayCounts);
+        } catch (e) {
+          console.error('Failed to refresh activity days:', e);
+        }
+      })();
+    };
+    window.addEventListener('user-activity-logged', onActivityLogged);
+    return () => window.removeEventListener('user-activity-logged', onActivityLogged);
+  }, [reviewerUpdateTrigger, selectedDate]);
 
   // Calculate quiz progress data
   const getQuizProgressData = () => {
@@ -255,14 +300,21 @@ export default function Dashboard() {
               {/* Days of the month */}
               {Array.from({ length: daysInMonth }).map((_, i) => {
                 const day = i + 1;
-                const isActive = activeDays.includes(day);
+                const count = activeDayCounts[day] || 0;
+                const isActive = count > 0;
                 const isToday = isCurrentMonth && day === today.getDate();
-                
+                // Color scale: 1 = blue-200, 2 = blue-400, 3+ = blue-600
+                let bgColor = 'bg-gray-100 text-gray-600';
+                if (isActive) {
+                  if (count >= 3) bgColor = 'bg-blue-600 text-white';
+                  else if (count === 2) bgColor = 'bg-blue-400 text-white';
+                  else bgColor = 'bg-blue-200 text-blue-900';
+                }
                 return (
                   <div
                     key={day}
                     className={`aspect-square rounded-lg flex items-center justify-center text-xs font-medium transition-all
-                      ${isActive ? 'bg-blue-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600'}
+                      ${bgColor}
                       ${isToday && !isActive ? 'ring-2 ring-blue-400' : ''}
                       ${isToday && isActive ? 'ring-2 ring-blue-800' : ''}
                     `}

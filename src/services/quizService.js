@@ -1,3 +1,14 @@
+// Get finished quiz history
+export const getQuizHistory = async () => {
+  try {
+    // Backend reference: GET /api/quizzes/history (or similar)
+    const response = await httpService.get('/quizzes/history');
+    return response.data || response;
+  } catch (error) {
+    console.error('Error fetching quiz history:', error);
+    throw error;
+  }
+};
 import httpService from './httpService';
 
 export const createQuiz = async (quizData) => {

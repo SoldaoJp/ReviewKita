@@ -4,6 +4,7 @@ import { getQuizByReviewer } from '../../services/quizService';
 import MultipleChoiceQuiz from './MultipleChoiceQuiz';
 import IdentificationQuiz from './IdentificationQuiz';
 import QuizResults from './QuizResults';
+import { addAttempt as saveQuizAttempt } from '../../services/quizHistoryService';
 
 function QuizPage() {
   const { reviewerId } = useParams();
@@ -120,8 +121,28 @@ function QuizPage() {
   };
 
   const handleQuizComplete = (timeUp = false) => {
+    // compute stats
+    const total = quiz.questions.length;
+    const correct = userAnswers.filter(a => a?.isCorrect === true).length;
+    const percentage = Math.round((correct / total) * 100);
+
+    // persist attempt locally for history page
+    try {
+      saveQuizAttempt({
+        reviewerId,
+        reviewerTitle: quiz.reviewerTitle || quiz.reviewer?.title || undefined,
+        quizId: quiz._id,
+        title: quiz.title,
+        finishedAt: new Date().toISOString(),
+        stats: { correct, total, percentage },
+        questions: quiz.questions,
+        answers: userAnswers,
+      });
+    } catch (e) {
+      console.warn('Failed to save quiz attempt locally:', e);
+    }
+
     setIsCompleted(true);
-    // Here you could also submit results to backend if needed
   };
 
   const calculateProgress = () => {

@@ -17,6 +17,7 @@ import AdminProfile from "./views/admin/Profile";
 import Flashcards from "./components/reviewer/Flashcards";
 import IdentificationCard from "./components/reviewer/IdentificationCard";
 import QuizPage from "./views/reviewer/QuizPage";
+import QuizHistoryPage from "./views/QuizHistoryPage";
 
 function AdminRoute({ children }) {
   const { user, isAuthenticated, loading } = useAuth();
@@ -41,6 +42,7 @@ function App() {
           {/* Main app routes - with Layout (includes Sidebar) */}
           <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
           <Route path="/reviewer" element={<Layout><ReviewerPage title="Reviewer" /></Layout>} />
+          <Route path="/quiz-history" element={<Layout><QuizHistoryPage /></Layout>} />
           <Route path="/profile" element={<Layout><ProfilePage /></Layout>} />
 
           {/* Admin routes */}
