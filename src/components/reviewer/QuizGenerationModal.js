@@ -8,7 +8,7 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId }) {
     timerMinutes: 0,
     difficulty: 'medium',
     provideScenarios: false,
-    scheduledAt: '', // ISO-less local string from datetime-local input
+  // removed scheduledAt
   });
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -51,10 +51,7 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId }) {
         provideScenarios: Boolean(formData.provideScenarios), // Ensure boolean
       };
       
-      // Only add scheduledAt if provided
-      if (formData.scheduledAt) {
-        quizPayload.scheduledAt = new Date(formData.scheduledAt).toISOString();
-      }
+      // removed scheduledAt logic
       
       await onGenerate(quizPayload);
       
@@ -65,7 +62,7 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId }) {
         timerMinutes: 0,
         difficulty: 'medium',
         provideScenarios: false,
-        scheduledAt: '',
+  // removed scheduledAt
       });
       onClose();
     } catch (error) {
@@ -166,21 +163,7 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId }) {
             </select>
           </div>
 
-          {/* Schedule (optional) */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Schedule (optional)
-            </label>
-            <input
-              type="datetime-local"
-              name="scheduledAt"
-              value={formData.scheduledAt}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-              disabled={isGenerating}
-            />
-            <p className="text-xs text-gray-500 mt-1">If set, we’ll remember when you plan to take this quiz.</p>
-          </div>
+          {/* removed schedule field */}
 
           {/* Provide Scenarios Toggle */}
           <div className="flex items-center justify-between">
