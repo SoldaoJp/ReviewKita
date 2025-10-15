@@ -1,8 +1,8 @@
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import { SearchProvider } from "./context/SearchContext";
-import { ReviewerProvider } from "./context/ReviewerContext";
+import { SearchProvider } from "./user/context/SearchContext";
+import { ReviewerProvider } from "./user/context/ReviewerContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
