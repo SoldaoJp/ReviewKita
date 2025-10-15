@@ -1,2 +1,2 @@
-export { default } from "../../../components/reviewer/ReviewerPage";
+export { default } from "../../components/reviewer/ReviewerPage";
 

@@ -77,8 +77,12 @@ function QuizPage() {
       timePerQuestionSeconds: Math.floor((Date.now() - (startTime || Date.now())) / 1000)
     };
     setUserAnswers(updatedAnswers);
-    if (currentQuestionIndex < quiz.questions.length - 1) setCurrentQuestionIndex(prev => prev + 1);
-    else handleQuizComplete(false);
+    if (currentQuestionIndex < quiz.questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    } else {
+      // Use the freshest answers to avoid missing the last response
+      handleQuizComplete(false, updatedAnswers);
+    }
   };
 
   const handleSkip = () => {
@@ -91,13 +95,18 @@ function QuizPage() {
       timePerQuestionSeconds: Math.floor((Date.now() - (startTime || Date.now())) / 1000)
     };
     setUserAnswers(updatedAnswers);
-    if (currentQuestionIndex < quiz.questions.length - 1) setCurrentQuestionIndex(prev => prev + 1);
-    else handleQuizComplete(false);
+    if (currentQuestionIndex < quiz.questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    } else {
+      // Use the freshest answers on final skip
+      handleQuizComplete(false, updatedAnswers);
+    }
   };
 
-  const handleQuizComplete = async (timeUp = false) => {
+  const handleQuizComplete = async (timeUp = false, answersOverride = null) => {
+    const answers = answersOverride || userAnswers;
     const total = quiz.questions.length;
-    const correct = userAnswers.filter(a => a?.isCorrect === true).length;
+    const correct = answers.filter(a => a?.isCorrect === true).length;
     const percentage = Math.round((correct / total) * 100);
     try {
       await saveQuizAttempt({
@@ -108,7 +117,7 @@ function QuizPage() {
         finishedAt: new Date().toISOString(),
         stats: { correct, total, percentage },
         questions: quiz.questions,
-        answers: userAnswers,
+        answers,
       });
     } catch {}
     setIsCompleted(true);
