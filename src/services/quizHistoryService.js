@@ -1,33 +1,56 @@
-// Simple client-side quiz history store using localStorage
-// Schema: { id, reviewerId, reviewerTitle, quizId, title, finishedAt, stats {correct, total, percentage}, answers, questions }
+// Quiz history service using backend API
+import httpService from './httpService';
 
-const STORAGE_KEY = 'quiz_history_v1';
-
-function loadAll() {
+// Submit a new quiz attempt to the backend
+export async function addAttempt(attempt) {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
+    // POST /api/quizzes/history
+    const response = await httpService.post('/quizzes/history', {
+      reviewer_id: attempt.reviewerId,
+      reviewer_title: attempt.reviewerTitle,
+      quiz_id: attempt.quizId,
+      title: attempt.title,
+      score_percent: attempt.stats?.percentage || 0,
+      details: attempt.questions.map((q, idx) => {
+        const ans = attempt.answers?.[idx];
+        return {
+          number: idx + 1,
+          question: q.question,
+          numberedQuestion: `${idx + 1}. ${q.question}`,
+          userAnswer: ans?.isSkipped ? 'Skipped' : (ans?.answer ?? ''),
+          correctAnswer: q.type === 'multiple-choice' 
+            ? `${q.correct_answer}${q.options ? ` (${q.options[q.correct_answer]})` : ''}`
+            : (q.identification_answer || ''),
+          explanation: q.explanation || '',
+        };
+      }),
+    });
+    return response;
+  } catch (error) {
+    console.error('Failed to save quiz attempt:', error);
+    throw error;
   }
 }
 
-function saveAll(list) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+// Fetch all quiz attempts from the backend
+export async function getAllAttempts() {
+  try {
+    const response = await httpService.get('/quizzes/history');
+    // Backend returns { history: [...] }
+    return response.history || [];
+  } catch (error) {
+    console.error('Failed to fetch quiz history:', error);
+    throw error;
+  }
 }
 
-export function addAttempt(attempt) {
-  const list = loadAll();
-  list.unshift({ id: `${Date.now()}_${Math.random().toString(36).slice(2,8)}`, ...attempt });
-  saveAll(list);
-}
-
-export function getAllAttempts() {
-  return loadAll();
-}
-
-export function getAttemptById(id) {
-  return loadAll().find(a => a.id === id) || null;
+// Get a single attempt by ID
+export async function getAttemptById(id) {
+  try {
+    const all = await getAllAttempts();
+    return all.find(a => a.id === id) || null;
+  } catch (error) {
+    console.error('Failed to fetch attempt by id:', error);
+    return null;
+  }
 }

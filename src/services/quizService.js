@@ -49,3 +49,16 @@ export const submitQuizAnswer = async (quizId, answerData) => {
     throw error;
   }
 };
+
+export const deleteQuiz = async (quizId) => {
+  try {
+    console.log('Deleting quiz:', quizId);
+    const response = await httpService.delete(`/quizzes/${quizId}`);
+    console.log('Delete quiz response:', response);
+    return response;
+  } catch (error) {
+    console.error('Error deleting quiz:', error);
+    console.error('Error response:', error.response);
+    throw error;
+  }
+};

@@ -1,9 +1,9 @@
 // src/components/reviewer/ReviewerDetailPage.js
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getReviewerById, deleteReviewer, updateReviewer, reenhanceReviewerContent, reportReviewer } from "../../services/reviewerService";
+import { getReviewerById, deleteReviewer, updateReviewer, reenhanceReviewerContent } from "../../services/reviewerService";
 import { logUserActivity } from "../../services/userActivityService";
-import { getAvailableLlmModels, recommendLlmConfig } from "../../services/llmConfigService";
+import { getAvailableLlmModels, recommendLlmConfig, reportLlmConfigReviewer } from "../../services/llmConfigService";
 import { createQuiz } from "../../services/quizService";
 import { useReviewerContext } from "../../context/ReviewerContext";
 import QuizGenerationModal from "./QuizGenerationModal";
@@ -32,6 +32,7 @@ function ReviewerDetailPage() {
   const [loadingModels, setLoadingModels] = useState(false);
   const [recommending, setRecommending] = useState(false);
   const [notification, setNotification] = useState(null); // { type: 'success' | 'error', message: string }
+  const [showRetakeModal, setShowRetakeModal] = useState(false);
 
   useEffect(() => {
       fetchReviewerDetail();
@@ -144,11 +145,19 @@ function ReviewerDetailPage() {
 
     try {
       setRecommending(true);
-      await recommendLlmConfig(reviewer.modelId, false);
-      alert("Model recommended successfully!");
+      const isRemoving = reviewer.userHasRecommendedModel;
+      await recommendLlmConfig(reviewer.modelId, isRemoving);
+      
+      // Update local state
+      setReviewer(prev => ({
+        ...prev,
+        userHasRecommendedModel: !isRemoving
+      }));
+      
+      showNotification('success', isRemoving ? 'Recommendation removed successfully!' : 'Model recommended successfully!');
     } catch (err) {
-      console.error("Error recommending model:", err);
-      alert("Failed to recommend model. Please try again.");
+      console.error("Error with model recommendation:", err);
+      showNotification('error', 'Failed to update recommendation. Please try again.');
     } finally {
       setRecommending(false);
     }
@@ -192,10 +201,16 @@ function ReviewerDetailPage() {
   };
 
   const handleSave = async () => {
+    // Validate that content is not empty
+    if (!editedContent || editedContent.trim() === '') {
+      showNotification('error', 'Content cannot be empty. Please enter some text.');
+      return;
+    }
+
     try {
       setSaving(true);
       // Include current model_id with originalContent for sync enhancement
-      const response = await updateReviewer(id, { originalContent: editedContent, model_id: reviewer.modelId });
+      const response = await updateReviewer(id, { originalContent: editedContent.trim(), model_id: reviewer.modelId });
       if (response.success) {
         // Update the local reviewer state with new content
         const updatedReviewer = {
@@ -237,27 +252,29 @@ function ReviewerDetailPage() {
 
   const handleReportSubmit = async () => {
     if (!reportIssue) {
-      alert("Please select an issue type.");
+      showNotification('error', 'Please select an issue type.');
       return;
     }
     if (!reportDetails.trim()) {
-      alert("Please provide details about the issue.");
+      showNotification('error', 'Please provide details about the issue.');
+      return;
+    }
+
+    if (!reviewer.modelId) {
+      showNotification('error', 'Unable to submit report: Model ID not found.');
       return;
     }
 
     try {
       const reportData = {
-        issueType: reportIssue,
-        details: reportDetails.trim(),
-        reviewerId: id,
-        reviewerTitle: reviewer.title,
-        reportedAt: new Date().toISOString()
+        type: reportIssue,
+        description: reportDetails.trim()
       };
 
-      const response = await reportReviewer(id, reportData);
+      const response = await reportLlmConfigReviewer(reviewer.modelId, reportData);
       
-      if (response.success) {
-        alert("Report submitted successfully. Thank you for helping improve our content!");
+      if (response.success || response.report) {
+        showNotification('success', 'Report submitted successfully. Thank you for helping improve our content!');
         
         // Reset and close modal
         setReportIssue("");
@@ -266,7 +283,7 @@ function ReviewerDetailPage() {
       }
     } catch (error) {
       console.error("Error submitting report:", error);
-      alert(error.message || "Failed to submit report. Please try again.");
+      showNotification('error', error.response?.data?.error || error.message || 'Failed to submit report. Please try again.');
     }
   };
 
@@ -546,7 +563,7 @@ function ReviewerDetailPage() {
                 onClick={handleEdit}
                 className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors text-sm"
               >
-                📝 Edit file
+                📝 Edit
               </button>
             )
           ) : (
@@ -566,10 +583,18 @@ function ReviewerDetailPage() {
               </button>
               <button 
                 onClick={handleRecommendModel}
-                className="px-4 py-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors text-sm"
+                className={`px-4 py-2 rounded-lg transition-colors text-sm ${
+                  reviewer.userHasRecommendedModel
+                    ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    : "bg-green-100 text-green-600 hover:bg-green-200"
+                }`}
                 disabled={recommending || !reviewer.modelId}
               >
-                {recommending ? "Processing..." : "👍 Recommend this model"}
+                {recommending 
+                  ? "Processing..." 
+                  : reviewer.userHasRecommendedModel 
+                    ? "Remove Recommendation"
+                    : "👍 Recommend Model"}
               </button>
             </>
           )}
@@ -629,40 +654,17 @@ function ReviewerDetailPage() {
           
           {/* Action Buttons */}
           <div className="flex flex-col gap-2">
-            {/* LLM Model Dropdown - Only show in Enhanced view */}
-            {activeView === "enhanced" && (
-              <div>
-                <label className="block mb-2 text-xs font-semibold text-gray-600">AI MODEL</label>
-                {loadingModels ? (
-                  <div className="w-full px-3 py-2 border rounded-lg text-gray-500 text-xs bg-gray-50">
-                    Loading models...
-                  </div>
-                ) : availableModels.length === 0 ? (
-                  <div className="w-full px-3 py-2 border rounded-lg text-red-500 text-xs bg-red-50">
-                    No models available
-                  </div>
-                ) : (
-                  <select
-                    value={selectedModelId || ''}
-                    onChange={(e) => handleModelChange(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 text-sm"
-                    disabled={reEnhancing}
-                  >
-                    {availableModels.map((model) => (
-                      <option key={model.id} value={model.id}>
-                        {model.model_name}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-            )}
-            
             <button 
-              onClick={() => setShowQuizModal(true)}
+              onClick={() => {
+                if (reviewer.hasQuiz) {
+                  setShowRetakeModal(true);
+                } else {
+                  setShowQuizModal(true);
+                }
+              }}
               className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
             >
-              Generate Quiz
+              {reviewer.hasQuiz ? "Retake Quiz" : "Generate Quiz"}
             </button>
             <button 
               onClick={() => setShowDeleteModal(true)}
@@ -915,6 +917,26 @@ function ReviewerDetailPage() {
         onGenerate={handleGenerateQuiz}
         reviewerId={id}
       />
+
+      {/* Retake Quiz Confirmation Modal */}
+      {showRetakeModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold mb-3">Retake Quiz</h3>
+            <p className="text-gray-600 text-sm mb-6">
+              This feature is not yet implemented. Stay tuned for updates!
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowRetakeModal(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getQuizByReviewer } from '../../services/quizService';
+import { getQuizByReviewer, deleteQuiz } from '../../services/quizService';
 import MultipleChoiceQuiz from './MultipleChoiceQuiz';
 import IdentificationQuiz from './IdentificationQuiz';
 import QuizResults from './QuizResults';
@@ -17,6 +17,7 @@ function QuizPage() {
   const [isCompleted, setIsCompleted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(null);
   const [startTime, setStartTime] = useState(null);
+  const [showExitModal, setShowExitModal] = useState(false);
 
   useEffect(() => {
     fetchQuiz();
@@ -120,15 +121,15 @@ function QuizPage() {
     }
   };
 
-  const handleQuizComplete = (timeUp = false) => {
+  const handleQuizComplete = async (timeUp = false) => {
     // compute stats
     const total = quiz.questions.length;
     const correct = userAnswers.filter(a => a?.isCorrect === true).length;
     const percentage = Math.round((correct / total) * 100);
 
-    // persist attempt locally for history page
+    // persist attempt to backend for history page
     try {
-      saveQuizAttempt({
+      await saveQuizAttempt({
         reviewerId,
         reviewerTitle: quiz.reviewerTitle || quiz.reviewer?.title || undefined,
         quizId: quiz._id,
@@ -139,7 +140,7 @@ function QuizPage() {
         answers: userAnswers,
       });
     } catch (e) {
-      console.warn('Failed to save quiz attempt locally:', e);
+      console.warn('Failed to save quiz attempt to backend:', e);
     }
 
     setIsCompleted(true);
@@ -147,6 +148,30 @@ function QuizPage() {
 
   const calculateProgress = () => {
     return ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
+  };
+
+  const handleBackClick = () => {
+    // Only show modal if quiz is in progress (not completed)
+    if (!isCompleted) {
+      setShowExitModal(true);
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const handleConfirmLeave = async () => {
+    try {
+      setShowExitModal(false);
+      // Delete the quiz when user confirms leaving
+      if (quiz && quiz._id) {
+        await deleteQuiz(quiz._id);
+      }
+      navigate(-1);
+    } catch (error) {
+      console.error('Error deleting quiz:', error);
+      // Still navigate even if delete fails
+      navigate(-1);
+    }
   };
 
   const formatTime = (seconds) => {
@@ -218,7 +243,7 @@ function QuizPage() {
             setTimeLeft(quiz.settings.timerMinutes * 60);
           }
         }}
-        onGoBack={() => navigate(-1)}
+        onGoBack={handleBackClick}
       />
     );
   }
@@ -228,33 +253,89 @@ function QuizPage() {
   // Render appropriate quiz component based on question type
   if (currentQuestion.type === 'multiple-choice') {
     return (
-      <MultipleChoiceQuiz
-        question={currentQuestion}
-        questionNumber={currentQuestionIndex + 1}
-        totalQuestions={quiz.questions.length}
-        progress={calculateProgress()}
-        timeLeft={timeLeft}
-        formatTime={formatTime}
-        onAnswer={handleAnswer}
-        onSkip={handleSkip}
-        onGoBack={() => navigate(-1)}
-        quizTitle={quiz.title}
-      />
+      <>
+        <MultipleChoiceQuiz
+          question={currentQuestion}
+          questionNumber={currentQuestionIndex + 1}
+          totalQuestions={quiz.questions.length}
+          progress={calculateProgress()}
+          timeLeft={timeLeft}
+          formatTime={formatTime}
+          onAnswer={handleAnswer}
+          onSkip={handleSkip}
+          onGoBack={handleBackClick}
+          quizTitle={quiz.title}
+        />
+        
+        {/* Exit Confirmation Modal */}
+        {showExitModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+              <h3 className="text-lg font-semibold mb-3">Leave Quiz?</h3>
+              <p className="text-gray-600 text-sm mb-6">
+                Leaving this page will reset all questions and progress.
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setShowExitModal(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmLeave}
+                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
+                >
+                  Leave
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
     );
   } else {
     return (
-      <IdentificationQuiz
-        question={currentQuestion}
-        questionNumber={currentQuestionIndex + 1}
-        totalQuestions={quiz.questions.length}
-        progress={calculateProgress()}
-        timeLeft={timeLeft}
-        formatTime={formatTime}
-        onAnswer={handleAnswer}
-        onSkip={handleSkip}
-        onGoBack={() => navigate(-1)}
-        quizTitle={quiz.title}
-      />
+      <>
+        <IdentificationQuiz
+          question={currentQuestion}
+          questionNumber={currentQuestionIndex + 1}
+          totalQuestions={quiz.questions.length}
+          progress={calculateProgress()}
+          timeLeft={timeLeft}
+          formatTime={formatTime}
+          onAnswer={handleAnswer}
+          onSkip={handleSkip}
+          onGoBack={handleBackClick}
+          quizTitle={quiz.title}
+        />
+        
+        {/* Exit Confirmation Modal */}
+        {showExitModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+              <h3 className="text-lg font-semibold mb-3">Leave Quiz?</h3>
+              <p className="text-gray-600 text-sm mb-6">
+                Leaving this page will reset all questions and progress.
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setShowExitModal(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmLeave}
+                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
+                >
+                  Leave
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
     );
   }
 }

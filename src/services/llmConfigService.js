@@ -37,6 +37,10 @@ export const rateLlmConfig = async (id, rating) => {
   return httpService.post(`/llm-configs/${id}/rate`, { rating });
 };
 
+export const reportLlmConfigReviewer = async (id, { type, description }) => {
+  return httpService.post(`/llm-configs/${id}/report/reviewer`, { type, description });
+};
+
 export default {
   getAvailableLlmModelsReviewer,
   getAvailableLlmModels,
@@ -46,4 +50,5 @@ export default {
   deleteLlmConfig,
   recommendLlmConfig,
   rateLlmConfig,
+  reportLlmConfigReviewer,
 };
