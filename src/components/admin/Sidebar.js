@@ -98,6 +98,22 @@ function AdminSidebar() {
                 </>
               )}
             </NavLink>
+
+            <NavLink
+              to="/admin/analytics"
+              className={({ isActive }) =>
+                `flex items-center px-4 py-2 rounded-xl transition-all text-sm ${
+                  isActive ? 'bg-[#0062FF]/[0.05] font-semibold' : 'text-gray-700 hover:bg-white/50'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <span className="h-4 w-4 mr-2" style={isActive ? { filter: 'brightness(0) saturate(100%) invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}}>📊</span>
+                  <span className={isActive ? 'text-black' : ''}>LLM Analytics</span>
+                </>
+              )}
+            </NavLink>
           </nav>
         </div>
 

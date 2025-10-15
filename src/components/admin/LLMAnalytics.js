@@ -1,4 +1,5 @@
 import React from "react";
+import AdminLayout from "./Layout";
 import {
   LineChart,
   Line,
@@ -46,14 +47,15 @@ export default function LLMAnalytics() {
   const COLORS = ["#3B82F6", "#22C55E", "#FACC15", "#F97316", "#EC4899"];
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-8">
-      {/* Header */}
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">
-        Large Language Model Analytics
-      </h1>
+    <AdminLayout>
+      <div className="p-8">
+        {/* Header */}
+        <h1 className="text-3xl font-bold text-gray-800 mb-8">
+          Large Language Model Analytics
+        </h1>
 
-      {/* Top Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl mb-8">
+        {/* Top Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-green-100 border-l-4 border-green-500 p-4 rounded-lg shadow">
           <h2 className="text-gray-700 font-semibold">Total Queries</h2>
           <p className="text-2xl font-bold text-gray-900">1,800,500</p>
@@ -77,10 +79,10 @@ export default function LLMAnalytics() {
           <p className="text-2xl font-bold text-gray-900">$1,500</p>
           <p className="text-red-600 text-sm">↑ 8% this week</p>
         </div>
-      </div>
+        </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-6xl">
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Daily Query Volume */}
         <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-gray-800 font-semibold mb-4">Daily Query Volume</h3>
@@ -114,13 +116,13 @@ export default function LLMAnalytics() {
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </div>
+        </div>
 
-      {/* Pie Chart Section */}
-      <div className="bg-white mt-8 p-6 rounded-lg shadow w-full max-w-6xl">
-        <h3 className="text-gray-800 font-semibold mb-4">Top 5 Prompt Categories</h3>
-        <div className="flex items-center justify-center">
-          <ResponsiveContainer width="100%" height={300}>
+        {/* Pie Chart Section */}
+        <div className="bg-white mt-8 p-6 rounded-lg shadow">
+          <h3 className="text-gray-800 font-semibold mb-4">Top 5 Prompt Categories</h3>
+          <div className="flex items-center justify-center">
+            <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
                 data={promptData}
@@ -139,9 +141,10 @@ export default function LLMAnalytics() {
               <Tooltip />
               <Legend />
             </PieChart>
-          </ResponsiveContainer>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
