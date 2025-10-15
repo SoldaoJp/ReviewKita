@@ -1,21 +1,27 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider, useAuth } from "./controllers/AuthContext";
-import Layout from "./views/sidebar/layout";
-import Dashboard from "./views/dashboard/DashBoard";
-import ReviewerPage from "./views/reviewer/ReviewerPage";
-import ReviewerDetailPage from "./views/reviewer/ReviewerDetailPage";
-import ProfilePage from "./views/profile/ProfilePage";
-import Login from "./views/auth/Login";
-import Signup from "./views/auth/signup";
-import ForgotPassword from "./views/auth/ForgotPassword";
-import ResetPassword from "./views/auth/ResetPassword";
-import ConfirmReset from "./views/auth/ConfirmReset";
-import AdminUsersView from "./views/admin/Users";
-import AdminLlmConfigsView from "./views/admin/LlmConfigs";
-import AdminDashboard from "./views/admin/Dashboard";
-import AdminProfile from "./views/admin/Profile";
+import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import LLMAnalytics from "./components/admin/LLMAnalytics";
+import RecommendationModel from "./components/admin/RecommendationModel";
 import Flashcards from "./components/reviewer/Flashcards";
 import IdentificationCard from "./components/reviewer/IdentificationCard";
+import { AuthProvider, useAuth } from "./controllers/AuthContext";
+import AdminDashboard from "./views/admin/Dashboard";
+import AdminLlmConfigsView from "./views/admin/LlmConfigs";
+import AdminProfile from "./views/admin/Profile";
+import AdminUsersView from "./views/admin/Users";
+import ConfirmReset from "./views/auth/ConfirmReset";
+import ForgotPassword from "./views/auth/ForgotPassword";
+import Login from "./views/auth/Login";
+import ResetPassword from "./views/auth/ResetPassword";
+import Signup from "./views/auth/signup";
+import Dashboard from "./views/dashboard/DashBoard";
+import ProfilePage from "./views/profile/ProfilePage";
+import ReviewerDetailPage from "./views/reviewer/ReviewerDetailPage";
+import ReviewerPage from "./views/reviewer/ReviewerPage";
+import Layout from "./views/sidebar/layout";
+
+
+
+
 
 function AdminRoute({ children }) {
   const { user, isAuthenticated, loading } = useAuth();
@@ -47,6 +53,8 @@ function App() {
           <Route path="/admin/users" element={<AdminRoute><AdminUsersView /></AdminRoute>} />
           <Route path="/admin/llm-configs" element={<AdminRoute><AdminLlmConfigsView /></AdminRoute>} />
           <Route path="/admin/profile" element={<AdminRoute><AdminProfile /></AdminRoute>} />
+         <Route path="/admin/recommendation-model" element={<RecommendationModel />} />
+          <Route path="admin/analytics" element={<LLMAnalytics />} />
 
           {/* Reviewer detail - without Layout (full screen) */}
           <Route path="/reviewer/:id" element={<ReviewerDetailPage />} />
