@@ -1,5 +1,5 @@
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import LLMAnalytics from "./components/admin/LLMAnalytics";
+import AdminAnalytics from "./components/admindashboard/AdminAnalytics";
 import RecommendationModel from "./components/admin/RecommendationModel";
 import Flashcards from "./components/reviewer/Flashcards";
 import IdentificationCard from "./components/reviewer/IdentificationCard";
@@ -54,7 +54,7 @@ function App() {
           <Route path="/admin/llm-configs" element={<AdminRoute><AdminLlmConfigsView /></AdminRoute>} />
           <Route path="/admin/profile" element={<AdminRoute><AdminProfile /></AdminRoute>} />
          <Route path="/admin/recommendation-model" element={<RecommendationModel />} />
-          <Route path="admin/analytics" element={<LLMAnalytics />} />
+          <Route path="admin/analytics" element={<AdminAnalytics />} />
 
           {/* Reviewer detail - without Layout (full screen) */}
           <Route path="/reviewer/:id" element={<ReviewerDetailPage />} />
