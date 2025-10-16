@@ -1,9 +1,13 @@
 import httpService from './httpService';
 
 // Get all reviewers for the logged-in user
-export const getAllReviewers = async (page = 1, limit = 100) => {
+export const getAllReviewers = async (limit = 100, cursor = null, sort = null) => {
     try {
-        const response = await httpService.get(`/reviewers?page=${page}&limit=${limit}`);
+        let url = `/reviewers?limit=${limit}`;
+        if (cursor) url += `&cursor=${cursor}`;
+        if (sort) url += `&sort=${sort}`;
+        
+        const response = await httpService.get(url);
         return response;
     } catch (error) {
         throw error;

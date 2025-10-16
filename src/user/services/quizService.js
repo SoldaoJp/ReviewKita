@@ -62,3 +62,16 @@ export const deleteQuiz = async (quizId) => {
     throw error;
   }
 };
+
+export const submitQuiz = async (quizId, answers) => {
+  try {
+    console.log('Submitting quiz:', { quizId, answers });
+    const response = await httpService.post(`/quizzes/${quizId}/submit`, { answers });
+    console.log('Submit quiz response:', response);
+    return response;
+  } catch (error) {
+    console.error('Error submitting quiz:', error);
+    console.error('Error response:', error.response);
+    throw error;
+  }
+};

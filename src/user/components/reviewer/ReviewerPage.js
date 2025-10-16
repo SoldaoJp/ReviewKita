@@ -27,6 +27,7 @@ function ReviewerPage({ title }) {
   const [showLearnModal, setShowLearnModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showQuizModal, setShowQuizModal] = useState(false);
+  const [showRetakeModal, setShowRetakeModal] = useState(false);
   const [selectedReviewer, setSelectedReviewer] = useState(null);
   const [reviewers, setReviewers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -175,7 +176,11 @@ function ReviewerPage({ title }) {
 
   const handleGenerateQuizClick = (reviewer) => {
     setSelectedReviewer(reviewer);
-    setShowQuizModal(true);
+    if (reviewer.hasQuiz) {
+      setShowRetakeModal(true);
+    } else {
+      setShowQuizModal(true);
+    }
   };
 
   const handleGenerateQuiz = async (quizData) => {
@@ -302,7 +307,7 @@ function ReviewerPage({ title }) {
                     }}
                     className="px-3 py-1 bg-cyan-500 text-white text-sm rounded hover:bg-cyan-600"
                   >
-                    Generate Quiz
+                    {reviewer.hasQuiz ? "Retake Quiz" : "Generate Quiz"}
                   </button>
                   <span className="text-xs text-gray-400">{formatDate(reviewer.extractedDate)}</span>
                 </div>
@@ -585,6 +590,26 @@ function ReviewerPage({ title }) {
         onGenerate={handleGenerateQuiz}
         reviewerId={selectedReviewer?._id}
       />
+
+      {/* Retake Quiz Confirmation Modal */}
+      {showRetakeModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold mb-3">Retake Quiz</h3>
+            <p className="text-gray-600 text-sm mb-6">
+              This feature is not yet implemented. Stay tuned for updates!
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowRetakeModal(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getQuizByReviewer, deleteQuiz } from '../../services/quizService';
+import { getQuizByReviewer, deleteQuiz, submitQuiz } from '../../services/quizService';
 import MultipleChoiceQuiz from './MultipleChoiceQuiz';
 import IdentificationQuiz from './IdentificationQuiz';
 import QuizResults from './QuizResults';
@@ -105,22 +105,64 @@ function QuizPage() {
 
   const handleQuizComplete = async (timeUp = false, answersOverride = null) => {
     const answers = answersOverride || userAnswers;
-    const total = quiz.questions.length;
-    const correct = answers.filter(a => a?.isCorrect === true).length;
-    const percentage = Math.round((correct / total) * 100);
+    
+    // Prepare answers in the format expected by the backend
+    const formattedAnswers = answers.map((ans, idx) => ({
+      questionId: idx + 1, // 1-based question number
+      answer: ans?.answer || undefined,
+      isSkipped: ans?.isSkipped || false,
+      timePerQuestionSeconds: ans?.timePerQuestionSeconds || 0
+    }));
+
     try {
-      await saveQuizAttempt({
-        reviewerId,
-        reviewerTitle: quiz.reviewerTitle || quiz.reviewer?.title || undefined,
-        quizId: quiz._id,
-        title: quiz.title,
-        finishedAt: new Date().toISOString(),
-        stats: { correct, total, percentage },
-        questions: quiz.questions,
-        answers,
-      });
-    } catch {}
-    setIsCompleted(true);
+      // Submit quiz to backend
+      const submitResponse = await submitQuiz(quiz._id, formattedAnswers);
+      
+      // Extract result from backend response
+      const result = submitResponse.result || {};
+      const total = result.total || quiz.questions.length;
+      const correct = result.correct || 0;
+      const percentage = result.scorePercent || 0;
+
+      // Save to quiz history
+      try {
+        await saveQuizAttempt({
+          reviewerId,
+          reviewerTitle: quiz.reviewerTitle || quiz.reviewer?.title || undefined,
+          quizId: quiz._id,
+          title: quiz.title,
+          finishedAt: new Date().toISOString(),
+          stats: { correct, total, percentage },
+          questions: quiz.questions,
+          answers,
+        });
+      } catch (historyError) {
+        console.error('Failed to save to quiz history:', historyError);
+      }
+
+      setIsCompleted(true);
+    } catch (error) {
+      console.error('Failed to submit quiz:', error);
+      // Fallback to client-side calculation if backend fails
+      const total = quiz.questions.length;
+      const correct = answers.filter(a => a?.isCorrect === true).length;
+      const percentage = Math.round((correct / total) * 100);
+      
+      try {
+        await saveQuizAttempt({
+          reviewerId,
+          reviewerTitle: quiz.reviewerTitle || quiz.reviewer?.title || undefined,
+          quizId: quiz._id,
+          title: quiz.title,
+          finishedAt: new Date().toISOString(),
+          stats: { correct, total, percentage },
+          questions: quiz.questions,
+          answers,
+        });
+      } catch {}
+      
+      setIsCompleted(true);
+    }
   };
 
   const calculateProgress = () => ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
