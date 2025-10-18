@@ -1,6 +1,7 @@
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import AdminAnalytics from "./components/admindashboard/AdminAnalytics";
 import RecommendationModel from "./components/admin/RecommendationModel";
+import AdminAnalytics from "./components/admindashboard/AdminAnalytics";
+import LLMReports from "./components/admindashboard/LLMReports";
 import Flashcards from "./components/reviewer/Flashcards";
 import IdentificationCard from "./components/reviewer/IdentificationCard";
 import { AuthProvider, useAuth } from "./controllers/AuthContext";
@@ -53,8 +54,9 @@ function App() {
           <Route path="/admin/users" element={<AdminRoute><AdminUsersView /></AdminRoute>} />
           <Route path="/admin/llm-configs" element={<AdminRoute><AdminLlmConfigsView /></AdminRoute>} />
           <Route path="/admin/profile" element={<AdminRoute><AdminProfile /></AdminRoute>} />
-         <Route path="/admin/recommendation-model" element={<RecommendationModel />} />
-          <Route path="admin/analytics" element={<AdminAnalytics />} />
+          <Route path="/admin/recommendation-model" element={<RecommendationModel />} />
+          <Route path="/admindashboard/AdminAnalytics" element={<AdminAnalytics />} />
+          <Route path="/admindashboard/llm-reports" element={<LLMReports />} />
 
           {/* Reviewer detail - without Layout (full screen) */}
           <Route path="/reviewer/:id" element={<ReviewerDetailPage />} />
