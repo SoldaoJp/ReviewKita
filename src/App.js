@@ -20,6 +20,7 @@ import ProfilePage from "./user/views/profile/ProfilePage";
 import ReviewerDetailPage from "./user/views/reviewer/ReviewerDetailPage";
 import ReviewerPage from "./user/views/reviewer/ReviewerPage";
 import Layout from "./user/views/sidebar/layout";
+import LLMReports from "./admin/views/LLMReports";
 function AdminRoute({ children }) {
   const { user, isAuthenticated, loading } = useAuth();
   if (loading) return null;
@@ -53,6 +54,7 @@ function App() {
           <Route path="/admin/profile" element={<AdminRoute><AdminProfile /></AdminRoute>} />
           <Route path="/admin/recommendation-model" element={<AdminRoute><RecommendationModel /></AdminRoute>} />
           <Route path="/admin/analytics" element={<AdminRoute><LLMAnalytics /></AdminRoute>} />
+           <Route path="/llm-reports" element={<LLMReports />} />
 
           {/* Reviewer detail - without Layout (full screen) */}
           <Route path="/reviewer/:id" element={<ReviewerDetailPage />} />
