@@ -1,7 +1,7 @@
 import { FaSearch, FaUser } from "react-icons/fa";
 import { FiChevronDown } from "react-icons/fi";
 import { useAuth } from "../../controllers/AuthContext";
-import { useSearch } from "../../context/SearchContext";
+import { useSearch } from "../../controllers/context/SearchContext";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 

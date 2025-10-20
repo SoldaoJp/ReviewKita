@@ -3,7 +3,7 @@ import { useAuth } from "../../controllers/AuthContext.js";
 import { useState, useEffect } from "react";
 import { getAllReviewers } from "../../services/reviewerService.js";
 import { getAvailableLlmModelsReviewer } from "../../services/llmConfigService.js";
-import { useReviewerContext } from "../../context/ReviewerContext.js";
+import { useReviewerContext } from "../../controllers/context/ReviewerContext.js";
 import Logo from "../../../assets/logo.png";
 import Search from "../../../assets/Search.svg";
 import Plus from "../../../assets/Plus.svg";

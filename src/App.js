@@ -2,8 +2,6 @@ import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-d
 import { AuthProvider, useAuth } from "./user/controllers/AuthContext";
 import LLMAnalytics from "./admin/views/LLMAnalytics";
 import RecommendationModel from "./admin/views/RecommendationModel";
-import Flashcards from "./user/views/reviewer/Flashcards";
-import IdentificationCard from "./user/views/reviewer/IdentificationCard";
 import QuizPage from "./user/views/reviewer/QuizPage";
 import QuizHistoryPage from "./user/views/QuizHistoryPage";
 import AdminDashboard from "./admin/views/Dashboard";
@@ -59,8 +57,6 @@ function App() {
           {/* Reviewer detail - without Layout (full screen) */}
           <Route path="/reviewer/:id" element={<ReviewerDetailPage />} />
           <Route path="/quiz/:reviewerId" element={<QuizPage />} />
-          <Route path="/flashcards" element={<Flashcards />} />
-          <Route path="/identificationcard" element={<IdentificationCard />} />
 
           {/* Default redirect */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />

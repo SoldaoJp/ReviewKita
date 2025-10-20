@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import { getAllReviewers } from '../services/reviewerService';
+import { getAllReviewers } from '../../services/reviewerService';
 
 const SearchContext = createContext(null);
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getAllAttempts, getAttemptById } from "../services/quizHistoryService";
-import Topbar from "../components/sidebar/Topbar";
+import Topbar from "./components/sidebar/Topbar";
 import { Info } from 'lucide-react';
 
 export default function QuizHistoryPage() {
