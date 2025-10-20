@@ -3,6 +3,7 @@ import { useAuth } from '../../user/controllers/AuthContext';
 import Logo from '../../assets/logo.png';
 import DashboardIcon from '../../assets/Dashboard.svg';
 import ProfileIcon from '../../assets/Profile.svg';
+import { AlertTriangle, Users as UsersIcon, Cpu, BarChart } from 'lucide-react';
 
 function AdminSidebar() {
   const { logout } = useAuth();
@@ -55,7 +56,7 @@ function AdminSidebar() {
             >
               {({ isActive }) => (
                 <>
-                  <span className="h-4 w-4 mr-2" style={isActive ? { filter: 'brightness(0) saturate(100%) invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}}>👥</span>
+                  <UsersIcon className={`h-4 w-4 mr-2 ${isActive ? 'text-[#2472B5]' : 'text-gray-700'}`} />
                   <span className={isActive ? 'text-black' : ''}>Users</span>
                 </>
               )}
@@ -75,7 +76,7 @@ function AdminSidebar() {
                     src={ProfileIcon} 
                     alt="Profile" 
                     className="h-4 w-4 mr-2" 
-                    style={isActive ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}}
+                    style={isActive ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}} 
                   />
                   <span className={isActive ? 'text-black' : ''}>Profile</span>
                 </>
@@ -92,7 +93,7 @@ function AdminSidebar() {
             >
               {({ isActive }) => (
                 <>
-                  <span className="h-4 w-4 mr-2" style={isActive ? { filter: 'brightness(0) saturate(100%) invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}}>🧠</span>
+                  <Cpu className={`h-4 w-4 mr-2 ${isActive ? 'text-[#2472B5]' : 'text-gray-700'}`} />
                   <span className={isActive ? 'text-black' : ''}>LLM Configs</span>
                 </>
               )}
@@ -108,8 +109,24 @@ function AdminSidebar() {
             >
               {({ isActive }) => (
                 <>
-                  <span className="h-4 w-4 mr-2" style={isActive ? { filter: 'brightness(0) saturate(100%) invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}}>📊</span>
+                  <BarChart className={`h-4 w-4 mr-2 ${isActive ? 'text-[#2472B5]' : 'text-gray-700'}`} />
                   <span className={isActive ? 'text-black' : ''}>LLM Analytics</span>
+                </>
+              )}
+            </NavLink>
+            
+            <NavLink
+              to="/llm-reports"
+              className={({ isActive }) =>
+                `flex items-center px-4 py-2 rounded-xl transition-all text-sm ${
+                  isActive ? 'bg-[#0062FF]/[0.05] font-semibold' : 'text-gray-700 hover:bg-white/50'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <AlertTriangle className={`h-4 w-4 mr-2 ${isActive ? 'text-[#2472B5]' : 'text-gray-700'}`} />
+                  <span className={isActive ? 'text-black' : ''}>LLM Reports</span>
                 </>
               )}
             </NavLink>
