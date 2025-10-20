@@ -62,26 +62,7 @@ function AdminSidebar() {
               )}
             </NavLink>
 
-            <NavLink
-              to="/admin/profile"
-              className={({ isActive }) =>
-                `flex items-center px-4 py-2 rounded-xl transition-all text-sm ${
-                  isActive ? 'bg-[#0062FF]/[0.05] font-semibold' : 'text-gray-700 hover:bg-white/50'
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <img 
-                    src={ProfileIcon} 
-                    alt="Profile" 
-                    className="h-4 w-4 mr-2" 
-                    style={isActive ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}} 
-                  />
-                  <span className={isActive ? 'text-black' : ''}>Profile</span>
-                </>
-              )}
-            </NavLink>
+            {/* Profile link moved to bottom of nav list for prominence */}
 
             <NavLink
               to="/admin/llm-configs"
@@ -127,6 +108,27 @@ function AdminSidebar() {
                 <>
                   <AlertTriangle className={`h-4 w-4 mr-2 ${isActive ? 'text-[#2472B5]' : 'text-gray-700'}`} />
                   <span className={isActive ? 'text-black' : ''}>LLM Reports</span>
+                </>
+              )}
+            </NavLink>
+
+            <NavLink
+              to="/admin/profile"
+              className={({ isActive }) =>
+                `flex items-center px-4 py-2 rounded-xl transition-all text-sm ${
+                  isActive ? 'bg-[#0062FF]/[0.05] font-semibold' : 'text-gray-700 hover:bg-white/50'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <img 
+                    src={ProfileIcon} 
+                    alt="Profile" 
+                    className="h-4 w-4 mr-2" 
+                    style={isActive ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}} 
+                  />
+                  <span className={isActive ? 'text-black' : ''}>Profile</span>
                 </>
               )}
             </NavLink>
