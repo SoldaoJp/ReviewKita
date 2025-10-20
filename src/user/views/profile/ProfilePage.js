@@ -27,7 +27,8 @@ function ProfilePage() {
   // Fetch reviewer count
   const fetchReviewerCount = async () => {
     try {
-      const response = await getAllReviewers(1, 1000);
+      const response = await getAllReviewers(1000); // Pass limit as first parameter
+      console.log('ProfilePage - Fetched reviewers:', response);
       if (response.success && Array.isArray(response.data)) {
         setReviewerCount(response.data.length);
       } else if (Array.isArray(response)) {

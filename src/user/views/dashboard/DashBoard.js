@@ -51,11 +51,16 @@ export default function Dashboard() {
     const fetchReviewersAndActivity = async () => {
       try {
         setLoading(true);
-        const response = await getAllReviewers(1, 1000);
+        const response = await getAllReviewers(1000); // Pass limit as first parameter
+        console.log('Fetched reviewers response:', response);
         if (response.success && Array.isArray(response.data)) {
+          console.log('Setting reviewers from response.data:', response.data);
           setReviewers(response.data);
         } else if (Array.isArray(response)) {
+          console.log('Setting reviewers from response array:', response);
           setReviewers(response);
+        } else {
+          console.log('Unexpected response format:', response);
         }
         // Fetch user activity days for calendar
         const activityRes = await getUserActivityDays();
@@ -160,7 +165,7 @@ export default function Dashboard() {
         const dataPoint = { date: formattedDate };
         
         // For each reviewer, add quiz score (0 for now since quiz not implemented)
-        reviewers.slice(0, 4).forEach((reviewer, idx) => {
+        reviewers.forEach((reviewer, idx) => {
           const key = `reviewer${idx}`;
           dataPoint[key] = 0; // Will be actual quiz score when implemented
         });
@@ -169,11 +174,11 @@ export default function Dashboard() {
       }
     }
 
-    // Create color palette
-    const colors = ['#3B82F6', '#EC4899', '#7C3AED', '#10B981'];
+    // Create color palette - extended to support more reviewers
+    const colors = ['#3B82F6', '#EC4899', '#7C3AED', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#14B8A6', '#F97316', '#06B6D4'];
     
-    // Create legends from reviewers
-    const legends = reviewers.slice(0, 4).map((reviewer, idx) => ({
+    // Create legends from ALL reviewers
+    const legends = reviewers.map((reviewer, idx) => ({
       key: `reviewer${idx}`,
       name: reviewer.title,
       color: colors[idx % colors.length],
@@ -193,16 +198,17 @@ export default function Dashboard() {
     // In the future, you can track actual time spent when user opens reviewers
     // This could be stored in a separate analytics collection or user activity log
 
-    const colors = ['#3B82F6', '#EC4899', '#7C3AED', '#10B981'];
+    // Extended color palette to support more reviewers
+    const colors = ['#3B82F6', '#EC4899', '#7C3AED', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#14B8A6', '#F97316', '#06B6D4'];
     
-    // Calculate percentage based on number of reviewers (placeholder logic)
+    // Calculate percentage based on ALL reviewers (placeholder logic)
     // You'll want to replace this with actual time tracking data
     const total = reviewers.length;
     
-    return reviewers.slice(0, 4).map((reviewer, idx) => {
-      // Placeholder: assign decreasing percentages
+    return reviewers.map((reviewer, idx) => {
+      // Placeholder: distribute percentages more evenly across all reviewers
       // In reality, this should come from time tracking data
-      const basePercentage = Math.max(10, 60 - (idx * 10));
+      const basePercentage = Math.max(5, Math.round(100 / total));
       
       return {
         name: reviewer.title,

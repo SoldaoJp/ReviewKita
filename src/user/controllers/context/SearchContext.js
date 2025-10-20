@@ -71,7 +71,7 @@ export function SearchProvider({ children }) {
 
       // Fetch reviewers and search them
       try {
-        const resp = await getAllReviewers(1, 500);
+        const resp = await getAllReviewers(500); // Pass limit as first parameter
         const reviewers = Array.isArray(resp) ? resp : (resp?.data || resp?.reviewers || []);
 
         for (const r of reviewers) {
