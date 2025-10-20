@@ -9,8 +9,10 @@ function AdminLayout({ children, topbarProps = {} }) {
         <AdminSidebar />
       </div>
       <main className="flex-1 overflow-y-auto">
-        <AdminTopbar {...topbarProps} />
-        <div className="p-8">{children}</div>
+        <div className="p-8">
+          <AdminTopbar {...topbarProps} />
+          {children}
+        </div>
       </main>
     </div>
   );
