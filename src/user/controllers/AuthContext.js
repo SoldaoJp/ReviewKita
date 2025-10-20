@@ -18,6 +18,7 @@ export const AuthProvider = ({ children }) => {
 	const [user, setUser] = useState(null);
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [loading, setLoading] = useState(true);
+	const [avatarVersion, setAvatarVersion] = useState(0);
 
 	useEffect(() => {
 		// Check if user is already authenticated on app start
@@ -114,6 +115,8 @@ export const AuthProvider = ({ children }) => {
 			const userModel = UserModel.fromApiResponse(apiUser || {});
 			setUser(userModel);
 			localStorage.setItem('user', JSON.stringify(userModel.toPlainObject()));
+			// bump avatarVersion to force cache-bust on avatar images
+			setAvatarVersion(Date.now());
 			return userModel;
 		} catch (error) {
 			console.error('Error refreshing user:', error);
@@ -128,7 +131,8 @@ export const AuthProvider = ({ children }) => {
 		login,
 		register,
 		logout,
-		refreshUser
+		refreshUser,
+		avatarVersion
 	};
 
 	return (

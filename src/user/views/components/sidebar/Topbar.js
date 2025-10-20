@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Topbar() {
-  const { user, logout } = useAuth();
+  const { user, logout, avatarVersion } = useAuth();
   const navigate = useNavigate();
   const {
     searchQuery,
@@ -24,7 +24,7 @@ export default function Topbar() {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
   const profilePic = user?.profilePicture
-    ? `http://localhost:5000/${user.profilePicture}`
+    ? `http://localhost:5000/${user.profilePicture}?v=${avatarVersion || ''}`
     : null;
 
   useEffect(() => {
