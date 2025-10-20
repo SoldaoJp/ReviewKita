@@ -12,6 +12,7 @@ import ReviewerIcon from "../../../../assets/reviewer.svg";
 import ProfileIcon from "../../../../assets/Profile.svg";
 import ForwardIcon from "../../../../assets/Forward.svg";
 import HistoryIcon from "../../../../assets/Clock.svg";
+import { BarChart3 } from "lucide-react";
 
 const colors = [
   "bg-blue-500",
@@ -183,6 +184,11 @@ function Sidebar() {
             <NavLink to="/quiz-history" className={({ isActive }) => `flex items-center px-4 py-2 rounded-xl transition-all text-sm ${isActive ? "bg-[#0062FF]/[0.05] font-semibold" : "text-gray-700 hover:bg-white/50"}`}>
               <img src={HistoryIcon || ForwardIcon} alt="Quiz History" className={`h-4 w-4 mr-2 ${window.location.pathname === '/quiz-history' ? 'text-[#2472B5] filter-blue' : ''}`} style={window.location.pathname === '/quiz-history' ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}} />
               <span className={window.location.pathname === '/quiz-history' ? 'text-black' : ''}>Quiz History</span>
+            </NavLink>
+
+            <NavLink to="/analytics" className={({ isActive }) => `flex items-center px-4 py-2 rounded-xl transition-all text-sm ${isActive ? "bg-[#0062FF]/[0.05] font-semibold" : "text-gray-700 hover:bg-white/50"}`}>
+              <BarChart3 className={`h-4 w-4 mr-2 ${window.location.pathname === '/analytics' ? 'text-[#2472B5]' : 'text-gray-700'}`} />
+              <span className={window.location.pathname === '/analytics' ? 'text-black' : ''}>Analytics</span>
             </NavLink>
 
             <NavLink to="/profile" className={({ isActive }) => `flex items-center px-4 py-2 rounded-xl transition-all text-sm ${isActive ? "bg-[#0062FF]/[0.05] font-semibold" : "text-gray-700 hover:bg-white/50"}`}>

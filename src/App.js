@@ -4,6 +4,7 @@ import LLMAnalytics from "./admin/views/LLMAnalytics";
 import RecommendationModel from "./admin/views/RecommendationModel";
 import QuizPage from "./user/views/reviewer/QuizPage";
 import QuizHistoryPage from "./user/views/QuizHistoryPage";
+import AnalyticsPage from "./user/views/analytics/AnalyticsPage";
 import AdminDashboard from "./admin/views/Dashboard";
 import AdminLlmConfigsView from "./admin/views/LlmConfigs";
 import AdminProfile from "./admin/views/Profile";
@@ -43,6 +44,7 @@ function App() {
           <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
           <Route path="/reviewer" element={<Layout><ReviewerPage title="Reviewer" /></Layout>} />
           <Route path="/quiz-history" element={<Layout><QuizHistoryPage /></Layout>} />
+          <Route path="/analytics" element={<Layout><AnalyticsPage /></Layout>} />
           <Route path="/profile" element={<Layout><ProfilePage /></Layout>} />
 
           {/* Admin routes */}
