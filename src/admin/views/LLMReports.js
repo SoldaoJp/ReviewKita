@@ -1,7 +1,7 @@
 // src/admin/views/LLMReports.js
 import React, { useState } from "react";
 import { ChevronDown, Search, X } from "lucide-react";
-import AdminSidebar from "./Sidebar";
+import AdminLayout from "./Layout";
 import { filterReports } from "../controllers/llmReportsController";
 
 export default function LLMReports() {
@@ -13,13 +13,9 @@ export default function LLMReports() {
   const reports = filterReports(selectedFilter, searchQuery);
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
-      <div className="w-72">
-        <AdminSidebar />
-      </div>
-
-      <main className="flex-1 p-6">
-        <h1 className="text-3xl font-bold mb-6 text-gray-800">LLM REPORTS</h1>
+    <AdminLayout>
+      <div className="p-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">LLM REPORTS</h1>
 
         {/* Search & Filter */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-6">
@@ -146,7 +142,7 @@ export default function LLMReports() {
             </div>
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }
