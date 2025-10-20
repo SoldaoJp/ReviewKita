@@ -1,4 +1,4 @@
-import Logo from "../../../assets/logo.png";
+import Logo from "../../../../assets/logo.png";
 import { useNavigate, useLocation } from "react-router-dom";
 
 export default function AuthTopbar({ showButtons = true }) {

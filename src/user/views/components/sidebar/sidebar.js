@@ -1,17 +1,17 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { useAuth } from "../../controllers/AuthContext.js";
+import { useAuth } from "../../../controllers/AuthContext";
 import { useState, useEffect } from "react";
-import { getAllReviewers } from "../../services/reviewerService.js";
-import { getAvailableLlmModelsReviewer } from "../../services/llmConfigService.js";
-import { useReviewerContext } from "../../controllers/context/ReviewerContext.js";
-import Logo from "../../../assets/logo.png";
-import Search from "../../../assets/Search.svg";
-import Plus from "../../../assets/Plus.svg";
-import DashboardIcon from "../../../assets/Dashboard.svg";
-import ReviewerIcon from "../../../assets/reviewer.svg";
-import ProfileIcon from "../../../assets/Profile.svg";
-import ForwardIcon from "../../../assets/Forward.svg";
-import HistoryIcon from "../../../assets/Clock.svg";
+import { getAllReviewers } from "../../../services/reviewerService";
+import { getAvailableLlmModelsReviewer } from "../../../services/llmConfigService";
+import { useReviewerContext } from "../../../controllers/context/ReviewerContext";
+import Logo from "../../../../assets/logo.png";
+import Search from "../../../../assets/Search.svg";
+import Plus from "../../../../assets/Plus.svg";
+import DashboardIcon from "../../../../assets/Dashboard.svg";
+import ReviewerIcon from "../../../../assets/reviewer.svg";
+import ProfileIcon from "../../../../assets/Profile.svg";
+import ForwardIcon from "../../../../assets/Forward.svg";
+import HistoryIcon from "../../../../assets/Clock.svg";
 
 const colors = [
   "bg-blue-500",
@@ -140,7 +140,7 @@ function Sidebar() {
       formDataToSend.append('description', formData.description);
       formDataToSend.append('file', formData.file);
       formDataToSend.append('model_id', selectedModelId);
-      const { createReviewer } = await import('../../services/reviewerService.js');
+  const { createReviewer } = await import('../../../services/reviewerService');
       const response = await createReviewer(formDataToSend);
       if (response.success) {
         showNotification('success', 'Reviewer added successfully!');

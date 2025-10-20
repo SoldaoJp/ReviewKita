@@ -1,7 +1,7 @@
 // src/components/dashboard/WelcomeCard.js
 import { useEffect, useState } from "react";
-import { getUserProfile } from "../../services/userService";
-import Image from "../../../assets/tasks.png";
+import { getUserProfile } from "../../../services/userService";
+import Image from "../../../../assets/tasks.png";
 
 export default function WelcomeCard({ user }) {
   const [username, setUsername] = useState(user?.name || "User");
