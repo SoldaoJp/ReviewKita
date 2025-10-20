@@ -1,26 +1,69 @@
 // src/admin/views/LLMReports.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronDown, Search, X } from "lucide-react";
 import AdminLayout from "./Layout";
-import { filterReports } from "../controllers/llmReportsController";
+import { fetchLLMReports } from "../services/llmReportsService";
 
 export default function LLMReports() {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedReport, setSelectedReport] = useState(null);
-  const [reports, setReports] = useState(() => filterReports('All', ''));
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch reports on mount and when filters change
+  useEffect(() => {
+    loadReports();
+  }, [selectedFilter, searchQuery]);
+
+  const loadReports = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const filters = {};
+      
+      // Map UI filter to API parameters
+      if (selectedFilter === 'Email' && searchQuery) {
+        filters.email = searchQuery;
+      } else if (selectedFilter === 'Model Name' && searchQuery) {
+        filters.model_name = searchQuery;
+      } else if (searchQuery) {
+        // Default search (could search both)
+        filters.model_name = searchQuery;
+      }
+      
+      // Map sort filters
+      if (selectedFilter === 'Sort Ascending') {
+        filters.sort = 'ascending';
+      } else if (selectedFilter === 'Sort Descending') {
+        filters.sort = 'descending';
+      } else if (selectedFilter === 'Random') {
+        filters.sort = 'random';
+      }
+      
+      const data = await fetchLLMReports(filters);
+      setReports(data);
+    } catch (err) {
+      console.error('Failed to load reports:', err);
+      setError(err.message || 'Failed to load reports');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleTopbarSearch = (q) => {
     setSearchQuery(q);
-    const newReports = filterReports(selectedFilter, q);
-    setReports(newReports);
   };
 
   const handleFilterChange = (filter) => {
     setSelectedFilter(filter);
-    const newReports = filterReports(filter, searchQuery);
-    setReports(newReports);
+  };
+
+  const handleSearch = () => {
+    loadReports();
   };
 
   return (
@@ -43,7 +86,10 @@ export default function LLMReports() {
           </div>
 
           {/* Search Button */}
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+          <button 
+            onClick={handleSearch}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+          >
             Search
           </button>
 
@@ -84,7 +130,22 @@ export default function LLMReports() {
         <div className="bg-white rounded-xl shadow p-6">
           <h2 className="text-lg font-semibold mb-4 text-gray-800">Reports Overview</h2>
 
-          {reports.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-3 text-gray-600">Loading reports...</span>
+            </div>
+          ) : error ? (
+            <div className="text-red-600 py-4">
+              <p>Error: {error}</p>
+              <button 
+                onClick={loadReports}
+                className="mt-2 text-sm text-blue-600 hover:underline"
+              >
+                Try again
+              </button>
+            </div>
+          ) : reports.length === 0 ? (
             <p className="text-gray-500 italic">No reports found.</p>
           ) : (
             <table className="w-full border-collapse border border-gray-200 text-sm text-gray-700">
@@ -102,15 +163,15 @@ export default function LLMReports() {
               <tbody>
                 {reports.map((r) => (
                   <tr key={r.id} className="hover:bg-gray-50 transition">
-                    <td className="border border-gray-200 px-4 py-2">{r.id}</td>
+                    <td className="border border-gray-200 px-4 py-2">{r.id.slice(0, 8)}...</td>
                     <td className="border border-gray-200 px-4 py-2">
-                      {r.username} <br />
-                      <span className="text-xs text-gray-500">{r.user_email}</span>
+                      {r.user?.username || 'N/A'} <br />
+                      <span className="text-xs text-gray-500">{r.user?.email || 'N/A'}</span>
                     </td>
-                    <td className="border border-gray-200 px-4 py-2">{r.llm_name}</td>
+                    <td className="border border-gray-200 px-4 py-2">{r.model?.name || 'N/A'}</td>
                     <td className="border border-gray-200 px-4 py-2">{r.type}</td>
                     <td className="border border-gray-200 px-4 py-2">{r.description}</td>
-                    <td className="border border-gray-200 px-4 py-2">{new Date(r.created_at).toLocaleString()}</td>
+                    <td className="border border-gray-200 px-4 py-2">{new Date(r.submitted_at).toLocaleString()}</td>
                     <td className="border border-gray-200 px-4 py-2 text-center">
                       <button onClick={() => setSelectedReport(r)} className="text-blue-600 hover:underline">
                         View
@@ -128,28 +189,27 @@ export default function LLMReports() {
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
             <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">{selectedReport.reviewer.title}</h2>
+                <h2 className="text-xl font-semibold">Report Details</h2>
                 <button onClick={() => setSelectedReport(null)}>
                   <X className="w-5 h-5 text-gray-500 hover:text-gray-800" />
                 </button>
               </div>
 
               <p className="text-sm text-gray-700 mb-3">
-                <strong>Reported by:</strong> {selectedReport.username} ({selectedReport.user_email})
+                <strong>Reported by:</strong> {selectedReport.user?.username || 'N/A'} ({selectedReport.user?.email || 'N/A'})
               </p>
               <p className="text-sm text-gray-700 mb-3">
-                <strong>LLM:</strong> {selectedReport.llm_name} ({selectedReport.llm_provider})
+                <strong>LLM:</strong> {selectedReport.model?.name || 'N/A'} ({selectedReport.model?.provider || 'N/A'})
               </p>
-
-              <div className="bg-gray-100 p-3 rounded-md mb-2">
-                <p className="font-medium text-gray-700 mb-1">Original:</p>
-                <p className="text-gray-600">{selectedReport.reviewer.original}</p>
-              </div>
-
-              <div className="bg-green-50 p-3 rounded-md">
-                <p className="font-medium text-gray-700 mb-1">Enhanced:</p>
-                <p className="text-gray-600">{selectedReport.reviewer.enhanced}</p>
-              </div>
+              <p className="text-sm text-gray-700 mb-3">
+                <strong>Type:</strong> {selectedReport.type}
+              </p>
+              <p className="text-sm text-gray-700 mb-3">
+                <strong>Description:</strong> {selectedReport.description}
+              </p>
+              <p className="text-sm text-gray-700 mb-3">
+                <strong>Submitted:</strong> {new Date(selectedReport.submitted_at).toLocaleString()}
+              </p>
             </div>
           </div>
         )}

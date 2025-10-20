@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getQuizByReviewer, deleteQuiz, submitQuiz } from '../../services/quizService';
 import MultipleChoiceQuiz from '../components/reviewer/MultipleChoiceQuiz';
 import IdentificationQuiz from '../components/reviewer/IdentificationQuiz';
+import EssayQuiz from '../components/reviewer/EssayQuiz';
+import FillInTheBlanksQuiz from '../components/reviewer/FillInTheBlanksQuiz';
 import QuizResults from '../components/reviewer/QuizResults';
 import { addAttempt as saveQuizAttempt } from '../../services/quizHistoryService';
 
@@ -65,9 +67,26 @@ function QuizPage() {
 
   const handleAnswer = (answer) => {
     const currentQuestion = quiz.questions[currentQuestionIndex];
-    const isCorrect = currentQuestion.type === 'multiple-choice' 
-      ? answer === currentQuestion.correct_answer
-      : answer.toLowerCase().trim() === currentQuestion.identification_answer.toLowerCase().trim();
+    let isCorrect = null;
+    
+    // Determine correctness based on question type
+    if (currentQuestion.type === 'multiple-choice') {
+      isCorrect = answer === currentQuestion.correct_answer;
+    } else if (currentQuestion.type === 'identification') {
+      isCorrect = answer.toLowerCase().trim() === currentQuestion.identification_answer.toLowerCase().trim();
+    } else if (currentQuestion.type === 'fill-in-the-blanks') {
+      // For fill-in-the-blanks, answer is an object with blank indices as keys
+      const correctAnswers = currentQuestion.blank_answers || [];
+      isCorrect = Object.keys(answer).every((blankIndex) => {
+        const userAnswer = answer[blankIndex].trim().toLowerCase();
+        const correctAnswer = correctAnswers[parseInt(blankIndex)]?.toLowerCase() || '';
+        return userAnswer === correctAnswer;
+      });
+    } else if (currentQuestion.type === 'open-ended') {
+      // Open-ended questions are subjectively graded, mark as answered (not auto-graded)
+      isCorrect = null; // No auto-grading for open-ended
+    }
+    
     const updatedAnswers = [...userAnswers];
     updatedAnswers[currentQuestionIndex] = {
       questionId: currentQuestion.id,
@@ -236,6 +255,7 @@ function QuizPage() {
 
   const currentQuestion = quiz.questions[currentQuestionIndex];
 
+  // Render Multiple Choice Quiz
   if (currentQuestion.type === 'multiple-choice') return (
     <>
       <MultipleChoiceQuiz
@@ -265,6 +285,67 @@ function QuizPage() {
     </>
   );
 
+  // Render Essay Quiz (open-ended questions)
+  if (currentQuestion.type === 'open-ended') return (
+    <>
+      <EssayQuiz
+        question={currentQuestion}
+        questionNumber={currentQuestionIndex + 1}
+        totalQuestions={quiz.questions.length}
+        progress={calculateProgress()}
+        timeLeft={timeLeft}
+        formatTime={formatTime}
+        onAnswer={handleAnswer}
+        onSkip={handleSkip}
+        onGoBack={handleBackClick}
+        quizTitle={quiz.title}
+      />
+      {showExitModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold mb-3">Leave Quiz?</h3>
+            <p className="text-gray-600 text-sm mb-6">Leaving this page will reset all questions and progress.</p>
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setShowExitModal(false)} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm">Cancel</button>
+              <button onClick={handleConfirmLeave} className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm">Leave</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+
+  // Render Fill in the Blanks Quiz
+  if (currentQuestion.type === 'fill-in-the-blanks') return (
+    <>
+      <FillInTheBlanksQuiz
+        question={currentQuestion}
+        questionNumber={currentQuestionIndex + 1}
+        totalQuestions={quiz.questions.length}
+        progress={calculateProgress()}
+        timeLeft={timeLeft}
+        formatTime={formatTime}
+        onAnswer={handleAnswer}
+        onSkip={handleSkip}
+        onGoBack={handleBackClick}
+        quizTitle={quiz.title}
+      />
+      {showExitModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold mb-3">Leave Quiz?</h3>
+            <p className="text-gray-600 text-sm mb-6">Leaving this page will reset all questions and progress.</p>
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setShowExitModal(false)} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm">Cancel</button>
+              <button onClick={handleConfirmLeave} className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm">Leave</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+
+  // Render Identification Quiz (default/fallback)
   return (
     <>
       <IdentificationQuiz

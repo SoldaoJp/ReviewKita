@@ -268,7 +268,8 @@ function ReviewerDetailPage() {
     try {
       const reportData = {
         type: reportIssue,
-        description: reportDetails.trim()
+        description: reportDetails.trim(),
+        reviewer_id: id // Add the reviewer ID from URL params
       };
 
       const response = await reportLlmConfigReviewer(reviewer.modelId, reportData);

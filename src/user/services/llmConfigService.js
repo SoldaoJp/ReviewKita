@@ -37,8 +37,8 @@ export const rateLlmConfig = async (id, rating) => {
   return httpService.post(`/llm-configs/${id}/rate`, { rating });
 };
 
-export const reportLlmConfigReviewer = async (id, { type, description }) => {
-  return httpService.post(`/llm-configs/${id}/report/reviewer`, { type, description });
+export const reportLlmConfigReviewer = async (id, { type, description, reviewer_id }) => {
+  return httpService.post(`/llm-configs/${id}/report/reviewer`, { type, description, reviewer_id });
 };
 
 export default {

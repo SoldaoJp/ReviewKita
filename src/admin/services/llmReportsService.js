@@ -1,3 +1,23 @@
+import httpService from '../../user/services/httpService';
+
+export const fetchLLMReports = async (filters = {}) => {
+  try {
+    const params = new URLSearchParams();
+    if (filters.model_name) params.append('model_name', filters.model_name);
+    if (filters.email) params.append('email', filters.email);
+    if (filters.sort) params.append('sort', filters.sort);
+    
+    const queryString = params.toString();
+    const url = `/admin/llm/reports${queryString ? `?${queryString}` : ''}`;
+    
+    const response = await httpService.get(url);
+    return response.reports || [];
+  } catch (error) {
+    console.error('Error fetching LLM reports:', error);
+    throw error;
+  }
+};
+
 export const getStaticReports = () => [
   {
     id: "RPT-001",
