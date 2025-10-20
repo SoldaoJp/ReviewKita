@@ -9,11 +9,22 @@ export default function LLMReports() {
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedReport, setSelectedReport] = useState(null);
+  const [reports, setReports] = useState(() => filterReports('All', ''));
 
-  const reports = filterReports(selectedFilter, searchQuery);
+  const handleTopbarSearch = (q) => {
+    setSearchQuery(q);
+    const newReports = filterReports(selectedFilter, q);
+    setReports(newReports);
+  };
+
+  const handleFilterChange = (filter) => {
+    setSelectedFilter(filter);
+    const newReports = filterReports(filter, searchQuery);
+    setReports(newReports);
+  };
 
   return (
-    <AdminLayout>
+    <AdminLayout topbarProps={{ onSearch: handleTopbarSearch }}>
       <div className="p-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">LLM REPORTS</h1>
 
@@ -53,7 +64,7 @@ export default function LLMReports() {
                     <button
                       key={filter}
                       onClick={() => {
-                        setSelectedFilter(filter);
+                        handleFilterChange(filter);
                         setDropdownOpen(false);
                       }}
                       className={`block w-full text-left px-4 py-2 hover:bg-gray-100 ${
