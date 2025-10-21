@@ -44,6 +44,7 @@ function ReviewerPage({ title }) {
   const [modelsLoading, setModelsLoading] = useState(false);
   const [selectedModelId, setSelectedModelId] = useState("");
   const [notification, setNotification] = useState(null); // { type: 'success' | 'error' | 'loading', message: string }
+  const [sortOrder, setSortOrder] = useState(""); // Sort order state
 
   // Auto-hide notification after 5 seconds (except for loading)
   useEffect(() => {
@@ -62,7 +63,7 @@ function ReviewerPage({ title }) {
   // Fetch reviewers on component mount
   useEffect(() => {
     fetchReviewers();
-  }, []);
+  }, [sortOrder]); // Re-fetch when sort order changes
 
   // Load available LLM models when the Add modal is opened
   useEffect(() => {
@@ -87,7 +88,7 @@ function ReviewerPage({ title }) {
   const fetchReviewers = async () => {
     try {
       setLoading(true);
-      const response = await getAllReviewers();
+      const response = await getAllReviewers(100, null, sortOrder || null);
       if (response.success) {
         setReviewers(response.data);
       }
@@ -231,7 +232,19 @@ function ReviewerPage({ title }) {
       {/* Reviewer Cards */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold">My Reviewers</h2>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          {/* Sort Dropdown */}
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg bg-white hover:border-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+          >
+            <option value="">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="a->z">A → Z</option>
+            <option value="z->a">Z → A</option>
+          </select>
+          
           <button
             onClick={() => setShowAddModal(true)}
             className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"

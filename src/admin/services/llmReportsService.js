@@ -8,7 +8,7 @@ export const fetchLLMReports = async (filters = {}) => {
     if (filters.sort) params.append('sort', filters.sort);
     
     const queryString = params.toString();
-    const url = `/admin/llm/reports${queryString ? `?${queryString}` : ''}`;
+    const url = `/llm-configs/reports/reviewers${queryString ? `?${queryString}` : ''}`;
     
     const response = await httpService.get(url);
     return response.reports || [];
