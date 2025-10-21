@@ -20,13 +20,21 @@ export default function AuthTopbar({ showButtons = true }) {
         {showButtons && (
           <div className="flex gap-3">
             <button
-              className={`px-4 py-1.5 rounded-md text-sm border border-gray-400 text-slate-800 hover:bg-gray-100 ${isLogin ? "bg-black text-white border-none" : ""}`}
+              className={`px-4 py-1.5 rounded-md text-sm transition-colors ${
+                isLogin 
+                  ? "bg-black text-white border-none" 
+                  : "border border-gray-400 text-slate-800 hover:bg-gray-100"
+              }`}
               onClick={() => navigate("/login")}
             >
               Log in
             </button>
             <button
-              className={`px-4 py-1.5 rounded-md text-sm border border-gray-400 text-slate-800 hover:bg-gray-100 ${isSignup ? "bg-black text-white border-none" : ""}`}
+              className={`px-4 py-1.5 rounded-md text-sm transition-colors ${
+                isSignup 
+                  ? "bg-black text-white border-none" 
+                  : "border border-gray-400 text-slate-800 hover:bg-gray-100"
+              }`}
               onClick={() => navigate("/signup")}
             >
               Sign up
