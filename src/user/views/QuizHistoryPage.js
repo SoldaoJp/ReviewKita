@@ -9,6 +9,19 @@ export default function QuizHistoryPage() {
   const [error, setError] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
 
+  // Function to get color based on score percentage
+  const getScoreColor = (percent) => {
+    if (percent >= 80) {
+      return { bg: 'bg-green-100', text: 'text-green-700', border: 'border-green-300' };
+    } else if (percent >= 60) {
+      return { bg: 'bg-yellow-100', text: 'text-yellow-700', border: 'border-yellow-300' };
+    } else if (percent >= 40) {
+      return { bg: 'bg-orange-100', text: 'text-orange-700', border: 'border-orange-300' };
+    } else {
+      return { bg: 'bg-red-100', text: 'text-red-700', border: 'border-red-300' };
+    }
+  };
+
   useEffect(() => {
     const loadHistory = async () => {
       setLoading(true);
@@ -53,23 +66,26 @@ export default function QuizHistoryPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map(a => (
-                <tr key={a.id} className="border-t">
-                  <td className="px-4 py-2 font-medium text-gray-800">{a.title || 'Untitled Quiz'}</td>
-                  <td className="px-4 py-2 text-gray-700">{a.reviewer_title || 'Unknown'}</td>
-                  <td className="px-4 py-2">
-                    <span className="inline-block px-2 py-1 rounded-full bg-blue-50 text-blue-700 font-semibold">
-                      {a.score_percent ?? 'N/A'}%
-                    </span>
-                  </td>
-                  <td className="px-4 py-2 text-gray-600">{new Date(a.submitted_at).toLocaleString()}</td>
-                  <td className="px-4 py-2">
-                    <button onClick={() => setSelectedId(a.id)} className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded">
-                      <Info className="w-4 h-4" /> Details
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {filtered.map(a => {
+                const scoreColors = getScoreColor(a.score_percent ?? 0);
+                return (
+                  <tr key={a.id} className="border-t">
+                    <td className="px-4 py-2 font-medium text-gray-800">{a.title || 'Untitled Quiz'}</td>
+                    <td className="px-4 py-2 text-gray-700">{a.reviewer_title || 'Unknown'}</td>
+                    <td className="px-4 py-2">
+                      <span className={`inline-block px-2 py-1 rounded-full ${scoreColors.bg} ${scoreColors.text} font-semibold`}>
+                        {a.score_percent ?? 'N/A'}%
+                      </span>
+                    </td>
+                    <td className="px-4 py-2 text-gray-600">{new Date(a.submitted_at).toLocaleString()}</td>
+                    <td className="px-4 py-2">
+                      <button onClick={() => setSelectedId(a.id)} className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded">
+                        <Info className="w-4 h-4" /> Details
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -87,7 +103,14 @@ export default function QuizHistoryPage() {
             </div>
             <div className="p-5 overflow-y-auto">
               <div className="mb-4">
-                <span className="inline-block px-2 py-1 rounded bg-blue-50 text-blue-700 font-semibold">Score: {selected.score_percent}%</span>
+                {(() => {
+                  const scoreColors = getScoreColor(selected.score_percent ?? 0);
+                  return (
+                    <span className={`inline-block px-3 py-1.5 rounded-lg ${scoreColors.bg} ${scoreColors.text} font-semibold border ${scoreColors.border}`}>
+                      Score: {selected.score_percent}%
+                    </span>
+                  );
+                })()}
               </div>
               <div className="space-y-4">
                 {selected.details?.map((detail, idx) => (
