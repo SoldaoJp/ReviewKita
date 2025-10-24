@@ -13,10 +13,15 @@ export const deleteUserById = async (id) => {
   return httpService.delete(`/admin/users/${id}`);
 };
 
+export const getUserActivityAnalytics = async (days = 30) => {
+  return httpService.get(`/user/activity/analytics?days=${days}`);
+};
+
 export default {
   getAllUsers,
   searchUserByEmail,
   deleteUserById,
+  getUserActivityAnalytics,
 };
 
 
