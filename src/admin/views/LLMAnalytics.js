@@ -113,11 +113,11 @@ export default function LLMAnalytics() {
 
   return (
     <AdminLayout>
-      <div className="bg-gray-100 min-h-screen">
-        <div className="p-8 max-w-7xl mx-auto">
+      <div className="bg-gray-50 min-h-screen">
+        <div className="p-6 max-w-7xl mx-auto">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold text-gray-800">LLM Analytics Dashboard</h1>
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl font-bold text-gray-800">LLM Analytics Dashboard</h1>
             <button 
               onClick={loadAnalytics}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
@@ -126,34 +126,34 @@ export default function LLMAnalytics() {
             </button>
           </div>
 
-          {/* Stats Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-            <div className="bg-white shadow-md rounded-lg p-6 border-l-4 border-blue-600">
-              <h3 className="text-sm font-medium text-gray-500 uppercase">Total Models</h3>
-              <p className="text-3xl font-bold text-gray-800 mt-2">{analytics.summary?.total_models || 0}</p>
+          {/* Stats Overview Cards - Compact */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+            <div className="bg-white shadow-sm rounded-lg p-4 border-l-4 border-blue-600">
+              <h3 className="text-xs font-medium text-gray-500 uppercase">Total Models</h3>
+              <p className="text-2xl font-bold text-gray-800 mt-1">{analytics.summary?.total_models || 0}</p>
             </div>
-            <div className="bg-white shadow-md rounded-lg p-6 border-l-4 border-green-500">
-              <h3 className="text-sm font-medium text-gray-500 uppercase">Total Uses</h3>
-              <p className="text-3xl font-bold text-gray-800 mt-2">{analytics.summary?.total_uses || 0}</p>
+            <div className="bg-white shadow-sm rounded-lg p-4 border-l-4 border-green-500">
+              <h3 className="text-xs font-medium text-gray-500 uppercase">Total Uses</h3>
+              <p className="text-2xl font-bold text-gray-800 mt-1">{analytics.summary?.total_uses || 0}</p>
             </div>
-            <div className="bg-white shadow-md rounded-lg p-6 border-l-4 border-yellow-500">
-              <h3 className="text-sm font-medium text-gray-500 uppercase">Total Reviewers</h3>
-              <p className="text-3xl font-bold text-gray-800 mt-2">{analytics.summary?.total_reviewers || 0}</p>
+            <div className="bg-white shadow-sm rounded-lg p-4 border-l-4 border-yellow-500">
+              <h3 className="text-xs font-medium text-gray-500 uppercase">Total Reviewers</h3>
+              <p className="text-2xl font-bold text-gray-800 mt-1">{analytics.summary?.total_reviewers || 0}</p>
             </div>
-            <div className="bg-white shadow-md rounded-lg p-6 border-l-4 border-orange-500">
-              <h3 className="text-sm font-medium text-gray-500 uppercase">Total Reports</h3>
-              <p className="text-3xl font-bold text-gray-800 mt-2">{analytics.summary?.total_reports || 0}</p>
+            <div className="bg-white shadow-sm rounded-lg p-4 border-l-4 border-orange-500">
+              <h3 className="text-xs font-medium text-gray-500 uppercase">Total Report Cases</h3>
+              <p className="text-2xl font-bold text-gray-800 mt-1">{analytics.summary?.total_reports || 0}</p>
             </div>
-            <div className="bg-white shadow-md rounded-lg p-6 border-l-4 border-purple-500">
-              <h3 className="text-sm font-medium text-gray-500 uppercase">Total Recommendations</h3>
-              <p className="text-3xl font-bold text-gray-800 mt-2">{analytics.summary?.total_recommendations || 0}</p>
+            <div className="bg-white shadow-sm rounded-lg p-4 border-l-4 border-purple-500">
+              <h3 className="text-xs font-medium text-gray-500 uppercase">Total Recommendations</h3>
+              <p className="text-2xl font-bold text-gray-800 mt-1">{analytics.summary?.total_recommendations || 0}</p>
             </div>
           </div>
 
           {/* Monthly Reviewers Trend */}
-          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Monthly Reviewers Trend</h3>
-            <ResponsiveContainer width="100%" height={300}>
+          <div className="bg-white p-5 rounded-lg shadow-sm mb-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">Monthly Reviewers Trend</h3>
+            <ResponsiveContainer width="100%" height={250}>
               <LineChart data={analytics.monthly_chart_data || []}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
@@ -172,15 +172,15 @@ export default function LLMAnalytics() {
             </ResponsiveContainer>
           </div>
 
-          {/* Model Comparison Charts */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* Model Comparison Charts - 2x2 Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             {/* Model Ratings */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Model Ratings</h3>
-              <ResponsiveContainer width="100%" height={300}>
+            <div className="bg-white p-5 rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">Model Ratings</h3>
+              <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={modelRatingsData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
                   <YAxis />
                   <Tooltip />
                   <Bar dataKey="rating" fill="#3B82F6" radius={[8, 8, 0, 0]} />
@@ -189,12 +189,12 @@ export default function LLMAnalytics() {
             </div>
 
             {/* Model Total Reviewers */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Total Reviewers per Model</h3>
-              <ResponsiveContainer width="100%" height={300}>
+            <div className="bg-white p-5 rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">Total Reviewers per Model</h3>
+              <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={modelReviewersData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
                   <YAxis />
                   <Tooltip />
                   <Bar dataKey="reviewers" fill="#22C55E" radius={[8, 8, 0, 0]} />
@@ -203,12 +203,12 @@ export default function LLMAnalytics() {
             </div>
 
             {/* Model Total Reports */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Total Reports per Model</h3>
-              <ResponsiveContainer width="100%" height={300}>
+            <div className="bg-white p-5 rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">Total Report Cases per Model</h3>
+              <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={modelReportsData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
                   <YAxis />
                   <Tooltip />
                   <Bar dataKey="reports" fill="#F97316" radius={[8, 8, 0, 0]} />
@@ -217,12 +217,12 @@ export default function LLMAnalytics() {
             </div>
 
             {/* Model Total Recommendations */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Total Recommendations per Model</h3>
-              <ResponsiveContainer width="100%" height={300}>
+            <div className="bg-white p-5 rounded-lg shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">Total Recommendations per Model</h3>
+              <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={modelRecommendationsData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
                   <YAxis />
                   <Tooltip />
                   <Bar dataKey="recommendations" fill="#8B5CF6" radius={[8, 8, 0, 0]} />
@@ -232,28 +232,28 @@ export default function LLMAnalytics() {
           </div>
 
           {/* Model Rankings Table */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Model Rankings</h3>
+          <div className="bg-white p-5 rounded-lg shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-800 mb-3">Model Rankings</h3>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating %</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Uses</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reviewers</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reports</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recommendations</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model Name</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating %</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Uses</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reviewers</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Report Cases</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recommendations</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {analytics.model_rankings?.map((model, index) => (
                     <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{model.model_name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <span className={`px-2 py-1 rounded-full ${
+                      <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">{index + 1}</td>
+                      <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{model.model_name}</td>
+                      <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                           model.rating_percentage >= 80 ? 'bg-green-100 text-green-800' :
                           model.rating_percentage >= 60 ? 'bg-yellow-100 text-yellow-800' :
                           'bg-red-100 text-red-800'
@@ -261,10 +261,10 @@ export default function LLMAnalytics() {
                           {model.rating_percentage.toFixed(1)}%
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{model.total_uses}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{model.total_reviewers}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{model.total_reports}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{model.recommendations}</td>
+                      <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{model.total_uses}</td>
+                      <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{model.total_reviewers}</td>
+                      <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{model.total_reports}</td>
+                      <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{model.recommendations}</td>
                     </tr>
                   ))}
                 </tbody>

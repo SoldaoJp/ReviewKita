@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Logo from "../../../assets/logo.png"; // adjust path if needed
 import AuthTopbar from "../components/auth/AuthTopbar";
+import TermsAndConditions from "../components/auth/TermsAndConditions";
 import { useNavigate } from "react-router-dom";
 import authController from "../../controllers/authController.js";
 
@@ -22,6 +23,8 @@ function Signup() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -36,6 +39,10 @@ function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!termsAccepted) {
+      setError('You must accept the Terms and Conditions to sign up.');
+      return;
+    }
     await authController.handleRegister(formData, navigate, setError, setLoading, setSuccess);
   };
 
@@ -242,17 +249,49 @@ function Signup() {
               </button>
             </div>
 
+            {/* Terms and Conditions Checkbox */}
+            <label className="flex items-start gap-3 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                disabled={loading}
+                className="mt-1 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                required
+              />
+              <span>
+                I agree to the{' '}
+                <button
+                  type="button"
+                  onClick={() => setShowTerms(true)}
+                  className="text-blue-600 hover:underline font-medium"
+                >
+                  Terms and Conditions
+                </button>
+              </span>
+            </label>
+
             {/* Button same size as login */}
             <button
               type="submit"
-              className="px-6 py-2 rounded-full bg-slate-900 text-white hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={loading}
+              className="px-6 py-2 rounded-full bg-slate-900 text-white hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed w-full"
+              disabled={loading || !termsAccepted}
             >
               {loading ? 'Creating account...' : 'Sign up'}
             </button>
           </form>
         </div>
       </main>
+
+      {/* Terms and Conditions Modal */}
+      <TermsAndConditions
+        isOpen={showTerms}
+        onClose={() => setShowTerms(false)}
+        onAccept={() => {
+          setTermsAccepted(true);
+          setShowTerms(false);
+        }}
+      />
     </div>
   );
 }

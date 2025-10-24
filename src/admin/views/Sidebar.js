@@ -81,7 +81,7 @@ function AdminSidebar() {
             </NavLink>
 
             <NavLink
-              to="/admin/analytics"
+              to="/admin/llm-analytics"
               className={({ isActive }) =>
                 `flex items-center px-4 py-2 rounded-xl transition-all text-sm ${
                   isActive ? 'bg-[#0062FF]/[0.05] font-semibold' : 'text-gray-700 hover:bg-white/50'
@@ -107,7 +107,7 @@ function AdminSidebar() {
               {({ isActive }) => (
                 <>
                   <AlertTriangle className={`h-4 w-4 mr-2 ${isActive ? 'text-[#2472B5]' : 'text-gray-700'}`} />
-                  <span className={isActive ? 'text-black' : ''}>LLM Reports</span>
+                  <span className={isActive ? 'text-black' : ''}>Report Cases</span>
                 </>
               )}
             </NavLink>

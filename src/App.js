@@ -53,7 +53,7 @@ function App() {
           <Route path="/admin/llm-configs" element={<AdminRoute><AdminLlmConfigsView /></AdminRoute>} />
           <Route path="/admin/profile" element={<AdminRoute><AdminProfile /></AdminRoute>} />
           <Route path="/admin/recommendation-model" element={<AdminRoute><RecommendationModel /></AdminRoute>} />
-          <Route path="/admin/analytics" element={<AdminRoute><LLMAnalytics /></AdminRoute>} />
+          <Route path="/admin/llm-analytics" element={<AdminRoute><LLMAnalytics /></AdminRoute>} />
            <Route path="/llm-reports" element={<LLMReports />} />
 
           {/* Reviewer detail - without Layout (full screen) */}

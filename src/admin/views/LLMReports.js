@@ -92,7 +92,7 @@ export default function LLMReports() {
   return (
     <AdminLayout topbarProps={{ onSearch: handleTopbarSearch }}>
       <div className="p-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">LLM REPORTS</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">REPORT CASES</h1>
 
         {/* Search & Filter */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-6">
@@ -151,12 +151,12 @@ export default function LLMReports() {
 
         {/* Reports Table */}
         <div className="bg-white rounded-xl shadow p-6">
-          <h2 className="text-lg font-semibold mb-4 text-gray-800">Reports Overview</h2>
+          <h2 className="text-lg font-semibold mb-4 text-gray-800">Report Cases Overview</h2>
 
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="ml-3 text-gray-600">Loading reports...</span>
+              <span className="ml-3 text-gray-600">Loading report cases...</span>
             </div>
           ) : error ? (
             <div className="text-red-600 py-4">
@@ -169,7 +169,7 @@ export default function LLMReports() {
               </button>
             </div>
           ) : reports.length === 0 ? (
-            <p className="text-gray-500 italic">No reports found.</p>
+            <p className="text-gray-500 italic">No report cases found.</p>
           ) : (
             <table className="w-full border-collapse border border-gray-200 text-sm text-gray-700">
               <thead className="bg-gray-100">

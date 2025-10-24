@@ -9,6 +9,59 @@ import {
 
 const defaultApiConfig = { temperature: 0.3, max_tokens: 2000, top_p: 1 };
 
+const SYSTEM_PROMPTS = {
+  reviewer: `You are an expert ReviewerEnhancer.
+Task: Analyze the provided document and produce a concise, structured enhancement grouped by TOPICS. 
+Output format requirements (strict):
+- Partition the output into groups by related topics/themes.
+- Each group MUST start with a single header line exactly in this form:
+  [SECTION: <SECTION_KEY>]
+  where <SECTION_KEY> is an UPPER_SNAKE_CASE identifier (e.g., CORE_CONCEPTS, METHODS, FINDINGS, LIMITATIONS, NEXT_STEPS).
+- Follow each header with clear, concise bullet points ("- ") summarizing the most important points for that topic.
+- Optionally include 1–2 short lines labeled "Summary:" at the end of the group if helpful.
+- End each group with a line: [END_SECTION]
+- Do not include any other markup, code fences, or prose outside these sections.
+- If a point contains subpoints, keep them brief using indented dashes ("  - ").
+- Avoid filler text. Preserve original meaning while improving clarity.
+
+If no clear grouping emerges, use a single section with key: GENERAL_SUMMARY.
+Your goal: deliver focused, high-value takeaways grouped into regex-friendly sections as specified.`,
+  quiz: `You are an expert quiz generator.
+Analyze the provided content and generate a comprehensive quiz.
+
+Return ONLY a valid JSON object in this exact structure:
+{
+  "quiz": {
+    "title": "Quiz Title Based on Content",
+    "description": "Brief description of what this quiz covers",
+    "questions": [
+      {
+        "id": 1,
+        "question": "...",
+        "type": "multiple-choice|identification|open-ended|fill-in-the-blanks",
+        "difficulty": "easy|medium|hard",
+        "options": {"A":"...","B":"...","C":"...","D":"..."},
+        "correct_answer": "A|B|C|D",
+        "identification_answer": "...",
+        "blank_answers": ["...","..."],
+        "subject_type": "...",
+        "scenario": "...",
+        "explanation": "... or empty for open-ended"
+      }
+    ]
+  }
+}
+
+You must:
+    + Default to multiple-choice questions with 4 options (A, B, C, D) if not specified.
+    + For multiple-choice: include options A, B, C, D and set "correct_answer" to one of A/B/C/D.
+    + For identification: no options; include "identification_answer".
+    + For open-ended: no options; require a conceptual response; set "explanation" to empty string initially.
+    + For fill-in-the-blanks: question text should include blanks (e.g., "___"); add ordered array "blank_answers".
+    + Include an optional "subject_type" and an "explanation" per question (but for open-ended, leave it empty initially).
+Generate questions based on the content length and complexity. Return ONLY the JSON, no additional text.`
+};
+
 export default function AdminLlmConfigsView() {
   const [configs, setConfigs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,7 +105,7 @@ export default function AdminLlmConfigsView() {
 
   const openCreate = () => {
     setEditing(null);
-    setForm({ model_name: '', system_prompt: '', is_active: true, use_case: 'reviewer', provider: 'openrouter', api_config: defaultApiConfig });
+    setForm({ model_name: '', system_prompt: SYSTEM_PROMPTS.reviewer, is_active: true, use_case: 'reviewer', provider: 'openrouter', api_config: defaultApiConfig });
     setShowModal(true);
   };
 
@@ -161,7 +214,10 @@ export default function AdminLlmConfigsView() {
                     <label className="block text-sm font-medium">Provider</label>
                     <input value={form.provider} onChange={(e)=>setForm({...form, provider: e.target.value})} className="w-full border rounded px-3 py-2" placeholder="openrouter" />
                     <label className="block text-sm font-medium">Use Case</label>
-                    <select value={form.use_case} onChange={(e)=>setForm({...form, use_case: e.target.value})} className="w-full border rounded px-3 py-2">
+                    <select value={form.use_case} onChange={(e)=>{
+                      const newUseCase = e.target.value;
+                      setForm({...form, use_case: newUseCase, system_prompt: SYSTEM_PROMPTS[newUseCase]});
+                    }} className="w-full border rounded px-3 py-2">
                       <option value="reviewer">reviewer</option>
                       <option value="quiz">quiz</option>
                     </select>
@@ -185,10 +241,15 @@ export default function AdminLlmConfigsView() {
                       </div>
                     </div>
                     <div className="relative" style={{ background: '#282a36' }}>
-                      <textarea ref={promptTextAreaRef} value={form.system_prompt} onChange={(e)=>setForm({...form, system_prompt: e.target.value})} onScroll={(e)=>{ if (lineNumberInnerRef.current) lineNumberInnerRef.current.style.transform = `translateY(-${e.currentTarget.scrollTop}px)`; }} spellCheck={false} className="w-full h-[420px] block font-mono text-sm resize-none" style={{ background: 'transparent', color: '#f8f8f2', caretColor: '#f8f8f2', outline: 'none', border: 'none', padding: '12px 14px', lineHeight: `${lineHeight}px` }} placeholder={`You are an AI that ...`} />
+                      <textarea ref={promptTextAreaRef} value={form.system_prompt} onChange={(e)=>setForm({...form, system_prompt: e.target.value})} onScroll={(e)=>{ if (lineNumberInnerRef.current) lineNumberInnerRef.current.style.transform = `translateY(-${e.currentTarget.scrollTop}px)`; }} spellCheck={false} disabled={form.use_case === 'quiz'} className="w-full h-[420px] block font-mono text-sm resize-none disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'transparent', color: '#f8f8f2', caretColor: '#f8f8f2', outline: 'none', border: 'none', padding: '12px 14px', lineHeight: `${lineHeight}px` }} placeholder={`You are an AI that ...`} />
                     </div>
                   </div>
                 </div>
+                {form.use_case === 'quiz' && (
+                  <p className="text-sm text-blue-600 bg-blue-50 border border-blue-200 rounded px-3 py-2">
+                    ℹ️ System prompt is automatically filled with the quiz template and cannot be modified.
+                  </p>
+                )}
                 <div className="grid grid-cols-3 gap-3">
                   <div>
                     <label className="block text-sm font-medium">Temperature</label>
