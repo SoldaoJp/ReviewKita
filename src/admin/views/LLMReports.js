@@ -92,7 +92,7 @@ export default function LLMReports() {
   return (
     <AdminLayout topbarProps={{ onSearch: handleTopbarSearch }}>
       <div className="p-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">REPORT CASES</h1>
+        <h1 className="text-2xl font-bold mb-6">REPORT CASES</h1>
 
         {/* Search & Filter */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-6">
@@ -150,7 +150,7 @@ export default function LLMReports() {
         </div>
 
         {/* Reports Table */}
-        <div className="bg-white rounded-xl shadow p-6">
+        <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
           <h2 className="text-lg font-semibold mb-4 text-gray-800">Report Cases Overview</h2>
 
           {loading ? (

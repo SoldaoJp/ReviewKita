@@ -13,8 +13,8 @@ export default function AdminProfile() {
   return (
     <AdminLayout>
       <div className="p-8">
+        <h2 className="text-2xl font-bold mb-6">Admin Profile</h2>
         <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
-          <h2 className="text-2xl font-semibold mb-4">Admin Profile</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <div className="text-sm text-gray-500">Full name</div>

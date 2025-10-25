@@ -100,9 +100,7 @@ export default function AdminDashboard() {
   return (
     <AdminLayout>
       <div className="p-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-          Dashboard
-        </h1>
+        <h1 className="text-2xl font-bold mb-8">Dashboard</h1>
 
         {/* User Activity Analytics - 30 Days */}
         <div className="bg-white rounded-xl shadow p-6 mb-8">
