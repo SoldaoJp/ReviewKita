@@ -588,17 +588,30 @@ export default function AnalyticsPage() {
 
           <div className="mb-6 flex items-center justify-between">
             <h1 className="text-3xl font-bold text-gray-800">Analytics</h1>
-            <div className="relative">
-              <select
-                value={selectedCluster}
-                onChange={(e) => setSelectedCluster(e.target.value)}
-                className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-100 cursor-pointer"
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <select
+                  value={selectedCluster}
+                  onChange={(e) => setSelectedCluster(e.target.value)}
+                  className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-100 cursor-pointer"
+                >
+                  <option value="overall">Overall</option>
+                  <option value="descriptive">Descriptive</option>
+                  <option value="analytical">Analytical</option>
+                  <option value="predictive">Predictive</option>
+                </select>
+              </div>
+              <button
+                title="Export (not implemented)"
+                onClick={(e) => { e.preventDefault(); }}
+                aria-disabled="true"
+                className="inline-flex items-center gap-2 bg-white/50 border border-[#eef3fb] text-sm text-gray-700 px-3 py-2 rounded-lg hover:bg-white/80 hover:text-gray-900 hover:shadow-sm transition-colors duration-150"
               >
-                <option value="overall">Overall</option>
-                <option value="descriptive">Descriptive</option>
-                <option value="analytical">Analytical</option>
-                <option value="predictive">Predictive</option>
-              </select>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v12m0 0l-4-4m4 4 4-4M4 20h16" />
+                </svg>
+                Export
+              </button>
             </div>
           </div>
 

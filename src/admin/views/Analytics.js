@@ -104,7 +104,20 @@ export default function AdminAnalytics() {
   return (
     <AdminLayout>
       <div className="p-6">
-        <h1 className="text-2xl font-bold mb-8">Analytics</h1>
+        <div className="mb-8 flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Analytics</h1>
+          <button
+            title="Export (not implemented)"
+            onClick={(e) => { e.preventDefault(); }}
+            aria-disabled="true"
+            className="inline-flex items-center gap-2 bg-white/50 border border-[#eef3fb] text-sm text-gray-700 px-3 py-2 rounded-lg hover:bg-white/80 hover:text-gray-900 hover:shadow-sm transition-colors duration-150"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v12m0 0l-4-4m4 4 4-4M4 20h16" />
+            </svg>
+            Export
+          </button>
+        </div>
 
         {/* Top KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
