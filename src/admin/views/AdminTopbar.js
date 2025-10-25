@@ -62,7 +62,7 @@ export default function AdminTopbar({ onSearch }) {
   };
 
   return (
-    <div className="flex items-center justify-between mb-6">
+  <div className="flex items-center justify-between mb-3">
       <div className="relative flex-1 mr-4" ref={ref}>
         <button className="sm:hidden p-2 rounded-md hover:bg-white/30 absolute left-0 top-1/2 -translate-y-1/2" onClick={() => setCollapsed(!collapsed)} aria-label="Toggle sidebar">
           <Menu className="h-5 w-5 text-gray-600" />

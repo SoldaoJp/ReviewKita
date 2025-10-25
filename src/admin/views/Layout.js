@@ -8,9 +8,12 @@ function AdminLayout({ children, topbarProps = {} }) {
       <div className="flex-shrink-0">
         <AdminSidebar />
       </div>
-      <main className="flex-1 overflow-y-auto">
-        <div className="p-6">
+      <main className="flex-1 flex flex-col">
+        {/* Topbar stays fixed at the top; content below becomes scrollable */}
+        <div className="w-full pt-3 sticky top-3 z-40 px-6 pb-3">
           <AdminTopbar {...topbarProps} />
+        </div>
+        <div className="flex-1 overflow-y-auto p-6">
           {children}
         </div>
       </main>
