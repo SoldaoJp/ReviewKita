@@ -1,16 +1,23 @@
-import { Search, X as XIcon, Menu } from 'lucide-react';
+import { Search, X as XIcon, Menu, ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { useAuth } from '../../user/controllers/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function AdminTopbar({ onSearch }) {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const ref = useRef();
   const inputRef = useRef();
+  const profileRef = useRef();
 
   useEffect(() => {
     function handleClickOutside(e) {
       if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+      if (profileRef.current && !profileRef.current.contains(e.target)) setShowProfileDropdown(false);
     }
     function handleKey(e) {
       // Press `/` to focus search (ignore when typing in inputs)
@@ -44,6 +51,16 @@ export default function AdminTopbar({ onSearch }) {
     setOpen(false);
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  const handleManageProfile = () => {
+    setShowProfileDropdown(false);
+    navigate('/admin/profile');
+  };
+
   return (
     <div className="flex items-center justify-between mb-6">
       <div className="relative flex-1 mr-4" ref={ref}>
@@ -75,10 +92,37 @@ export default function AdminTopbar({ onSearch }) {
         )}
       </div>
 
-      <div className="relative" ref={inputRef}>
-        <div className="flex items-center gap-2 cursor-pointer">
+      <div className="relative" ref={profileRef}>
+        <div 
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+        >
           <div className="w-8 h-8 flex items-center justify-center bg-gray-300 rounded-full overflow-hidden">A</div>
+          <ChevronDown className="text-gray-600 w-4 h-4" />
         </div>
+
+        {showProfileDropdown && (
+          <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+            <div className="px-4 py-3 border-b border-gray-200">
+              <p className="font-semibold text-gray-900 text-sm">{user?.username || user?.name || 'Admin'}</p>
+              <p className="text-xs text-gray-500 mt-1">{user?.email || 'admin@example.com'}</p>
+            </div>
+
+            <button
+              onClick={handleManageProfile}
+              className="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-100"
+            >
+              Manage Profile
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="w-full px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50 transition-colors rounded-b-lg"
+            >
+              Logout
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

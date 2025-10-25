@@ -61,7 +61,7 @@ export default function LLMAnalytics() {
   if (error) {
     return (
       <AdminLayout>
-        <div className="p-8">
+        <div className="p-6">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
             <p className="text-red-600 mb-4">Error: {error}</p>
             <button 
@@ -113,7 +113,7 @@ export default function LLMAnalytics() {
 
   return (
     <AdminLayout>
-      <div className="p-8">
+      <div className="p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold">LLM Analytics Dashboard</h1>

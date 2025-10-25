@@ -162,42 +162,42 @@ function Sidebar() {
   };
 
   return (
-    <div className="p-4 h-screen flex flex-col">
+    <div className="p-2 h-screen flex flex-col w-48">
       <div className="flex-1 bg-white/60 backdrop-blur-sm border border-white/30 rounded-[25px] shadow-lg flex flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-          <div className="flex items-center gap-2 px-6 py-6">
-            <img src={Logo} alt="ReviewKita Logo" className="h-10 w-10 object-contain" />
-            <span className="font-bold text-base text-gray-800">ReviewKita</span>
+          <div className="flex items-center gap-2 px-4 py-4">
+            <img src={Logo} alt="ReviewKita Logo" className="h-8 w-8 object-contain" />
+            <span className="font-bold text-sm text-gray-800">ReviewKita</span>
           </div>
 
-          <nav className="mt-2 flex flex-col gap-1 px-3">
-            <NavLink to="/dashboard" className={({ isActive }) => `flex items-center px-4 py-2 rounded-xl transition-all text-sm ${isActive ? "bg-[#0062FF]/[0.05] font-semibold" : "text-gray-700 hover:bg-white/50"}`}>
-              <img src={DashboardIcon} alt="Dashboard" className={`h-4 w-4 mr-2 ${window.location.pathname === '/dashboard' ? 'text-[#2472B5] filter-blue' : ''}`} style={window.location.pathname === '/dashboard' ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}} />
+          <nav className="mt-2 flex flex-col gap-1 px-2">
+            <NavLink to="/dashboard" className={({ isActive }) => `flex items-center px-3 py-2 rounded-lg transition-all text-xs ${isActive ? "bg-[#0062FF]/[0.05] font-semibold" : "text-gray-700 hover:bg-white/50"}`}>
+              <img src={DashboardIcon} alt="Dashboard" className={`h-3.5 w-3.5 mr-2 ${window.location.pathname === '/dashboard' ? 'text-[#2472B5] filter-blue' : ''}`} style={window.location.pathname === '/dashboard' ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}} />
               <span className={window.location.pathname === '/dashboard' ? 'text-black' : ''}>Dashboard</span>
             </NavLink>
 
-            <NavLink to="/reviewer" className={({ isActive }) => `flex items-center px-4 py-2 rounded-xl transition-all text-sm ${isActive ? "bg-[#0062FF]/[0.05] font-semibold" : "text-gray-700 hover:bg-white/50"}`}>
-              <img src={ReviewerIcon} alt="Reviewer" className={`h-4 w-4 mr-2 ${window.location.pathname === '/reviewer' ? 'text-[#2472B5] filter-blue' : ''}`} style={window.location.pathname === '/reviewer' ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}} />
+            <NavLink to="/reviewer" className={({ isActive }) => `flex items-center px-3 py-2 rounded-lg transition-all text-xs ${isActive ? "bg-[#0062FF]/[0.05] font-semibold" : "text-gray-700 hover:bg-white/50"}`}>
+              <img src={ReviewerIcon} alt="Reviewer" className={`h-3.5 w-3.5 mr-2 ${window.location.pathname === '/reviewer' ? 'text-[#2472B5] filter-blue' : ''}`} style={window.location.pathname === '/reviewer' ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}} />
               <span className={window.location.pathname === '/reviewer' ? 'text-black' : ''}>Reviewer</span>
             </NavLink>
 
-            <NavLink to="/quiz-history" className={({ isActive }) => `flex items-center px-4 py-2 rounded-xl transition-all text-sm ${isActive ? "bg-[#0062FF]/[0.05] font-semibold" : "text-gray-700 hover:bg-white/50"}`}>
-              <img src={HistoryIcon || ForwardIcon} alt="Quiz History" className={`h-4 w-4 mr-2 ${window.location.pathname === '/quiz-history' ? 'text-[#2472B5] filter-blue' : ''}`} style={window.location.pathname === '/quiz-history' ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}} />
+            <NavLink to="/quiz-history" className={({ isActive }) => `flex items-center px-3 py-2 rounded-lg transition-all text-xs ${isActive ? "bg-[#0062FF]/[0.05] font-semibold" : "text-gray-700 hover:bg-white/50"}`}>
+              <img src={HistoryIcon || ForwardIcon} alt="Quiz History" className={`h-3.5 w-3.5 mr-2 ${window.location.pathname === '/quiz-history' ? 'text-[#2472B5] filter-blue' : ''}`} style={window.location.pathname === '/quiz-history' ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}} />
               <span className={window.location.pathname === '/quiz-history' ? 'text-black' : ''}>Quiz History</span>
             </NavLink>
 
-            <NavLink to="/analytics" className={({ isActive }) => `flex items-center px-4 py-2 rounded-xl transition-all text-sm ${isActive ? "bg-[#0062FF]/[0.05] font-semibold" : "text-gray-700 hover:bg-white/50"}`}>
-              <BarChart3 className={`h-4 w-4 mr-2 ${window.location.pathname === '/analytics' ? 'text-[#2472B5]' : 'text-gray-700'}`} />
+            <NavLink to="/analytics" className={({ isActive }) => `flex items-center px-3 py-2 rounded-lg transition-all text-xs ${isActive ? "bg-[#0062FF]/[0.05] font-semibold" : "text-gray-700 hover:bg-white/50"}`}>
+              <BarChart3 className={`h-3.5 w-3.5 mr-2 ${window.location.pathname === '/analytics' ? 'text-[#2472B5]' : 'text-gray-700'}`} />
               <span className={window.location.pathname === '/analytics' ? 'text-black' : ''}>Analytics</span>
             </NavLink>
 
-            <NavLink to="/profile" className={({ isActive }) => `flex items-center px-4 py-2 rounded-xl transition-all text-sm ${isActive ? "bg-[#0062FF]/[0.05] font-semibold" : "text-gray-700 hover:bg-white/50"}`}>
-              <img src={ProfileIcon} alt="Profile" className={`h-4 w-4 mr-2 ${window.location.pathname === '/profile' ? 'text-[#2472B5] filter-blue' : ''}`} style={window.location.pathname === '/profile' ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}} />
+            <NavLink to="/profile" className={({ isActive }) => `flex items-center px-3 py-2 rounded-lg transition-all text-xs ${isActive ? "bg-[#0062FF]/[0.05] font-semibold" : "text-gray-700 hover:bg-white/50"}`}>
+              <img src={ProfileIcon} alt="Profile" className={`h-3.5 w-3.5 mr-2 ${window.location.pathname === '/profile' ? 'text-[#2472B5] filter-blue' : ''}`} style={window.location.pathname === '/profile' ? { filter: 'invert(34%) sepia(87%) saturate(747%) hue-rotate(184deg) brightness(92%) contrast(92%)' } : {}} />
               <span className={window.location.pathname === '/profile' ? 'text-black' : ''}>Profile</span>
             </NavLink>
           </nav>
 
-          <div className="mt-8 px-6">
+          <div className="mt-8 px-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-gray-800 text-xs font-bold">My Reviewers</h3>
               <div className="flex items-center gap-1">
@@ -216,12 +216,12 @@ function Sidebar() {
                 <p className="text-xs text-gray-500 text-center py-2">No reviewers yet</p>
               ) : (
                 reviewers.map((reviewer, index) => (
-                  <NavLink key={reviewer._id} to={`/reviewer/${reviewer._id}`} className={({ isActive }) => `flex items-center gap-1 px-2 py-1 rounded-xl justify-between transition-all text-xs ${isActive ? "bg-white/70 shadow-sm" : "hover:bg-white/40"}`}>
-                    <div className="flex items-center gap-1">
-                      <span className={`w-2 h-2 rounded-full ${getColorForIndex(index)}`}></span>
-                      <span className="text-xs text-gray-700 truncate">{reviewer.title}</span>
+                  <NavLink key={reviewer._id} to={`/reviewer/${reviewer._id}`} className={({ isActive }) => `flex items-center gap-1 px-2 py-1 rounded-lg justify-between transition-all text-xs ${isActive ? "bg-white/70 shadow-sm" : "hover:bg-white/40"}`} title={reviewer.title}>
+                    <div className="flex items-center gap-1 min-w-0 flex-1">
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${getColorForIndex(index)}`}></span>
+                      <span className="text-xs text-gray-700 truncate">{reviewer.title.substring(0, 12)}{reviewer.title.length > 12 ? '...' : ''}</span>
                     </div>
-                    <img src={ForwardIcon} alt="Forward" className="h-3 w-3 opacity-60" />
+                    <img src={ForwardIcon} alt="Forward" className="h-2.5 w-2.5 opacity-60 flex-shrink-0" />
                   </NavLink>
                 ))
               )}
@@ -229,9 +229,9 @@ function Sidebar() {
           </div>
         </div>
 
-        <div className="px-6 py-4">
+        <div className="px-4 py-3">
           <button className="w-full py-2 px-3 rounded-lg transition-all text-xs text-red-600 hover:bg-red-50 border border-gray-200 hover:border-red-200 flex items-center justify-center gap-2" onClick={handleLogout}>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
             Logout

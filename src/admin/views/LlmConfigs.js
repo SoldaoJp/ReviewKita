@@ -159,7 +159,7 @@ export default function AdminLlmConfigsView() {
 
   return (
     <AdminLayout>
-      <div className="p-8">
+      <div className="p-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">LLM Configurations</h1>
           <button onClick={openCreate} className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800">+ New Config</button>

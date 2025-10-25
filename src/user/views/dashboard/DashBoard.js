@@ -1,5 +1,6 @@
 // src/components/dashboard/Dashboard.js
 import { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import Topbar from "../components/sidebar/Topbar";
 import ProgressTracker from "../components/dashboard/ProgressTracker";
 import RightPanel from "../components/dashboard/RightPanel";
@@ -15,6 +16,7 @@ export default function Dashboard() {
   const [reviewers, setReviewers] = useState([]);
   const [loading, setLoading] = useState(true);
   const { reviewerUpdateTrigger } = useReviewerContext();
+  const navigate = useNavigate();
   
   // Get month and year from selected date
   const monthName = selectedDate.toLocaleString('default', { month: 'long' });
@@ -235,13 +237,13 @@ export default function Dashboard() {
             <div data-search-section="subjects"><SubjectTracker data={subjectTrackerData} /></div>
           </div>
           <div className="grid grid-cols-2 gap-2 mt-1" data-search-section="quick-actions">
-            <button className="w-full bg-white/50 rounded-xl p-4 card-shadow font-medium hover:bg-white/60 transition text-gray-700 flex items-center justify-center gap-2">
+            <button onClick={() => navigate('/reviewer')} className="w-full bg-white/50 rounded-xl p-4 card-shadow font-medium hover:bg-white/60 transition text-gray-700 flex items-center justify-center gap-2">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               View Reviewers
             </button>
-            <button className="w-full bg-white/50 rounded-xl p-4 card-shadow font-medium hover:bg-white/60 transition text-gray-700 flex items-center justify-center gap-2">
+            <button onClick={() => navigate('/profile')} className="w-full bg-white/50 rounded-xl p-4 card-shadow font-medium hover:bg-white/60 transition text-gray-700 flex items-center justify-center gap-2">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
