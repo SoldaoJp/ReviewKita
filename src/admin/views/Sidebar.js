@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../user/controllers/AuthContext';
 import Logo from '../../assets/logo.png';
 import DashboardIcon from '../../assets/Dashboard.svg';
-import { AlertTriangle, Users as UsersIcon, Cpu, BarChart } from 'lucide-react';
+import { AlertTriangle, Users as UsersIcon, Cpu, BarChart, LineChart as LineChartIcon, UserCog } from 'lucide-react';
 
 function AdminSidebar() {
   const { logout, user } = useAuth();
@@ -105,6 +105,38 @@ function AdminSidebar() {
                 <>
                   <AlertTriangle className={`h-3.5 w-3.5 mr-2 ${isActive ? 'text-[#2472B5]' : 'text-gray-700'}`} />
                   <span className={isActive ? 'text-black' : ''}>Report Cases</span>
+                </>
+              )}
+            </NavLink>
+
+            <NavLink
+              to="/admin/analytics"
+              className={({ isActive }) =>
+                `flex items-center px-3 py-2 rounded-lg transition-all text-xs ${
+                  isActive ? 'bg-[#0062FF]/[0.05] font-semibold' : 'text-gray-700 hover:bg-white/50'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <LineChartIcon className={`h-3.5 w-3.5 mr-2 ${isActive ? 'text-[#2472B5]' : 'text-gray-700'}`} />
+                  <span className={isActive ? 'text-black' : ''}>Analytics</span>
+                </>
+              )}
+            </NavLink>
+
+            <NavLink
+              to="/admin/profile"
+              className={({ isActive }) =>
+                `flex items-center px-3 py-2 rounded-lg transition-all text-xs ${
+                  isActive ? 'bg-[#0062FF]/[0.05] font-semibold' : 'text-gray-700 hover:bg-white/50'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <UserCog className={`h-3.5 w-3.5 mr-2 ${isActive ? 'text-[#2472B5]' : 'text-gray-700'}`} />
+                  <span className={isActive ? 'text-black' : ''}>Manage Profile</span>
                 </>
               )}
             </NavLink>

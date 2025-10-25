@@ -1,6 +1,7 @@
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./user/controllers/AuthContext";
 import LLMAnalytics from "./admin/views/LLMAnalytics";
+import Analytics from "./admin/views/Analytics";
 import RecommendationModel from "./admin/views/RecommendationModel";
 import QuizPage from "./user/views/reviewer/QuizPage";
 import QuizHistoryPage from "./user/views/QuizHistoryPage";
@@ -54,7 +55,8 @@ function App() {
           <Route path="/admin/profile" element={<AdminRoute><AdminProfile /></AdminRoute>} />
           <Route path="/admin/recommendation-model" element={<AdminRoute><RecommendationModel /></AdminRoute>} />
           <Route path="/admin/llm-analytics" element={<AdminRoute><LLMAnalytics /></AdminRoute>} />
-           <Route path="/llm-reports" element={<LLMReports />} />
+          <Route path="/admin/analytics" element={<AdminRoute><Analytics /></AdminRoute>} />
+          <Route path="/llm-reports" element={<LLMReports />} />
 
           {/* Reviewer detail - without Layout (full screen) */}
           <Route path="/reviewer/:id" element={<ReviewerDetailPage />} />
