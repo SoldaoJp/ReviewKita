@@ -212,8 +212,8 @@ export default function AdminAnalytics() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip />
-                <Bar dataKey="accuracy" fill="#3B82F6" radius={[8, 8, 0, 0]} />
+                <Tooltip formatter={(value) => `${value}%`} />
+                <Bar dataKey="accuracy" name="Accuracy" fill="#3B82F6" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -232,7 +232,7 @@ export default function AdminAnalytics() {
                 <XAxis type="number" />
                 <YAxis dataKey="name" type="category" width={80} />
                 <Tooltip formatter={(value) => `${value}%`} />
-                <Bar dataKey="coverage" fill="#10B981" radius={[0, 8, 8, 0]} />
+                <Bar dataKey="coverage" name="Coverage Percentage" fill="#10B981" radius={[0, 8, 8, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -256,10 +256,10 @@ export default function AdminAnalytics() {
                   textAnchor="end"
                   height={80}
                 />
-                <YAxis type="number" dataKey="timePerQuestion" name="Seconds" />
+                <YAxis type="number" dataKey="timePerQuestion" name="Seconds per Question" />
                 <Tooltip cursor={{ strokeDasharray: '3 3' }} />
                 <Scatter
-                  name="Speed"
+                  name="Average Time (seconds)"
                   data={data.subjects}
                   fill="#F59E0B"
                   shape="circle"
@@ -281,16 +281,16 @@ export default function AdminAnalytics() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip formatter={(value) => `${value}%`} />
                 <Legend />
                 <Line
                   type="monotone"
                   dataKey="mastery"
+                  name="Mastery Percentage"
                   stroke="#8B5CF6"
                   strokeWidth={3}
                   dot={{ r: 5 }}
                   activeDot={{ r: 7 }}
-                  name="Mastery %"
                 />
               </LineChart>
             </ResponsiveContainer>
