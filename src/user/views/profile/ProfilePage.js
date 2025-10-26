@@ -6,7 +6,7 @@ import { useAuth } from "../../controllers/AuthContext";
 import StreakIcon from "../../../assets/StreakIcon.svg";
 import LongestStreakIcon from "../../../assets/LongestStreak.svg";
 import AchievementIcon from "../../../assets/Achievement.svg";
-import { Clock, HelpCircle, CheckCircle, Edit, BarChart3 } from 'lucide-react';
+import { Edit } from 'lucide-react';
 
 function ProfilePage() {
   const { refreshUser } = useAuth();
@@ -179,39 +179,7 @@ function ProfilePage() {
             </div>
           </div>
 
-          {/* Progress Over Time */}
-          <div className="bg-white/50 rounded-2xl p-6 shadow-sm border border-[#eef3fb] mb-6">
-            <h3 className="text-lg font-bold mb-4">Progress over time</h3>
-            <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg border border-gray-200">
-              <div className="text-center">
-                <BarChart3 size={48} className="text-gray-400 mb-2 mx-auto" />
-                <p className="text-gray-400">Chart Placeholder</p>
-              </div>
-            </div>
-            <div className="flex justify-around mt-6 pt-4 border-t border-gray-200">
-              <div className="text-center">
-                <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mb-2 mx-auto">
-                  <Clock size={20} className="text-blue-600" />
-                </div>
-                <p className="text-xs text-gray-500">Minutes Studied</p>
-                <p className="text-lg font-bold">350</p>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center w-10 h-10 bg-purple-100 rounded-full mb-2 mx-auto">
-                  <HelpCircle size={20} className="text-purple-600" />
-                </div>
-                <p className="text-xs text-gray-500">Questions Answered</p>
-                <p className="text-lg font-bold">115</p>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full mb-2 mx-auto">
-                  <CheckCircle size={20} className="text-green-600" />
-                </div>
-                <p className="text-xs text-gray-500">Accuracy</p>
-                <p className="text-lg font-bold">82%</p>
-              </div>
-            </div>
-          </div>
+          {/* Progress Over Time removed per request */}
         </div>
 
         {/* Right Panel - Streak and Mastery */}
@@ -250,30 +218,7 @@ function ProfilePage() {
             </div>
           </div>
 
-          {/* Mastery */}
-          <div className="bg-white/50 rounded-2xl p-6 shadow-sm border border-[#eef3fb]">
-            <h3 className="text-lg font-bold mb-4">Mastery</h3>
-            <div className="space-y-4">
-              {[
-                { label: "Data Scalability", color: "bg-blue-500", width: "w-4/5" },
-                { label: "Quantitative Meth...", color: "bg-pink-500", width: "w-2/3" },
-                { label: "Advanced Databa...", color: "bg-purple-500", width: "w-1/2" },
-                { label: "Networking 2", color: "bg-green-500", width: "w-3/5" },
-                { label: "Advanced Progra...", color: "bg-orange-500", width: "w-1/3" },
-                { label: "IAS", color: "bg-red-500", width: "w-1/4" },
-              ].map((item, idx) => (
-                <div key={idx}>
-                  <div className="flex items-center mb-1">
-                    <div className={`w-3 h-3 ${item.color} rounded-full mr-2`}></div>
-                    <p className="text-sm text-gray-700">{item.label}</p>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className={`${item.color} ${item.width} h-2 rounded-full`}></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Mastery removed per request */}
         </div>
       </div>
 
