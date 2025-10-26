@@ -474,7 +474,7 @@ export default function AnalyticsPage() {
                   cx="50%"
                   cy="50%"
                   outerRadius={100}
-                  label
+                  label={({ value }) => `${value}%`}
                 >
                   {overallAccuracyData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -531,7 +531,7 @@ export default function AnalyticsPage() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="subject" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip formatter={(value) => `${value}%`} />
                 <Legend />
                 <Bar dataKey="accuracy" fill="#3B82F6" radius={[8, 8, 0, 0]} />
               </BarChart>
@@ -579,7 +579,7 @@ export default function AnalyticsPage() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="avgTime" fill="#8B5CF6" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="avgTime" name="Average Time (seconds)" fill="#8B5CF6" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
             <p className="text-sm text-gray-600 mt-3">⏱️ Programming takes the most time (65s avg)</p>
@@ -646,13 +646,13 @@ export default function AnalyticsPage() {
                   cx="50%"
                   cy="50%"
                   outerRadius={100}
-                  label
+                  label={({ value }) => `${value}%`}
                 >
                   {processedData.answerDistributionData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip formatter={(value) => `${value}%`} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -679,7 +679,7 @@ export default function AnalyticsPage() {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="subject" />
               <YAxis />
-              <Tooltip />
+              <Tooltip formatter={(value) => `${value}%`} />
               <Legend />
               <Bar dataKey="accuracy" fill="#3B82F6" radius={[8, 8, 0, 0]} />
             </BarChart>
@@ -724,7 +724,7 @@ export default function AnalyticsPage() {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="avgTime" fill="#8B5CF6" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="avgTime" name="Average Time (seconds)" fill="#8B5CF6" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
@@ -743,16 +743,19 @@ export default function AnalyticsPage() {
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Per Subject Speed</h3>
         <p className="text-sm text-gray-500 mb-4">Questions answered per minute by subject</p>
         {perSubjectSpeedData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={perSubjectSpeedData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="subject" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="speed" fill="#10B981" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          <>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={perSubjectSpeedData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="subject" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="speed" name="Questions per Minute" fill="#10B981" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+            <p className="text-sm text-gray-600 mt-3">⚡ Science has the fastest response speed (1.5 q/min)</p>
+          </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
             <p>No speed data available yet</p>
@@ -788,16 +791,19 @@ export default function AnalyticsPage() {
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Weakest Subjects</h3>
         <p className="text-sm text-gray-500 mb-4">Subjects ranked by performance (lowest to highest)</p>
         {processedData.subjectRankingData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={processedData.subjectRankingData} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis dataKey="subject" type="category" width={100} />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="score" fill="#F59E0B" radius={[0, 8, 8, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          <>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={processedData.subjectRankingData} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis dataKey="subject" type="category" width={100} />
+                <Tooltip formatter={(value) => `${value}%`} />
+                <Legend />
+                <Bar dataKey="score" name="Score" fill="#F59E0B" radius={[0, 8, 8, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+            <p className="text-sm text-gray-600 mt-3">💡 Focus on {processedData.subjectRankingData[0]?.subject} to improve overall score</p>
+          </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
             <p>No ranking data available yet</p>
@@ -815,16 +821,16 @@ export default function AnalyticsPage() {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="subject" />
               <YAxis />
-              <Tooltip />
+              <Tooltip formatter={(value) => `${value}%`} />
               <Legend />
               <Line
                 type="monotone"
                 dataKey="mastery"
+                name="Mastery Percentage"
                 stroke="#8B5CF6"
                 strokeWidth={3}
                 dot={{ r: 5 }}
                 activeDot={{ r: 7 }}
-                name="Mastery %"
               />
             </LineChart>
           </ResponsiveContainer>
