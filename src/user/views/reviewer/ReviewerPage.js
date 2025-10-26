@@ -288,9 +288,50 @@ function ReviewerPage({ title }) {
   const handleGenerateQuizClick = (reviewer) => {
     setSelectedReviewer(reviewer);
     if (reviewer.hasQuiz) {
+      // If quiz exists, show modal to confirm retake
       setShowRetakeModal(true);
     } else {
+      // If no quiz, show generation modal
       setShowQuizModal(true);
+    }
+  };
+
+  const handleRetakeQuiz = async () => {
+    if (!selectedReviewer) return;
+    
+    try {
+      setShowRetakeModal(false);
+      showNotification('loading', 'Generating retake quiz...');
+      
+      // Generate a new quiz (retake) with default settings
+      const quizData = {
+        reviewerId: selectedReviewer._id,
+        numberOfQuestions: 10, // Default number of questions for retake
+        questionTypes: ['multiple-choice'] // Default question type
+      };
+      
+      const response = await createQuiz(quizData);
+      console.log('Retake quiz created successfully:', response);
+      showNotification('success', 'Retake quiz generated successfully! Redirecting...');
+      
+      // Navigate to quiz page after a brief delay
+      setTimeout(() => {
+        navigate(`/quiz/${selectedReviewer._id}`);
+      }, 1500);
+    } catch (error) {
+      console.error('Error generating retake quiz:', error);
+      
+      let errorMessage = 'Failed to generate retake quiz. Please try again.';
+      if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        errorMessage = error.response.data.errors.map(e => e.msg).join(', ');
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      showNotification('error', errorMessage);
+      setSelectedReviewer(null);
     }
   };
 
@@ -845,14 +886,20 @@ function ReviewerPage({ title }) {
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
             <h3 className="text-lg font-semibold mb-3">Retake Quiz</h3>
             <p className="text-gray-600 text-sm mb-6">
-              This feature is not yet implemented. Stay tuned for updates!
+              Are you sure you want to generate a new quiz for this reviewer? This will create a new attempt.
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowRetakeModal(false)}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
               >
-                Close
+                Cancel
+              </button>
+              <button
+                onClick={handleRetakeQuiz}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+              >
+                Generate Retake
               </button>
             </div>
           </div>
