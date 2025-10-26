@@ -1,5 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Topbar from '../components/sidebar/Topbar';
+import {
+  getOverallAccuracy,
+  getCorrectWrongSkipped,
+  getPerSubjectAccuracy,
+  getPerSubjectCoverage,
+  getAverageTime,
+  getPerSubjectSpeed,
+  getWeakestSubject,
+  getStreak,
+  getSubjectMastery,
+  getSubjectRanking,
+  getDifficultyAnalysis,
+  getImprovementTrajectory,
+  getAnswerRateTrends,
+} from '../../services/analyticsService';
 import {
   BarChart,
   Bar,
@@ -25,67 +40,323 @@ import {
 
 export default function AnalyticsPage() {
   const [selectedCluster, setSelectedCluster] = useState('overall');
+  const [loading, setLoading] = useState(true);
+  const [analyticsData, setAnalyticsData] = useState({
+    overallAccuracy: null,
+    correctWrongSkipped: null,
+    perSubjectAccuracy: null,
+    perSubjectCoverage: null,
+    averageTime: null,
+    perSubjectSpeed: null,
+    weakestSubject: null,
+    streak: null,
+    subjectMastery: null,
+    subjectRanking: null,
+    difficultyAnalysis: null,
+    improvementTrajectory: null,
+    answerRateTrends: null,
+  });
 
-  // Sample data - replace with real API data
-  const overallAccuracyData = [
-    { name: 'Correct', value: 75, color: '#22C55E' },
-    { name: 'Wrong', value: 15, color: '#EF4444' },
-    { name: 'Skipped', value: 10, color: '#F59E0B' },
-  ];
+  // Fetch all analytics data
+  useEffect(() => {
+    const fetchAnalyticsData = async () => {
+      try {
+        setLoading(true);
+        const [
+          overallAccuracyRes,
+          correctWrongSkippedRes,
+          perSubjectAccuracyRes,
+          perSubjectCoverageRes,
+          averageTimeRes,
+          perSubjectSpeedRes,
+          weakestSubjectRes,
+          streakRes,
+          subjectMasteryRes,
+          subjectRankingRes,
+          difficultyAnalysisRes,
+          improvementTrajectoryRes,
+          answerRateTrendsRes,
+        ] = await Promise.all([
+          getOverallAccuracy(),
+          getCorrectWrongSkipped(),
+          getPerSubjectAccuracy(),
+          getPerSubjectCoverage(),
+          getAverageTime(),
+          getPerSubjectSpeed(),
+          getWeakestSubject(),
+          getStreak(),
+          getSubjectMastery(),
+          getSubjectRanking(),
+          getDifficultyAnalysis(),
+          getImprovementTrajectory(),
+          getAnswerRateTrends(),
+        ]);
 
-  const analyticsMetrics = {
-    overallAccuracy: 78.5,
-    totalQuestionsTaken: 450,
-    correctAnswers: 354,
-    wrongAnswers: 78,
-    skippedAnswers: 18,
-    averageTimePerQuestion: 45.2,
-    streakDays: 12,
-    previousOverallAccuracy: 72.1,
-    improvementRate: 6.4,
+        setAnalyticsData({
+          overallAccuracy: overallAccuracyRes,
+          correctWrongSkipped: correctWrongSkippedRes,
+          perSubjectAccuracy: perSubjectAccuracyRes,
+          perSubjectCoverage: perSubjectCoverageRes,
+          averageTime: averageTimeRes,
+          perSubjectSpeed: perSubjectSpeedRes,
+          weakestSubject: weakestSubjectRes,
+          streak: streakRes,
+          subjectMastery: subjectMasteryRes,
+          subjectRanking: subjectRankingRes,
+          difficultyAnalysis: difficultyAnalysisRes,
+          improvementTrajectory: improvementTrajectoryRes,
+          answerRateTrends: answerRateTrendsRes,
+        });
+      } catch (error) {
+        console.error('Error fetching analytics data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalyticsData();
+  }, []);
+
+  // Process data from API
+  const processedData = {
+    // Overall Accuracy Pie Data
+    overallAccuracyData: analyticsData.overallAccuracy
+      ? [
+          { name: 'Correct', value: analyticsData.overallAccuracy.totalCorrect, color: '#22C55E' },
+          { name: 'Wrong', value: analyticsData.overallAccuracy.totalQuestions - analyticsData.overallAccuracy.totalCorrect - (analyticsData.overallAccuracy.totalSkipped || 0), color: '#EF4444' },
+          { name: 'Skipped', value: analyticsData.overallAccuracy.totalSkipped || 0, color: '#F59E0B' },
+        ]
+      : [],
+
+    // Analytics Metrics
+    analyticsMetrics: analyticsData.overallAccuracy
+      ? {
+          overallAccuracy: analyticsData.overallAccuracy.accuracyPct,
+          totalQuestionsTaken: analyticsData.overallAccuracy.totalQuestions,
+          correctAnswers: analyticsData.overallAccuracy.totalCorrect,
+          wrongAnswers: analyticsData.overallAccuracy.totalQuestions - analyticsData.overallAccuracy.totalCorrect - (analyticsData.overallAccuracy.totalSkipped || 0),
+          skippedAnswers: analyticsData.overallAccuracy.totalSkipped || 0,
+          totalQuizzes: analyticsData.overallAccuracy.totalQuizzes,
+          totalRetakes: analyticsData.overallAccuracy.totalRetakes,
+          totalAttempts: analyticsData.overallAccuracy.totalAttempts,
+        }
+      : {
+          overallAccuracy: 0,
+          totalQuestionsTaken: 0,
+          correctAnswers: 0,
+          wrongAnswers: 0,
+          skippedAnswers: 0,
+          totalQuizzes: 0,
+          totalRetakes: 0,
+          totalAttempts: 0,
+        },
+
+    // Correct vs Wrong vs Skipped Weekly Data
+    correctVsWrongData: analyticsData.correctWrongSkipped?.weeks?.map((week) => ({
+      week: `Week ${week.week}`,
+      correct: week.correct,
+      wrong: week.wrong,
+      skipped: week.skipped,
+    })) || [],
+
+    // Per Subject Accuracy Data
+    perSubjectAccuracyData: analyticsData.perSubjectAccuracy?.perSubject?.map((subject) => ({
+      subject: subject.subject,
+      accuracy: subject.accuracyPct,
+      totalItems: subject.totalQuestions,
+      correctItems: subject.correct,
+      timePerQuestion: 0, // Will be filled from averageTime
+      mastery: subject.accuracyPct, // Use accuracy as mastery for now
+      quizCount: subject.quizCount,
+      wrong: subject.wrong,
+      skipped: subject.skipped,
+    })) || [],
+
+    // Subject Coverage Data
+    subjectCoverageData: analyticsData.perSubjectCoverage?.coverage?.map((subject) => ({
+      name: subject.subject,
+      coverage: subject.coveragePct.toFixed(1),
+      totalQuestions: subject.totalQuestions,
+    })) || [],
+
+    // Average Time per Question Data
+    avgTimePerQuestionData: analyticsData.averageTime?.perSubject?.map((subject) => ({
+      subject: subject.subject,
+      avgTime: subject.avgTimePerQSec.toFixed(1),
+      totalQuestions: subject.totalQuestions,
+    })) || [],
+
+    // Per Subject Speed Data
+    perSubjectSpeedData: analyticsData.perSubjectSpeed?.perSubjectSpeed?.map((subject) => ({
+      subject: subject.subject,
+      speed: (60 / subject.avgTimePerQSec).toFixed(2), // Convert to questions per minute
+      avgTimePerQSec: subject.avgTimePerQSec,
+      totalQuestions: subject.totalQuestions,
+    })) || [],
+
+    // Subject Mastery Data
+    subjectMasteryData: analyticsData.subjectMastery?.mastery?.map((subject) => ({
+      subject: subject.subject,
+      mastery: subject.masteryPct,
+      totalAnswered: subject.totalAnswered,
+      totalCorrect: subject.totalCorrect,
+    })) || [],
+
+    // Answer Distribution Data (from correct-wrong-skipped overall)
+    answerDistributionData: analyticsData.correctWrongSkipped?.overall
+      ? [
+          { name: 'Correct', value: analyticsData.correctWrongSkipped.overall.correct, color: '#22C55E' },
+          { name: 'Wrong', value: analyticsData.correctWrongSkipped.overall.wrong, color: '#EF4444' },
+          { name: 'Skipped', value: analyticsData.correctWrongSkipped.overall.skipped, color: '#F59E0B' },
+        ]
+      : [],
+
+    // Subject Ranking Data (weakest subjects)
+    subjectRankingData: analyticsData.subjectRanking?.ranking?.map((item) => ({
+      subject: item.subject,
+      score: item.score,
+      rank: item.rank,
+      accuracyPct: item.accuracyPct,
+      avgTimePerQSec: item.avgTimePerQSec,
+      correct: item.correct,
+      wrong: item.wrong,
+      skipped: item.skipped,
+      totalQuestions: item.totalQuestions,
+    })) || [],
+
+    // Difficulty Performance Data
+    difficultyPerformanceData: analyticsData.difficultyAnalysis?.difficulty
+      ? [
+          {
+            difficulty: 'Easy',
+            correct: analyticsData.difficultyAnalysis.difficulty.easy.correct,
+            wrong: analyticsData.difficultyAnalysis.difficulty.easy.wrong,
+            skipped: analyticsData.difficultyAnalysis.difficulty.easy.skipped,
+            accuracyPct: analyticsData.difficultyAnalysis.difficulty.easy.accuracyPct,
+          },
+          {
+            difficulty: 'Medium',
+            correct: analyticsData.difficultyAnalysis.difficulty.medium.correct,
+            wrong: analyticsData.difficultyAnalysis.difficulty.medium.wrong,
+            skipped: analyticsData.difficultyAnalysis.difficulty.medium.skipped,
+            accuracyPct: analyticsData.difficultyAnalysis.difficulty.medium.accuracyPct,
+          },
+          {
+            difficulty: 'Hard',
+            correct: analyticsData.difficultyAnalysis.difficulty.hard.correct,
+            wrong: analyticsData.difficultyAnalysis.difficulty.hard.wrong,
+            skipped: analyticsData.difficultyAnalysis.difficulty.hard.skipped,
+            accuracyPct: analyticsData.difficultyAnalysis.difficulty.hard.accuracyPct,
+          },
+        ]
+      : [],
+
+    // Improvement Trajectory Data
+    improvementTrajectoryData: analyticsData.improvementTrajectory?.attempts?.map((attempt) => ({
+      attempt: attempt.attemptNumber,
+      score: attempt.averageScore,
+      date: new Date(attempt.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      totalQuizzes: attempt.totalQuizzes,
+    })) || [],
+
+    // Answer Rate Trends Data
+    answerRateTrendsData: analyticsData.answerRateTrends?.monthly?.map((month) => ({
+      month: month.monthName,
+      correct: month.correctPct,
+      wrong: month.wrongPct,
+      skipped: month.skippedPct,
+      totalQuestions: month.totalQuestions,
+    })) || [],
   };
 
-  const perSubjectAccuracyData = [
-    { subject: 'Math', accuracy: 85, totalItems: 120, correctItems: 102, timePerQuestion: 48, mastery: 88 },
-    { subject: 'Science', accuracy: 78, totalItems: 95, correctItems: 74, timePerQuestion: 42, mastery: 80 },
-    { subject: 'History', accuracy: 92, totalItems: 85, correctItems: 78, timePerQuestion: 38, mastery: 91 },
-    { subject: 'English', accuracy: 88, totalItems: 80, correctItems: 70, timePerQuestion: 40, mastery: 86 },
-    { subject: 'Programming', accuracy: 95, totalItems: 70, correctItems: 67, timePerQuestion: 65, mastery: 96 },
-  ];
+  // Merge time data into perSubjectAccuracyData
+  if (analyticsData.averageTime?.perSubject) {
+    processedData.perSubjectAccuracyData = processedData.perSubjectAccuracyData.map((subject) => {
+      const timeData = analyticsData.averageTime.perSubject.find(
+        (t) => t.subject === subject.subject
+      );
+      return {
+        ...subject,
+        timePerQuestion: timeData ? timeData.avgTimePerQSec.toFixed(1) : 0,
+      };
+    });
+  }
 
-  // Calculate weakest subject
-  const weakestSubject = perSubjectAccuracyData.reduce((min, current) =>
-    current.accuracy < min.accuracy ? current : min
-  );
+  // Get weakest subject from API or calculate from processed data
+  const weakestSubject = analyticsData.weakestSubject?.weakestSubject
+    ? {
+        subject: analyticsData.weakestSubject.stats.subject,
+        accuracy: analyticsData.weakestSubject.stats.accuracyPct,
+        totalItems: analyticsData.weakestSubject.stats.totalQuestions,
+        correctItems: analyticsData.weakestSubject.stats.correct,
+        wrong: analyticsData.weakestSubject.stats.wrong,
+        skipped: analyticsData.weakestSubject.stats.skipped,
+        avgTime: analyticsData.weakestSubject.stats.avgTimePerQSec,
+      }
+    : null;
 
-  // Subject coverage data
-  const subjectCoverageData = perSubjectAccuracyData.map(subject => ({
-    name: subject.subject,
-    coverage: ((subject.totalItems / analyticsMetrics.totalQuestionsTaken) * 100).toFixed(1),
-  }));
+  // Custom Tooltip for charts with additional info
+  const CustomTooltip = ({ active, payload, label, additionalData }) => {
+    if (active && payload && payload.length) {
+      const subject = label || payload[0].payload.subject;
+      const extra = additionalData?.find((d) => d.subject === subject);
 
-  const avgTimePerQuestionData = [
-    { subject: 'Math', avgTime: 45 },
-    { subject: 'Science', avgTime: 38 },
-    { subject: 'History', avgTime: 52 },
-    { subject: 'English', avgTime: 40 },
-    { subject: 'Programming', avgTime: 65 },
-  ];
+      return (
+        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+          <p className="font-semibold text-gray-800 mb-2">{subject}</p>
+          {payload.map((entry, index) => (
+            <p key={index} className="text-sm" style={{ color: entry.color }}>
+              <span className="font-medium">{entry.name}:</span> {entry.value}
+              {entry.name === 'accuracy' && '%'}
+              {entry.name === 'avgTime' && 's'}
+              {entry.name === 'coverage' && '%'}
+            </p>
+          ))}
+          {extra && (
+            <>
+              {extra.totalQuestions && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Total Questions: {extra.totalQuestions}
+                </p>
+              )}
+              {extra.quizCount && (
+                <p className="text-sm text-gray-600">
+                  Quiz Count: {extra.quizCount}
+                </p>
+              )}
+              {extra.wrong !== undefined && (
+                <p className="text-sm text-red-600">
+                  Wrong: {extra.wrong}
+                </p>
+              )}
+              {extra.skipped !== undefined && (
+                <p className="text-sm text-yellow-600">
+                  Skipped: {extra.skipped}
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      );
+    }
+    return null;
+  };
 
-  const correctVsWrongData = [
-    { week: 'Week 1', correct: 120, wrong: 25, skipped: 15 },
-    { week: 'Week 2', correct: 145, wrong: 20, skipped: 10 },
-    { week: 'Week 3', correct: 160, wrong: 18, skipped: 8 },
-    { week: 'Week 4', correct: 175, wrong: 15, skipped: 5 },
-  ];
+  // Sample data - replace with real API data
+  const overallAccuracyData = processedData.overallAccuracyData;
+  const analyticsMetrics = processedData.analyticsMetrics;
 
-  const perSubjectSpeedData = [
-    { subject: 'Math', speed: 1.2 },
-    { subject: 'Science', speed: 1.5 },
-    { subject: 'History', speed: 0.9 },
-    { subject: 'English', speed: 1.3 },
-    { subject: 'Programming', speed: 0.8 },
-  ];
+  const perSubjectAccuracyData = processedData.perSubjectAccuracyData;
+
+  // Subject coverage data (use processedData instead)
+  const subjectCoverageData = processedData.subjectCoverageData;
+
+  // Use processed data with fallback
+  const avgTimePerQuestionData = processedData.avgTimePerQuestionData;
+
+  const correctVsWrongData = processedData.correctVsWrongData;
+
+  const perSubjectSpeedData = processedData.perSubjectSpeedData;
 
   const difficultyPerformanceData = [
     { difficulty: 'Easy', correct: 95, wrong: 5 },
@@ -162,17 +433,26 @@ export default function AnalyticsPage() {
       {/* Current Streak */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <p className="text-gray-600 text-sm font-medium mb-2">Current Streak</p>
-        <p className="text-4xl font-bold text-orange-500 mb-2">🔥 {analyticsMetrics.streakDays}</p>
+        <p className="text-4xl font-bold text-orange-500 mb-2">🔥 {analyticsData.streak?.streakDays || 0}</p>
         <p className="text-xs text-gray-500">Consecutive active days</p>
       </div>
 
       {/* Weakest Subject */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <p className="text-gray-600 text-sm font-medium mb-2">Weakest Subject</p>
-        <p className="text-lg font-bold text-red-600 mb-2">{weakestSubject.subject}</p>
-        <p className="text-xs text-gray-500">
-          {weakestSubject.accuracy}% — Focus on this next
-        </p>
+        {weakestSubject ? (
+          <>
+            <p className="text-lg font-bold text-red-600 mb-2">{weakestSubject.subject}</p>
+            <p className="text-xs text-gray-500">
+              {weakestSubject.accuracy}% — Focus on this next
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="text-lg font-bold text-gray-400 mb-2">N/A</p>
+            <p className="text-xs text-gray-500">No data available yet</p>
+          </>
+        )}
       </div>
     </div>
   );
@@ -183,203 +463,275 @@ export default function AnalyticsPage() {
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Overall Accuracy</h3>
         <p className="text-sm text-gray-500 mb-4">Your performance breakdown across all quizzes</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={overallAccuracyData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              label
-            >
-              {overallAccuracyData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
-        <p className="text-sm text-gray-600 mt-3">✅ 75% correct answers across all attempts</p>
+        {overallAccuracyData.length > 0 ? (
+          <>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={overallAccuracyData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label
+                >
+                  {overallAccuracyData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+            <p className="text-sm text-gray-600 mt-3">✅ {analyticsMetrics.overallAccuracy}% correct answers across all attempts</p>
+          </>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No quiz data available yet. Start taking quizzes to see your overall accuracy!</p>
+          </div>
+        )}
       </div>
 
       {/* Correct vs Wrong vs Skipped */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Correct vs Wrong vs Skipped</h3>
         <p className="text-sm text-gray-500 mb-4">Weekly trend of your quiz responses</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={correctVsWrongData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="week" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="correct" stroke="#22C55E" strokeWidth={2} />
-            <Line type="monotone" dataKey="wrong" stroke="#EF4444" strokeWidth={2} />
-            <Line type="monotone" dataKey="skipped" stroke="#F59E0B" strokeWidth={2} />
-          </LineChart>
-        </ResponsiveContainer>
-        <p className="text-sm text-gray-600 mt-3">📈 Correct answers increased by 45% over 4 weeks</p>
+        {correctVsWrongData.length > 0 ? (
+          <>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={correctVsWrongData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="week" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="correct" stroke="#22C55E" strokeWidth={2} />
+                <Line type="monotone" dataKey="wrong" stroke="#EF4444" strokeWidth={2} />
+                <Line type="monotone" dataKey="skipped" stroke="#F59E0B" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+            <p className="text-sm text-gray-600 mt-3">📈 Correct answers increased by 45% over 4 weeks</p>
+          </>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No quiz data available yet. Start taking quizzes to see your progress!</p>
+          </div>
+        )}
       </div>
 
       {/* Per Subject Accuracy */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Per Subject Accuracy</h3>
         <p className="text-sm text-gray-500 mb-4">How well you perform in each subject</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={perSubjectAccuracyData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="subject" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="accuracy" fill="#3B82F6" radius={[8, 8, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-        <p className="text-sm text-gray-600 mt-3">🎯 Programming has the highest accuracy (95%)</p>
+        {perSubjectAccuracyData.length > 0 ? (
+          <>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={perSubjectAccuracyData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="subject" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="accuracy" fill="#3B82F6" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+            <p className="text-sm text-gray-600 mt-3">🎯 Programming has the highest accuracy (95%)</p>
+          </>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No subject data available yet. Start taking quizzes to see your accuracy!</p>
+          </div>
+        )}
       </div>
 
       {/* Per-Subject Coverage */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Per-Subject Coverage</h3>
         <p className="text-sm text-gray-500 mb-4">Percentage of total questions per subject</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={subjectCoverageData} layout="vertical">
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis type="number" />
-            <YAxis dataKey="name" type="category" width={80} />
-            <Tooltip formatter={(value) => `${value}%`} />
-            <Bar dataKey="coverage" fill="#10B981" radius={[0, 8, 8, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        {subjectCoverageData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={subjectCoverageData} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis type="number" />
+              <YAxis dataKey="name" type="category" width={80} />
+              <Tooltip formatter={(value) => `${value}%`} />
+              <Bar dataKey="coverage" fill="#10B981" radius={[0, 8, 8, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No subject coverage data available yet. Start taking quizzes!</p>
+          </div>
+        )}
       </div>
 
       {/* Average Time per Question */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Average Time per Question</h3>
         <p className="text-sm text-gray-500 mb-4">Time spent per question by subject (seconds)</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={avgTimePerQuestionData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="subject" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="avgTime" fill="#8B5CF6" radius={[8, 8, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-        <p className="text-sm text-gray-600 mt-3">⏱️ Programming takes the most time (65s avg)</p>
+        {avgTimePerQuestionData.length > 0 ? (
+          <>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={avgTimePerQuestionData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="subject" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="avgTime" fill="#8B5CF6" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+            <p className="text-sm text-gray-600 mt-3">⏱️ Programming takes the most time (65s avg)</p>
+          </>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No timing data available yet. Start taking quizzes to see your speed!</p>
+          </div>
+        )}
       </div>
 
       {/* Per-Subject Speed */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Per-Subject Speed</h3>
         <p className="text-sm text-gray-500 mb-4">Questions answered per minute by subject</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <ScatterChart margin={{ top: 20, right: 20, bottom: 60, left: 20 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              type="category"
-              dataKey="subject"
-              name="Subject"
-              angle={-45}
-              textAnchor="end"
-              height={80}
-            />
-            <YAxis type="number" dataKey="speed" name="Questions/min" />
-            <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-            <Scatter
-              name="Speed"
-              data={perSubjectSpeedData}
-              fill="#F59E0B"
-              shape="circle"
-            />
-          </ScatterChart>
-        </ResponsiveContainer>
-        <p className="text-sm text-gray-600 mt-3">⚡ Science has the fastest response speed (1.5 q/min)</p>
+        {perSubjectSpeedData.length > 0 ? (
+          <>
+            <ResponsiveContainer width="100%" height={300}>
+              <ScatterChart margin={{ top: 20, right: 20, bottom: 60, left: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  type="category"
+                  dataKey="subject"
+                  name="Subject"
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                />
+                <YAxis type="number" dataKey="speed" name="Questions/min" />
+                <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+                <Scatter
+                  name="Speed"
+                  data={perSubjectSpeedData}
+                  fill="#F59E0B"
+                  shape="circle"
+                />
+              </ScatterChart>
+            </ResponsiveContainer>
+            <p className="text-sm text-gray-600 mt-3">⚡ Science has the fastest response speed (1.5 q/min)</p>
+          </>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No speed data available yet. Start taking quizzes to see your response speed!</p>
+          </div>
+        )}
       </div>
     </div>
   );
 
   const renderDescriptiveCharts = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Correct vs Wrong vs Skipped - Bar Chart */}
+      {/* Answer Distribution */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Answer Distribution</h3>
         <p className="text-sm text-gray-500 mb-4">Counts and percentages of answers</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={overallAccuracyData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              label
-            >
-              {overallAccuracyData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
-        <div className="mt-4 space-y-2 text-sm">
-          <p className="text-green-700">✅ Correct: {analyticsMetrics.correctAnswers} ({((analyticsMetrics.correctAnswers / analyticsMetrics.totalQuestionsTaken) * 100).toFixed(1)}%)</p>
-          <p className="text-red-700">❌ Wrong: {analyticsMetrics.wrongAnswers} ({((analyticsMetrics.wrongAnswers / analyticsMetrics.totalQuestionsTaken) * 100).toFixed(1)}%)</p>
-          <p className="text-yellow-700">⏭️ Skipped: {analyticsMetrics.skippedAnswers} ({((analyticsMetrics.skippedAnswers / analyticsMetrics.totalQuestionsTaken) * 100).toFixed(1)}%)</p>
-        </div>
+        {processedData.answerDistributionData.length > 0 ? (
+          <>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={processedData.answerDistributionData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label
+                >
+                  {processedData.answerDistributionData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-4 space-y-2 text-sm">
+              <p className="text-green-700">✅ Correct: {analyticsData.correctWrongSkipped?.overall.correct} ({((analyticsData.correctWrongSkipped?.overall.correct / analyticsData.correctWrongSkipped?.overall.total) * 100).toFixed(1)}%)</p>
+              <p className="text-red-700">❌ Wrong: {analyticsData.correctWrongSkipped?.overall.wrong} ({((analyticsData.correctWrongSkipped?.overall.wrong / analyticsData.correctWrongSkipped?.overall.total) * 100).toFixed(1)}%)</p>
+              <p className="text-yellow-700">⏭️ Skipped: {analyticsData.correctWrongSkipped?.overall.skipped} ({((analyticsData.correctWrongSkipped?.overall.skipped / analyticsData.correctWrongSkipped?.overall.total) * 100).toFixed(1)}%)</p>
+            </div>
+          </>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No answer distribution data available yet</p>
+          </div>
+        )}
       </div>
 
       {/* Per Subject Accuracy */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Per Subject Accuracy</h3>
         <p className="text-sm text-gray-500 mb-4">Subject-wise performance distribution</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={perSubjectAccuracyData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="subject" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="accuracy" fill="#3B82F6" radius={[8, 8, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        {perSubjectAccuracyData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={perSubjectAccuracyData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="subject" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="accuracy" fill="#3B82F6" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No subject data available yet</p>
+          </div>
+        )}
       </div>
 
       {/* Per-Subject Coverage */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Per-Subject Coverage</h3>
-        <p className="text-sm text-gray-500 mb-4">Percentage of items answered per subject</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={subjectCoverageData} layout="vertical">
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis type="number" />
-            <YAxis dataKey="name" type="category" width={80} />
-            <Tooltip formatter={(value) => `${value}%`} />
-            <Bar dataKey="coverage" fill="#10B981" radius={[0, 8, 8, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        <p className="text-sm text-gray-500 mb-4">Total correct answers per subject</p>
+        {perSubjectAccuracyData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={perSubjectAccuracyData} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis type="number" />
+              <YAxis dataKey="subject" type="category" width={100} />
+              <Tooltip />
+              <Bar dataKey="correctItems" fill="#10B981" radius={[0, 8, 8, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No coverage data available yet</p>
+          </div>
+        )}
       </div>
 
       {/* Average Time */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Average Time per Question</h3>
         <p className="text-sm text-gray-500 mb-4">Time efficiency by subject</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={avgTimePerQuestionData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="subject" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="avgTime" fill="#8B5CF6" radius={[8, 8, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        {avgTimePerQuestionData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={avgTimePerQuestionData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="subject" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="avgTime" fill="#8B5CF6" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No timing data available yet</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -390,76 +742,97 @@ export default function AnalyticsPage() {
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Per Subject Speed</h3>
         <p className="text-sm text-gray-500 mb-4">Questions answered per minute by subject</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={perSubjectSpeedData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="subject" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="speed" fill="#10B981" radius={[8, 8, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-        <p className="text-sm text-gray-600 mt-3">⚡ Science has the fastest response speed (1.5 q/min)</p>
+        {perSubjectSpeedData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={perSubjectSpeedData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="subject" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="speed" fill="#10B981" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No speed data available yet</p>
+          </div>
+        )}
       </div>
 
       {/* Difficulty Performance */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Difficulty Performance</h3>
         <p className="text-sm text-gray-500 mb-4">How you perform across difficulty levels</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={difficultyPerformanceData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="difficulty" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="correct" fill="#22C55E" radius={[8, 8, 0, 0]} />
-            <Bar dataKey="wrong" fill="#EF4444" radius={[8, 8, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-        <p className="text-sm text-gray-600 mt-3">📊 95% accuracy on easy questions, 52% on hard</p>
+        {processedData.difficultyPerformanceData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={processedData.difficultyPerformanceData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="difficulty" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="correct" fill="#22C55E" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="wrong" fill="#EF4444" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No difficulty data available yet</p>
+          </div>
+        )}
       </div>
 
       {/* Weakest Subjects */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Weakest Subjects</h3>
         <p className="text-sm text-gray-500 mb-4">Subjects ranked by performance (lowest to highest)</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={weakestSubjectsData} layout="vertical">
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis type="number" />
-            <YAxis dataKey="subject" type="category" />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="score" fill="#F59E0B" radius={[0, 8, 8, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-        <p className="text-sm text-gray-600 mt-3">💡 Focus on History to improve overall score</p>
+        {processedData.subjectRankingData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={processedData.subjectRankingData} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis type="number" />
+              <YAxis dataKey="subject" type="category" width={100} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="score" fill="#F59E0B" radius={[0, 8, 8, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No ranking data available yet</p>
+          </div>
+        )}
       </div>
 
       {/* Subject Mastery Score */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Subject Mastery Score</h3>
         <p className="text-sm text-gray-500 mb-4">Long-term progress weighted by item count</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={subjectMasteryData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="subject" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="mastery"
-              stroke="#8B5CF6"
-              strokeWidth={3}
-              dot={{ r: 5 }}
-              activeDot={{ r: 7 }}
-              name="Mastery %"
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        {processedData.subjectMasteryData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={processedData.subjectMasteryData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="subject" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="mastery"
+                stroke="#8B5CF6"
+                strokeWidth={3}
+                dot={{ r: 5 }}
+                activeDot={{ r: 7 }}
+                name="Mastery %"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No mastery data available yet</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -470,75 +843,116 @@ export default function AnalyticsPage() {
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Improvement Rate</h3>
         <p className="text-sm text-gray-500 mb-4">Your progress trajectory and predicted future performance</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={improvementData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="attempt" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="score" stroke="#3B82F6" strokeWidth={3} dot={{ r: 6 }} />
-          </LineChart>
-        </ResponsiveContainer>
-        <p className="text-sm text-gray-600 mt-3">🔮 Projected score for next attempt: 94% | 🚀 38% improvement since first attempt</p>
+        {processedData.improvementTrajectoryData.length > 0 ? (
+          <>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={processedData.improvementTrajectoryData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="attempt" label={{ value: 'Attempt', position: 'insideBottom', offset: -5 }} />
+                <YAxis label={{ value: 'Score (%)', angle: -90, position: 'insideLeft' }} />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="score" stroke="#3B82F6" strokeWidth={3} dot={{ r: 6 }} name="Average Score" />
+              </LineChart>
+            </ResponsiveContainer>
+            {analyticsData.improvementTrajectory && (
+              <p className="text-sm text-gray-600 mt-3">
+                🔮 Predicted next score: {analyticsData.improvementTrajectory.predictedNextScore}% | 
+                🚀 {analyticsData.improvementTrajectory.improvementPct}% improvement since first attempt
+              </p>
+            )}
+          </>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No improvement data available yet. Keep taking quizzes to track your progress!</p>
+          </div>
+        )}
       </div>
 
       {/* Subject Mastery Score Radar */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Subject Mastery Radar</h3>
         <p className="text-sm text-gray-500 mb-4">Comprehensive mastery across all subjects</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <RadarChart data={subjectMasteryData}>
-            <PolarGrid />
-            <PolarAngleAxis dataKey="subject" />
-            <PolarRadiusAxis angle={90} domain={[0, 100]} />
-            <Radar name="Mastery" dataKey="mastery" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.6} />
-            <Tooltip />
-            <Legend />
-          </RadarChart>
-        </ResponsiveContainer>
-        <p className="text-sm text-gray-600 mt-3">🎯 Programming mastery is nearly complete (95%)</p>
+        {processedData.subjectMasteryData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <RadarChart data={processedData.subjectMasteryData}>
+              <PolarGrid />
+              <PolarAngleAxis dataKey="subject" />
+              <PolarRadiusAxis angle={90} domain={[0, 100]} />
+              <Radar name="Mastery" dataKey="mastery" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.6} />
+              <Tooltip />
+              <Legend />
+            </RadarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No mastery data available yet</p>
+          </div>
+        )}
       </div>
 
       {/* Streak & Consistency */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Streak & Consistency</h3>
         <p className="text-sm text-gray-500 mb-4">Last 7 days participation (engagement driver)</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={streakData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="day" />
-            <YAxis domain={[0, 1]} />
-            <Tooltip formatter={() => 'Active'} />
-            <Bar
-              dataKey="active"
-              fill="#14B8A6"
-              radius={[8, 8, 0, 0]}
-            />
-          </BarChart>
-        </ResponsiveContainer>
-        <p className="mt-4 text-sm text-gray-600">
-          🔥 {streakData.filter(d => d.active === 1).length} / 7 days active | Current streak: {analyticsMetrics.streakDays} days
-        </p>
+        {analyticsData.streak?.last7Days ? (
+          <>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={analyticsData.streak.last7Days.map((day) => ({
+                date: new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                active: day.active,
+              }))}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis domain={[0, 1]} ticks={[0, 1]} />
+                <Tooltip formatter={(value) => (value === 1 ? 'Active' : 'Inactive')} />
+                <Bar
+                  dataKey="active"
+                  fill="#14B8A6"
+                  radius={[8, 8, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+            <p className="mt-4 text-sm text-gray-600">
+              🔥 {analyticsData.streak.last7Days.filter(d => d.active === 1).length} / 7 days active | Current streak: {analyticsData.streak.streakDays} days
+            </p>
+          </>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No streak data available yet</p>
+          </div>
+        )}
       </div>
 
       {/* Correct/Wrong/Skipped Rate Trends */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Answer Rate Trends</h3>
         <p className="text-sm text-gray-500 mb-4">Monthly trends predicting future answer patterns</p>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={rateData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="correct" stroke="#22C55E" strokeWidth={2} />
-            <Line type="monotone" dataKey="wrong" stroke="#EF4444" strokeWidth={2} />
-            <Line type="monotone" dataKey="skipped" stroke="#F59E0B" strokeWidth={2} />
-          </LineChart>
-        </ResponsiveContainer>
-        <p className="text-sm text-gray-600 mt-3">📈 Predicted next month: 94% correct, 4% wrong, 2% skipped</p>
+        {processedData.answerRateTrendsData.length > 0 ? (
+          <>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={processedData.answerRateTrendsData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis label={{ value: 'Percentage (%)', angle: -90, position: 'insideLeft' }} />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="correct" stroke="#22C55E" strokeWidth={2} name="Correct %" />
+                <Line type="monotone" dataKey="wrong" stroke="#EF4444" strokeWidth={2} name="Wrong %" />
+                <Line type="monotone" dataKey="skipped" stroke="#F59E0B" strokeWidth={2} name="Skipped %" />
+              </LineChart>
+            </ResponsiveContainer>
+            {analyticsData.answerRateTrends?.predicted && (
+              <p className="text-sm text-gray-600 mt-3">
+                📈 Predicted {analyticsData.answerRateTrends.predicted.nextMonth}: {analyticsData.answerRateTrends.predicted.predictedCorrectPct}% correct, {analyticsData.answerRateTrends.predicted.predictedWrongPct}% wrong, {analyticsData.answerRateTrends.predicted.predictedSkippedPct}% skipped
+              </p>
+            )}
+          </>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-gray-400">
+            <p>No trend data available yet. Keep taking quizzes to see patterns!</p>
+          </div>
+        )}
       </div>
 
       {/* Subject Details Table */}
