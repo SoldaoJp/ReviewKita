@@ -75,3 +75,29 @@ export const submitQuiz = async (quizId, answers) => {
     throw error;
   }
 };
+
+export const createRetakeQuiz = async (originalQuizId) => {
+  try {
+    console.log('Creating retake quiz for original quiz:', originalQuizId);
+    const response = await httpService.post('/quiz-retakes', { originalQuizId });
+    console.log('Retake quiz creation response:', response);
+    return response;
+  } catch (error) {
+    console.error('Error creating retake quiz:', error);
+    console.error('Error response:', error.response);
+    throw error;
+  }
+};
+
+export const submitRetakeQuiz = async (retakeQuizId, answers) => {
+  try {
+    console.log('Submitting retake quiz:', { retakeQuizId, answers });
+    const response = await httpService.post(`/quiz-retakes/${retakeQuizId}/submit`, { answers });
+    console.log('Submit retake quiz response:', response);
+    return response;
+  } catch (error) {
+    console.error('Error submitting retake quiz:', error);
+    console.error('Error response:', error.response);
+    throw error;
+  }
+};

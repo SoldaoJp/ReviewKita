@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getQuizByReviewer, deleteQuiz, submitQuiz } from '../../services/quizService';
+import { getQuizByReviewer, deleteQuiz, submitQuiz, submitRetakeQuiz } from '../../services/quizService';
 import MultipleChoiceQuiz from '../components/reviewer/MultipleChoiceQuiz';
 import IdentificationQuiz from '../components/reviewer/IdentificationQuiz';
 import EssayQuiz from '../components/reviewer/EssayQuiz';
@@ -48,6 +48,12 @@ function QuizPage() {
       setLoading(true);
       const response = await getQuizByReviewer(reviewerId);
       if (!response.quiz) throw new Error('Quiz data not found in response');
+      
+      // Debug: Log the quiz object to see its structure
+      console.log('Fetched quiz object:', response.quiz);
+      console.log('Has originalQuiz?', !!response.quiz.originalQuiz);
+      console.log('Has isRetake?', !!response.quiz.isRetake);
+      
       setQuiz(response.quiz);
       const initialAnswers = response.quiz.questions.map(q => ({
         questionId: q.id,
@@ -134,8 +140,27 @@ function QuizPage() {
     }));
 
     try {
-      // Submit quiz to backend
-      const submitResponse = await submitQuiz(quiz._id, formattedAnswers);
+      // Determine if this is a retake quiz and use appropriate endpoint
+      const isRetakeQuiz = quiz.originalQuiz || quiz.isRetake;
+      
+      console.log('Quiz submission details:');
+      console.log('- Quiz ID:', quiz._id);
+      console.log('- Has originalQuiz field:', !!quiz.originalQuiz);
+      console.log('- Has isRetake field:', !!quiz.isRetake);
+      console.log('- Is detected as retake?', isRetakeQuiz);
+      console.log('- Will use endpoint:', isRetakeQuiz ? 'POST /quiz-retakes/:id/submit' : 'POST /quizzes/:id/submit');
+      
+      let submitResponse;
+      
+      if (isRetakeQuiz) {
+        // Use retake submission endpoint
+        console.log('Submitting as RETAKE quiz to:', `/quiz-retakes/${quiz._id}/submit`);
+        submitResponse = await submitRetakeQuiz(quiz._id, formattedAnswers);
+      } else {
+        // Use regular quiz submission endpoint
+        console.log('Submitting as REGULAR quiz to:', `/quizzes/${quiz._id}/submit`);
+        submitResponse = await submitQuiz(quiz._id, formattedAnswers);
+      }
       
       // Extract result from backend response
       const result = submitResponse.result || {};
