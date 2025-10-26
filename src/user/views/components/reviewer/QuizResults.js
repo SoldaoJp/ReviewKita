@@ -70,6 +70,20 @@ export default function QuizResults({ quiz, userAnswers, onRetake, onGoBack }) {
               const userAnswer = userAnswers[index];
               const isCorrect = userAnswer.isCorrect === true;
               const isSkipped = userAnswer.isSkipped === true;
+              
+              // Helper function to get option text from array format
+              const getOptionText = (optionKey) => {
+                if (!question.options) return '';
+                if (Array.isArray(question.options)) {
+                  // Array format: ["A) text", "B) text", ...]
+                  const option = question.options.find(opt => opt.startsWith(optionKey + ')'));
+                  return option || '';
+                } else {
+                  // Object format: { A: "text", B: "text", ... }
+                  return question.options[optionKey] || '';
+                }
+              };
+              
               return (
                 <div key={question.id} className="border rounded-lg p-4">
                   <div className="flex items-start justify-between mb-2">
@@ -78,7 +92,7 @@ export default function QuizResults({ quiz, userAnswers, onRetake, onGoBack }) {
                       {question.type === 'multiple-choice' && (
                         <div className="space-y-1 text-sm">
                           <p className="text-gray-600"><strong>Your answer:</strong> {isSkipped ? 'Skipped' : userAnswer.answer || 'No answer'}</p>
-                          <p className="text-gray-600"><strong>Correct answer:</strong> {question.correct_answer}{question.options && ` (${question.options[question.correct_answer]})`}</p>
+                          <p className="text-gray-600"><strong>Correct answer:</strong> {question.correct_answer}{question.options && ` (${getOptionText(question.correct_answer)})`}</p>
                         </div>
                       )}
                       {question.type === 'identification' && (

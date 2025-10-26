@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Topbar from "../components/sidebar/Topbar";
 import { getAllReviewers, createReviewer, deleteReviewer } from "../../services/reviewerService";
 import { getAvailableLlmModelsReviewer } from "../../services/llmConfigService";
-import { createQuiz } from "../../services/quizService";
+import { createQuiz, createRetakeQuiz } from "../../services/quizService";
 import { useNavigate } from "react-router-dom";
 import { useReviewerContext } from "../../controllers/context/ReviewerContext";
 import QuizGenerationModal from "../components/reviewer/QuizGenerationModal";
@@ -130,7 +130,10 @@ function ReviewerPage({ title }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showQuizModal, setShowQuizModal] = useState(false);
   const [showRetakeModal, setShowRetakeModal] = useState(false);
+  const [showDifficultyModal, setShowDifficultyModal] = useState(false);
   const [selectedReviewer, setSelectedReviewer] = useState(null);
+  const [selectedDifficulty, setSelectedDifficulty] = useState(null);
+  const [hoveredQuiz, setHoveredQuiz] = useState(null); // For retake dropdown on hover
   const [reviewers, setReviewers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -287,17 +290,81 @@ function ReviewerPage({ title }) {
 
   const handleGenerateQuizClick = (reviewer) => {
     setSelectedReviewer(reviewer);
-    if (reviewer.hasQuiz) {
+    setShowDifficultyModal(true);
+  };
+
+  const handleDifficultySelect = (difficulty) => {
+    setSelectedDifficulty(difficulty);
+    setShowDifficultyModal(false);
+    
+    // Check if this difficulty already has a quiz
+    const hasQuizForDifficulty = selectedReviewer?.quizzes?.[difficulty]?.quizId;
+    
+    if (hasQuizForDifficulty) {
+      // Show retake confirmation
       setShowRetakeModal(true);
     } else {
+      // Show quiz generation modal
       setShowQuizModal(true);
+    }
+  };
+
+  const handleRetakeQuiz = async () => {
+    if (!selectedReviewer || !selectedDifficulty) return;
+    
+    try {
+      setShowRetakeModal(false);
+      showNotification('loading', `Generating new ${selectedDifficulty} quiz...`);
+      
+      // Get the quiz ID for the selected difficulty
+      const quizId = selectedReviewer.quizzes?.[selectedDifficulty]?.quizId;
+      
+      if (!quizId) {
+        throw new Error('Quiz ID not found for selected difficulty');
+      }
+      
+      // Use retake endpoint to create a new quiz with same settings
+      const response = await createRetakeQuiz(quizId);
+      console.log('Retake quiz created successfully:', response);
+      
+      // Get the retake quiz ID from response
+      const retakeQuizId = response.retake?._id || response._id;
+      
+      showNotification('success', 'New quiz generated successfully! Redirecting...');
+      
+      setTimeout(() => {
+        // Navigate to retake quiz using the retake quiz ID
+        navigate(`/retake-quiz/${retakeQuizId}`);
+      }, 1500);
+    } catch (error) {
+      console.error('Error generating retake quiz:', error);
+      
+      let errorMessage = 'Failed to generate new quiz. Please try again.';
+      if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        errorMessage = error.response.data.errors.map(e => e.msg).join(', ');
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      showNotification('error', errorMessage);
+      setSelectedReviewer(null);
+      setSelectedDifficulty(null);
     }
   };
 
   const handleGenerateQuiz = async (quizData) => {
     try {
-      showNotification('loading', 'Generating quiz...');
-      const response = await createQuiz(quizData);
+      showNotification('loading', `Generating ${selectedDifficulty} quiz...`);
+      
+      // Add difficulty to quiz data
+      const quizDataWithDifficulty = {
+        ...quizData,
+        difficulty: selectedDifficulty
+      };
+      
+      const response = await createQuiz(quizDataWithDifficulty);
       console.log('Quiz created successfully:', response);
       showNotification('success', 'Quiz generated successfully! Redirecting...');
       setShowQuizModal(false);
@@ -322,6 +389,7 @@ function ReviewerPage({ title }) {
       
       showNotification('error', errorMessage);
       setSelectedReviewer(null);
+      setSelectedDifficulty(null);
     }
   };
 
@@ -420,6 +488,21 @@ function ReviewerPage({ title }) {
                 <div className="mt-4">
                   <h3 className="text-lg font-semibold">{reviewer.title}</h3>
                   <p className="text-sm text-gray-500">{reviewer.description}</p>
+                  
+                  {/* Difficulty Badges */}
+                  {reviewer.hasQuiz && (
+                    <div className="flex gap-2 mt-2">
+                      {reviewer.hasEasyQuiz && (
+                        <span className="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">Easy</span>
+                      )}
+                      {reviewer.hasMediumQuiz && (
+                        <span className="px-2 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded-full">Medium</span>
+                      )}
+                      {reviewer.hasHardQuiz && (
+                        <span className="px-2 py-0.5 text-xs bg-red-100 text-red-700 rounded-full">Hard</span>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex justify-between items-center mt-4">
@@ -430,7 +513,7 @@ function ReviewerPage({ title }) {
                     }}
                     className="px-3 py-1 bg-cyan-500 text-white text-sm rounded hover:bg-cyan-600"
                   >
-                    {reviewer.hasQuiz ? "Retake Quiz" : "Generate Quiz"}
+                    {reviewer.hasAllDifficulties ? "Retake Quiz" : reviewer.hasQuiz ? "Generate/Retake Quiz" : "Generate Quiz"}
                   </button>
                   <span className="text-xs text-gray-400">{formatDate(reviewer.extractedDate)}</span>
                 </div>
@@ -834,25 +917,132 @@ function ReviewerPage({ title }) {
         onClose={() => {
           setShowQuizModal(false);
           setSelectedReviewer(null);
+          setSelectedDifficulty(null);
         }}
         onGenerate={handleGenerateQuiz}
         reviewerId={selectedReviewer?._id}
       />
 
+      {/* Difficulty Selection Modal */}
+      {showDifficultyModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
+            <h3 className="text-lg font-semibold mb-3">Select Quiz Difficulty</h3>
+            <p className="text-gray-600 text-sm mb-6">
+              Choose the difficulty level for your quiz. Already completed? Click to practice more!
+            </p>
+            <div className="space-y-3">
+              {/* Easy Button */}
+              <div 
+                className="relative"
+                onMouseEnter={() => selectedReviewer?.hasEasyQuiz && setHoveredQuiz('easy')}
+                onMouseLeave={() => setHoveredQuiz(null)}
+              >
+                <button
+                  onClick={() => handleDifficultySelect('easy')}
+                  disabled={false}
+                  className={`w-full py-3 px-4 rounded-lg font-medium transition-all ${
+                    selectedReviewer?.hasEasyQuiz
+                      ? 'bg-green-100 text-green-700 border-2 border-green-300 hover:bg-green-200'
+                      : 'bg-green-500 text-white hover:bg-green-600'
+                  }`}
+                >
+                  Easy {selectedReviewer?.hasEasyQuiz && '✓'}
+                </button>
+                {hoveredQuiz === 'easy' && selectedReviewer?.hasEasyQuiz && (
+                  <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-3 rounded whitespace-nowrap">
+                    Practice more
+                  </div>
+                )}
+              </div>
+
+              {/* Medium Button */}
+              <div 
+                className="relative"
+                onMouseEnter={() => selectedReviewer?.hasMediumQuiz && setHoveredQuiz('medium')}
+                onMouseLeave={() => setHoveredQuiz(null)}
+              >
+                <button
+                  onClick={() => handleDifficultySelect('medium')}
+                  disabled={false}
+                  className={`w-full py-3 px-4 rounded-lg font-medium transition-all ${
+                    selectedReviewer?.hasMediumQuiz
+                      ? 'bg-yellow-100 text-yellow-700 border-2 border-yellow-300 hover:bg-yellow-200'
+                      : 'bg-yellow-500 text-white hover:bg-yellow-600'
+                  }`}
+                >
+                  Medium {selectedReviewer?.hasMediumQuiz && '✓'}
+                </button>
+                {hoveredQuiz === 'medium' && selectedReviewer?.hasMediumQuiz && (
+                  <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-3 rounded whitespace-nowrap">
+                    Practice more
+                  </div>
+                )}
+              </div>
+
+              {/* Hard Button */}
+              <div 
+                className="relative"
+                onMouseEnter={() => selectedReviewer?.hasHardQuiz && setHoveredQuiz('hard')}
+                onMouseLeave={() => setHoveredQuiz(null)}
+              >
+                <button
+                  onClick={() => handleDifficultySelect('hard')}
+                  disabled={false}
+                  className={`w-full py-3 px-4 rounded-lg font-medium transition-all ${
+                    selectedReviewer?.hasHardQuiz
+                      ? 'bg-red-100 text-red-700 border-2 border-red-300 hover:bg-red-200'
+                      : 'bg-red-500 text-white hover:bg-red-600'
+                  }`}
+                >
+                  Hard {selectedReviewer?.hasHardQuiz && '✓'}
+                </button>
+                {hoveredQuiz === 'hard' && selectedReviewer?.hasHardQuiz && (
+                  <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-3 rounded whitespace-nowrap">
+                    Practice more
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end mt-6">
+              <button
+                onClick={() => {
+                  setShowDifficultyModal(false);
+                  setSelectedReviewer(null);
+                }}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Retake Quiz Confirmation Modal */}
       {showRetakeModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6">
-            <h3 className="text-lg font-semibold mb-3">Retake Quiz</h3>
+            <h3 className="text-lg font-semibold mb-3">Practice More - {selectedDifficulty?.charAt(0).toUpperCase() + selectedDifficulty?.slice(1)} Level</h3>
             <p className="text-gray-600 text-sm mb-6">
-              This feature is not yet implemented. Stay tuned for updates!
+              Ready to practice more? We'll generate a fresh set of <span className="font-semibold">{selectedDifficulty}</span> questions with the same settings. Your previous attempts will be saved in your history!
             </p>
             <div className="flex gap-3 justify-end">
               <button
-                onClick={() => setShowRetakeModal(false)}
+                onClick={() => {
+                  setShowRetakeModal(false);
+                  setSelectedReviewer(null);
+                  setSelectedDifficulty(null);
+                }}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-sm"
               >
-                Close
+                Cancel
+              </button>
+              <button
+                onClick={handleRetakeQuiz}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+              >
+                Start Practice
               </button>
             </div>
           </div>

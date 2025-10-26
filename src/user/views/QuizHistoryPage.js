@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { getAllAttempts, getAttemptById } from "../services/quizHistoryService";
 import Topbar from "./components/sidebar/Topbar";
-import { Info } from 'lucide-react';
+import { Info, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function QuizHistoryPage() {
   const [attempts, setAttempts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
+  const [expandedQuizId, setExpandedQuizId] = useState(null);
 
   // Function to get color based on score percentage
   const getScoreColor = (percent) => {
@@ -40,7 +41,17 @@ export default function QuizHistoryPage() {
 
   const filtered = attempts;
 
-  const selected = selectedId ? attempts.find(a => a.id === selectedId) : null;
+  const selected = selectedId ? attempts.find(a => {
+    if (a.id === selectedId) return a;
+    return a.retakes?.find(r => r.id === selectedId);
+  })?.id === selectedId 
+    ? attempts.find(a => a.id === selectedId)
+    : attempts.flatMap(a => a.retakes || []).find(r => r.id === selectedId) 
+    : null;
+
+  const toggleExpand = (quizId) => {
+    setExpandedQuizId(expandedQuizId === quizId ? null : quizId);
+  };
 
   return (
     <div className="p-8 max-w-[1800px] mx-auto">
@@ -68,22 +79,64 @@ export default function QuizHistoryPage() {
             <tbody>
               {filtered.map(a => {
                 const scoreColors = getScoreColor(a.score_percent ?? 0);
+                const hasRetakes = a.retakes && a.retakes.length > 0;
+                const isExpanded = expandedQuizId === a.id;
+                
                 return (
-                  <tr key={a.id} className="border-t">
-                    <td className="px-4 py-2 font-medium text-gray-800">{a.title || 'Untitled Quiz'}</td>
-                    <td className="px-4 py-2 text-gray-700">{a.reviewer_title || 'Unknown'}</td>
-                    <td className="px-4 py-2">
-                      <span className={`inline-block px-2 py-1 rounded-full ${scoreColors.bg} ${scoreColors.text} font-semibold`}>
-                        {a.score_percent ?? 'N/A'}%
-                      </span>
-                    </td>
-                    <td className="px-4 py-2 text-gray-600">{new Date(a.submitted_at).toLocaleString()}</td>
-                    <td className="px-4 py-2">
-                      <button onClick={() => setSelectedId(a.id)} className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded">
-                        <Info className="w-4 h-4" /> Details
-                      </button>
-                    </td>
-                  </tr>
+                  <>
+                    <tr key={a.id} className="border-t hover:bg-gray-50">
+                      <td className="px-4 py-2 font-medium text-gray-800">
+                        <div className="flex items-center gap-2">
+                          {hasRetakes && (
+                            <button 
+                              onClick={() => toggleExpand(a.id)}
+                              className="text-gray-500 hover:text-gray-700"
+                            >
+                              {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            </button>
+                          )}
+                          {a.title || 'Untitled Quiz'}
+                        </div>
+                      </td>
+                      <td className="px-4 py-2 text-gray-700">{a.reviewer_title || 'Unknown'}</td>
+                      <td className="px-4 py-2">
+                        <span className={`inline-block px-2 py-1 rounded-full ${scoreColors.bg} ${scoreColors.text} font-semibold`}>
+                          {a.score_percent ?? 'N/A'}%
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 text-gray-600">{new Date(a.submitted_at).toLocaleString()}</td>
+                      <td className="px-4 py-2">
+                        <button onClick={() => setSelectedId(a.id)} className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded">
+                          <Info className="w-4 h-4" /> Details
+                        </button>
+                      </td>
+                    </tr>
+                    
+                    {/* Retakes rows */}
+                    {isExpanded && hasRetakes && a.retakes.map((retake, idx) => {
+                      const retakeScoreColors = getScoreColor(retake.score_percent ?? 0);
+                      return (
+                        <tr key={retake.id} className="border-t bg-blue-50/30">
+                          <td className="px-4 py-2 pl-12 text-gray-700">
+                            <span className="text-xs text-blue-600 font-medium mr-2">RETAKE {idx + 1}</span>
+                            {retake.title || 'Retake Quiz'}
+                          </td>
+                          <td className="px-4 py-2 text-gray-600 text-sm">{a.reviewer_title || 'Unknown'}</td>
+                          <td className="px-4 py-2">
+                            <span className={`inline-block px-2 py-1 rounded-full ${retakeScoreColors.bg} ${retakeScoreColors.text} font-semibold text-xs`}>
+                              {retake.score_percent ?? 'N/A'}%
+                            </span>
+                          </td>
+                          <td className="px-4 py-2 text-gray-600 text-sm">{new Date(retake.submitted_at).toLocaleString()}</td>
+                          <td className="px-4 py-2">
+                            <button onClick={() => setSelectedId(retake.id)} className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-100 hover:bg-blue-200 rounded text-sm">
+                              <Info className="w-4 h-4" /> Details
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </>
                 );
               })}
             </tbody>

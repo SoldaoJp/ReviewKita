@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getQuizByReviewer, deleteQuiz, submitQuiz } from '../../services/quizService';
+import { getRetakeQuiz, submitRetakeQuiz, deleteRetakeQuiz } from '../../services/quizService';
 import MultipleChoiceQuiz from '../components/reviewer/MultipleChoiceQuiz';
 import IdentificationQuiz from '../components/reviewer/IdentificationQuiz';
 import EssayQuiz from '../components/reviewer/EssayQuiz';
@@ -8,8 +8,8 @@ import FillInTheBlanksQuiz from '../components/reviewer/FillInTheBlanksQuiz';
 import QuizResults from '../components/reviewer/QuizResults';
 import { addAttempt as saveQuizAttempt } from '../../services/quizHistoryService';
 
-function QuizPage() {
-  const { reviewerId } = useParams();
+function RetakeQuizPage() {
+  const { retakeQuizId } = useParams();
   const navigate = useNavigate();
   const [quiz, setQuiz] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,9 +21,15 @@ function QuizPage() {
   const [startTime, setStartTime] = useState(null);
   const [showExitModal, setShowExitModal] = useState(false);
 
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
   useEffect(() => {
-    fetchQuiz();
-  }, [reviewerId]);
+    fetchRetakeQuiz();
+  }, [retakeQuizId]);
 
   useEffect(() => {
     if (!quiz || !quiz.settings.timerMinutes || quiz.settings.timerMinutes === 0) return;
@@ -43,11 +49,13 @@ function QuizPage() {
     return () => clearInterval(timer);
   }, [quiz, startTime]);
 
-  const fetchQuiz = async () => {
+  const fetchRetakeQuiz = async () => {
     try {
       setLoading(true);
-      const response = await getQuizByReviewer(reviewerId);
-      if (!response.quiz) throw new Error('Quiz data not found in response');
+      const response = await getRetakeQuiz(retakeQuizId);
+      if (!response.quiz) throw new Error('Retake quiz data not found in response');
+      
+      console.log('Fetched retake quiz:', response.quiz);
       
       setQuiz(response.quiz);
       const initialAnswers = response.quiz.questions.map(q => ({
@@ -60,7 +68,7 @@ function QuizPage() {
       setUserAnswers(initialAnswers);
       setError(null);
     } catch (err) {
-      setError(err.message || 'Failed to load quiz. Please try again.');
+      setError(err.message || 'Failed to load retake quiz. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -100,7 +108,6 @@ function QuizPage() {
     if (currentQuestionIndex < quiz.questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
     } else {
-      // Use the freshest answers to avoid missing the last response
       handleQuizComplete(false, updatedAnswers);
     }
   };
@@ -118,7 +125,6 @@ function QuizPage() {
     if (currentQuestionIndex < quiz.questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
     } else {
-      // Use the freshest answers on final skip
       handleQuizComplete(false, updatedAnswers);
     }
   };
@@ -128,15 +134,15 @@ function QuizPage() {
     
     // Prepare answers in the format expected by the backend
     const formattedAnswers = answers.map((ans, idx) => ({
-      questionId: idx + 1, // 1-based question number
+      questionId: idx + 1,
       answer: ans?.answer || undefined,
       isSkipped: ans?.isSkipped || false,
       timePerQuestionSeconds: ans?.timePerQuestionSeconds || 0
     }));
 
     try {
-      // Submit regular quiz
-      const submitResponse = await submitQuiz(quiz._id, formattedAnswers);
+      console.log('Submitting retake quiz:', retakeQuizId);
+      const submitResponse = await submitRetakeQuiz(retakeQuizId, formattedAnswers);
       
       // Extract result from backend response
       const result = submitResponse.result || {};
@@ -147,9 +153,9 @@ function QuizPage() {
       // Save to quiz history
       try {
         await saveQuizAttempt({
-          reviewerId,
-          reviewerTitle: quiz.reviewerTitle || quiz.reviewer?.title || undefined,
-          quizId: quiz._id,
+          reviewerId: quiz.reviewer,
+          reviewerTitle: quiz.title,
+          quizId: retakeQuizId,
           title: quiz.title,
           finishedAt: new Date().toISOString(),
           stats: { correct, total, percentage },
@@ -162,17 +168,17 @@ function QuizPage() {
 
       setIsCompleted(true);
     } catch (error) {
-      console.error('Failed to submit quiz:', error);
-      // Fallback to client-side calculation if backend fails
+      console.error('Failed to submit retake quiz:', error);
+      // Fallback to basic completion
       const total = quiz.questions.length;
-      const correct = answers.filter(a => a?.isCorrect === true).length;
+      const correct = answers.filter(a => !a?.isSkipped && a?.answer).length;
       const percentage = Math.round((correct / total) * 100);
       
       try {
         await saveQuizAttempt({
-          reviewerId,
-          reviewerTitle: quiz.reviewerTitle || quiz.reviewer?.title || undefined,
-          quizId: quiz._id,
+          reviewerId: quiz.reviewer,
+          reviewerTitle: quiz.title,
+          quizId: retakeQuizId,
           title: quiz.title,
           finishedAt: new Date().toISOString(),
           stats: { correct, total, percentage },
@@ -195,15 +201,11 @@ function QuizPage() {
   const handleConfirmLeave = async () => {
     try {
       setShowExitModal(false);
-      if (quiz && quiz._id) await deleteQuiz(quiz._id);
+      if (quiz && retakeQuizId) await deleteRetakeQuiz(retakeQuizId);
       navigate(-1);
-    } catch { navigate(-1); }
-  };
-
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    } catch { 
+      navigate(-1); 
+    }
   };
 
   if (loading) return (
@@ -227,7 +229,7 @@ function QuizPage() {
   if (!quiz) return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
       <div className="text-center">
-        <p className="text-gray-600 mb-4">No quiz found for this reviewer.</p>
+        <p className="text-gray-600 mb-4">No quiz found.</p>
         <button onClick={() => navigate(-1)} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Go Back</button>
       </div>
     </div>
@@ -377,7 +379,4 @@ function QuizPage() {
   );
 }
 
-export default QuizPage;
-
-
-
+export default RetakeQuizPage;

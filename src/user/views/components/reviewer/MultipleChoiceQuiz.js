@@ -27,12 +27,27 @@ export default function MultipleChoiceQuiz({
     }, 3000);
   };
 
-  const options = question.options ? [
-    { key: 'A', text: question.options.A },
-    { key: 'B', text: question.options.B },
-    { key: 'C', text: question.options.C },
-    { key: 'D', text: question.options.D }
-  ] : [];
+  // Handle both array format ["A) text", "B) text"] and object format {A: "text", B: "text"}
+  const options = question.options ? (() => {
+    if (Array.isArray(question.options)) {
+      // Array format: ["A) 0 m/s²", "B) 9.8 m/s²", ...]
+      return question.options.map(opt => {
+        const match = opt.match(/^([A-D])\)\s*(.+)$/);
+        if (match) {
+          return { key: match[1], text: match[2] };
+        }
+        return null;
+      }).filter(Boolean);
+    } else {
+      // Object format: { A: "text", B: "text", ... }
+      return [
+        { key: 'A', text: question.options.A },
+        { key: 'B', text: question.options.B },
+        { key: 'C', text: question.options.C },
+        { key: 'D', text: question.options.D }
+      ].filter(opt => opt.text);
+    }
+  })() : [];
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gradient-to-br from-blue-50 to-blue-100 text-gray-800 font-sans py-8">
