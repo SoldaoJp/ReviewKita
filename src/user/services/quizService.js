@@ -89,6 +89,19 @@ export const createRetakeQuiz = async (originalQuizId) => {
   }
 };
 
+export const getRetakeQuiz = async (retakeQuizId) => {
+  try {
+    console.log('Fetching retake quiz:', retakeQuizId);
+    const response = await httpService.get(`/quiz-retakes/${retakeQuizId}`);
+    console.log('Retake quiz fetch response:', response);
+    return response; // Backend returns { quiz: {...} }
+  } catch (error) {
+    console.error('Error fetching retake quiz:', error);
+    console.error('Error response:', error.response);
+    throw error;
+  }
+};
+
 export const submitRetakeQuiz = async (retakeQuizId, answers) => {
   try {
     console.log('Submitting retake quiz:', { retakeQuizId, answers });
@@ -97,6 +110,19 @@ export const submitRetakeQuiz = async (retakeQuizId, answers) => {
     return response;
   } catch (error) {
     console.error('Error submitting retake quiz:', error);
+    console.error('Error response:', error.response);
+    throw error;
+  }
+};
+
+export const deleteRetakeQuiz = async (retakeQuizId) => {
+  try {
+    console.log('Deleting retake quiz:', retakeQuizId);
+    const response = await httpService.delete(`/quiz-retakes/${retakeQuizId}`);
+    console.log('Delete retake quiz response:', response);
+    return response;
+  } catch (error) {
+    console.error('Error deleting retake quiz:', error);
     console.error('Error response:', error.response);
     throw error;
   }

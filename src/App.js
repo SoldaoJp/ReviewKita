@@ -4,6 +4,7 @@ import LLMAnalytics from "./admin/views/LLMAnalytics";
 import Analytics from "./admin/views/Analytics";
 import RecommendationModel from "./admin/views/RecommendationModel";
 import QuizPage from "./user/views/reviewer/QuizPage";
+import RetakeQuizPage from "./user/views/reviewer/RetakeQuizPage";
 import QuizHistoryPage from "./user/views/QuizHistoryPage";
 import AnalyticsPage from "./user/views/analytics/AnalyticsPage";
 import AdminDashboard from "./admin/views/Dashboard";
@@ -61,6 +62,7 @@ function App() {
           {/* Reviewer detail - without Layout (full screen) */}
           <Route path="/reviewer/:id" element={<ReviewerDetailPage />} />
           <Route path="/quiz/:reviewerId" element={<QuizPage />} />
+          <Route path="/retake-quiz/:retakeQuizId" element={<RetakeQuizPage />} />
 
           {/* Default redirect */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />

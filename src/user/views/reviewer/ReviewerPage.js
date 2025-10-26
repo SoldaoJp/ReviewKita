@@ -327,19 +327,14 @@ function ReviewerPage({ title }) {
       const response = await createRetakeQuiz(quizId);
       console.log('Retake quiz created successfully:', response);
       
-      // Store retake quiz info in sessionStorage
-      const retakeInfo = {
-        isRetake: true,
-        retakeQuizId: response.retake?._id || response._id,
-        originalQuizId: quizId,
-        reviewerId: selectedReviewer._id
-      };
-      sessionStorage.setItem('currentRetakeQuiz', JSON.stringify(retakeInfo));
+      // Get the retake quiz ID from response
+      const retakeQuizId = response.retake?._id || response._id;
       
       showNotification('success', 'New quiz generated successfully! Redirecting...');
       
       setTimeout(() => {
-        navigate(`/quiz/${selectedReviewer._id}`);
+        // Navigate to retake quiz using the retake quiz ID
+        navigate(`/retake-quiz/${retakeQuizId}`);
       }, 1500);
     } catch (error) {
       console.error('Error generating retake quiz:', error);
