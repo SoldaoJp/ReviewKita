@@ -99,13 +99,11 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout>
-      <div className="p-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-          Dashboard
-        </h1>
+      <div className="p-6">
+        <h1 className="text-2xl font-bold mb-8">Dashboard</h1>
 
         {/* User Activity Analytics - 30 Days */}
-        <div className="bg-white rounded-xl shadow p-6 mb-8">
+        <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6 mb-8">
           <h2 className="text-xl font-semibold text-gray-700 mb-2">
             User Activity Overview (Last 30 Days)
           </h2>
@@ -173,7 +171,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-white rounded-xl shadow p-6">
+          <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
             <h2 className="text-xl font-semibold text-gray-700 mb-2">
               Class Mastery by Topic
             </h2>
@@ -194,7 +192,7 @@ export default function AdminDashboard() {
               🟩 Highest mastery: Programming (88%) | 🔴 Lowest: History (60%)
             </p>
           </div>
-          <div className="bg-white rounded-xl shadow p-6">
+          <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
             <h2 className="text-xl font-semibold text-gray-700 mb-2">
               Student Engagement Trends
             </h2>
@@ -213,7 +211,7 @@ export default function AdminDashboard() {
             </ResponsiveContainer>
             <p className="text-sm text-gray-600 mt-3">🔹 Engagement increased by 40% since Week 1.</p>
           </div>
-          <div className="bg-white rounded-xl shadow p-6">
+          <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
             <h2 className="text-xl font-semibold text-gray-700 mb-2">Feature Usage Distribution</h2>
             <p className="text-gray-500 mb-4">Shows which features drive most of the learning time.</p>
             <ResponsiveContainer width="100%" height={250}>
@@ -229,7 +227,7 @@ export default function AdminDashboard() {
             </ResponsiveContainer>
             <p className="text-sm text-gray-600 mt-3">🧠 AI Summaries are the most used feature (40%).</p>
           </div>
-          <div className="bg-white rounded-xl shadow p-6">
+          <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
             <h2 className="text-xl font-semibold text-gray-700 mb-2">Upload Success by File Type</h2>
             <p className="text-gray-500 mb-4">Measures upload reliability and parsing success rates.</p>
             <ResponsiveContainer width="100%" height={250}>

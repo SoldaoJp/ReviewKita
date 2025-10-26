@@ -91,66 +91,69 @@ export default function LLMReports() {
 
   return (
     <AdminLayout topbarProps={{ onSearch: handleTopbarSearch }}>
-      <div className="p-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">REPORT CASES</h1>
+      <div className="p-6">
+        {/* Header with Title and Controls */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold">REPORT CASES</h1>
+          
+          {/* Search & Filter Controls */}
+          <div className="flex items-center gap-2">
+            {/* Search bar */}
+            <div className="flex items-center bg-white shadow-sm rounded-lg px-3 border border-gray-300">
+              <Search className="text-gray-500 w-5 h-5 mr-2" />
+              <input
+                type="text"
+                placeholder="Search by model name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="py-2 focus:outline-none text-gray-700 w-48"
+              />
+            </div>
 
-        {/* Search & Filter */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-6">
-          {/* Search bar */}
-          <div className="flex items-center bg-white shadow-sm rounded-lg px-3 w-full sm:max-w-md border border-gray-300 mb-2 sm:mb-0">
-            <Search className="text-gray-500 w-5 h-5 mr-2" />
-            <input
-              type="text"
-              placeholder="Search by model name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full py-2 focus:outline-none text-gray-700"
-            />
-          </div>
-
-          {/* Search Button */}
-          <button 
-            onClick={handleSearch}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-          >
-            Search
-          </button>
-
-          {/* Dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setDropdownOpen(!isDropdownOpen)}
-              className="flex items-center bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition"
+            {/* Search Button */}
+            <button 
+              onClick={handleSearch}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
             >
-              <span className="mr-2">{selectedFilter}</span>
-              <ChevronDown className="w-4 h-4" />
+              Search
             </button>
 
-            {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                {["All", "Sort Ascending", "Sort Descending"].map(
-                  (filter) => (
-                    <button
-                      key={filter}
-                      onClick={() => {
-                        handleFilterChange(filter);
-                        setDropdownOpen(false);
-                      }}
-                      className={`block w-full text-left px-4 py-2 hover:bg-gray-100 ${
-                        selectedFilter === filter ? "font-semibold bg-gray-50" : ""
-                      }`}
-                    >
-                      {filter}
-                    </button>
-                  )
-                )}
-              </div>
-            )}
+            {/* Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setDropdownOpen(!isDropdownOpen)}
+                className="flex items-center bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition"
+              >
+                <span className="mr-2">{selectedFilter}</span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                  {["All", "Sort Ascending", "Sort Descending"].map(
+                    (filter) => (
+                      <button
+                        key={filter}
+                        onClick={() => {
+                          handleFilterChange(filter);
+                          setDropdownOpen(false);
+                        }}
+                        className={`block w-full text-left px-4 py-2 hover:bg-gray-100 ${
+                          selectedFilter === filter ? "font-semibold bg-gray-50" : ""
+                        }`}
+                      >
+                        {filter}
+                      </button>
+                    )
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Reports Table */}
-        <div className="bg-white rounded-xl shadow p-6">
+        <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
           <h2 className="text-lg font-semibold mb-4 text-gray-800">Report Cases Overview</h2>
 
           {loading ? (
