@@ -17,10 +17,13 @@ import {
   ScatterChart,
   Scatter,
 } from "recharts";
+import { extractDataset } from '../services/adminService';
 
 export default function AdminAnalytics() {
   const [analyticsData, setAnalyticsData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
 
   useEffect(() => {
     // Simulate fetching analytics data from backend
@@ -81,6 +84,97 @@ export default function AdminAnalytics() {
 
   const data = analyticsData;
 
+  // Export dataset to CSV
+  const handleExportDataset = async () => {
+    try {
+      setExporting(true);
+      setExportProgress(0);
+
+      // Simulate progress for fetching data
+      setExportProgress(20);
+      const response = await extractDataset();
+      setExportProgress(50);
+
+      console.log('Export response:', response);
+
+      if (!response || !response.dataset) {
+        throw new Error('No dataset returned from server');
+      }
+
+      const dataset = response.dataset;
+
+      // Validate dataset is an array
+      if (!Array.isArray(dataset)) {
+        throw new Error('Invalid dataset structure: expected an array');
+      }
+
+      if (dataset.length === 0) {
+        throw new Error('Dataset is empty');
+      }
+      
+      // Convert dataset to CSV format
+      setExportProgress(70);
+      const csvContent = convertDatasetToCSV(dataset);
+      setExportProgress(90);
+
+      // Download CSV file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `ReviewKita_Dataset_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      setExportProgress(100);
+      setTimeout(() => {
+        setExporting(false);
+        setExportProgress(0);
+      }, 500);
+    } catch (error) {
+      console.error('Error exporting dataset:', error);
+      alert('Failed to export dataset. Please try again.');
+      setExporting(false);
+      setExportProgress(0);
+    }
+  };
+
+  // Convert dataset to CSV format
+  const convertDatasetToCSV = (dataset) => {
+    // Helper function to safely escape CSV values
+    const escapeCSV = (value) => {
+      if (value === null || value === undefined) return '';
+      const str = String(value);
+      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    let csv = '';
+
+    // Get all unique keys from all objects (in case some objects have different keys)
+    const allKeys = new Set();
+    dataset.forEach(record => {
+      Object.keys(record).forEach(key => allKeys.add(key));
+    });
+
+    const headers = Array.from(allKeys);
+
+    // Add header row
+    csv += headers.map(header => escapeCSV(header)).join(',') + '\n';
+
+    // Add data rows
+    dataset.forEach(record => {
+      const row = headers.map(header => escapeCSV(record[header]));
+      csv += row.join(',') + '\n';
+    });
+
+    return csv;
+  };
+
   // Calculate weakest subject
   const weakestSubject = data.subjects.reduce((min, current) =>
     current.accuracy < min.accuracy ? current : min
@@ -107,17 +201,51 @@ export default function AdminAnalytics() {
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-2xl font-bold">Analytics</h1>
           <button
-            title="Export (not implemented)"
-            onClick={(e) => { e.preventDefault(); }}
-            aria-disabled="true"
-            className="inline-flex items-center gap-2 bg-white/50 border border-[#eef3fb] text-sm text-gray-700 px-3 py-2 rounded-lg hover:bg-white/80 hover:text-gray-900 hover:shadow-sm transition-colors duration-150"
+            onClick={handleExportDataset}
+            disabled={exporting}
+            className={`inline-flex items-center gap-2 bg-white/50 border border-[#eef3fb] text-sm text-gray-700 px-3 py-2 rounded-lg hover:bg-white/80 hover:text-gray-900 hover:shadow-sm transition-colors duration-150 ${exporting ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v12m0 0l-4-4m4 4 4-4M4 20h16" />
-            </svg>
-            Export
+            {exporting ? (
+              <>
+                <svg className="animate-spin h-4 w-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Exporting...
+              </>
+            ) : (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v12m0 0l-4-4m4 4 4-4M4 20h16" />
+                </svg>
+                Export
+              </>
+            )}
           </button>
         </div>
+
+        {/* Export Progress Bar */}
+        {exporting && (
+          <div className="mb-6 bg-white/50 rounded-xl shadow-sm border border-[#eef3fb] p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-gray-700">Exporting dataset...</span>
+              <span className="text-sm font-medium text-blue-600">{exportProgress}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2.5">
+              <div 
+                className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                style={{ width: `${exportProgress}%` }}
+              ></div>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              {exportProgress < 30 && 'Fetching data from server...'}
+              {exportProgress >= 30 && exportProgress < 60 && 'Processing student performance data...'}
+              {exportProgress >= 60 && exportProgress < 85 && 'Converting to CSV format...'}
+              {exportProgress >= 85 && exportProgress < 100 && 'Preparing download...'}
+              {exportProgress === 100 && 'Complete! Download started.'}
+            </p>
+          </div>
+        )}
 
         {/* Top KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">

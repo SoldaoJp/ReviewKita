@@ -17,11 +17,16 @@ export const getUserActivityAnalytics = async (days = 30) => {
   return httpService.get(`/user/activity/analytics?days=${days}`);
 };
 
+export const extractDataset = async () => {
+  return httpService.get('/admin/extract-dataset');
+};
+
 export default {
   getAllUsers,
   searchUserByEmail,
   deleteUserById,
   getUserActivityAnalytics,
+  extractDataset,
 };
 
 

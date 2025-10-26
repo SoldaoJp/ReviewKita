@@ -712,7 +712,7 @@ export default function AnalyticsPage() {
         )}
       </div>
 
-      {/* Average Time per Question */}
+      {/* Average Time */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Average Time per Question</h3>
         <p className="text-sm text-gray-500 mb-4">Time efficiency by subject</p>
