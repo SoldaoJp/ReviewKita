@@ -1,9 +1,9 @@
-import React from "react";
+﻿import React from "react";
 
 function ProfilePosts() {
   const posts = [
-    { id: 1, text: "This is my first post 🎉" },
-    { id: 2, text: "Excited to share my project updates 🚀" },
+    { id: 1, text: "This is my first post ðŸŽ‰" },
+    { id: 2, text: "Excited to share my project updates ðŸš€" },
   ];
 
   return (

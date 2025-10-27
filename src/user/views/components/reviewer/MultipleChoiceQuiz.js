@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { ChevronLeft, Clock, SkipForward } from "lucide-react";
 
 export default function MultipleChoiceQuiz({
@@ -30,7 +30,7 @@ export default function MultipleChoiceQuiz({
   // Handle both array format ["A) text", "B) text"] and object format {A: "text", B: "text"}
   const options = question.options ? (() => {
     if (Array.isArray(question.options)) {
-      // Array format: ["A) 0 m/s²", "B) 9.8 m/s²", ...]
+      // Array format: ["A) 0 m/sÂ²", "B) 9.8 m/sÂ²", ...]
       return question.options.map(opt => {
         const match = opt.match(/^([A-D])\)\s*(.+)$/);
         if (match) {
@@ -140,5 +140,6 @@ export default function MultipleChoiceQuiz({
     </div>
   );
 }
+
 
 

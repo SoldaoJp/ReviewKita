@@ -1,4 +1,4 @@
-import httpService from '../../user/services/httpService';
+﻿import httpService from '../../user/services/httpService';
 
 export const fetchLLMReports = async (filters = {}) => {
   try {
@@ -28,7 +28,7 @@ export const getStaticReports = () => [
     type: "hallucination",
     description: "Incorrect facts in section 2",
     reviewer: {
-      title: "Cell Biology – Photosynthesis",
+      title: "Cell Biology â€“ Photosynthesis",
       original: "The process occurs in mitochondria...",
       enhanced:
         "The process occurs in chloroplasts where sunlight converts CO2...",
@@ -60,7 +60,7 @@ export const getStaticReports = () => [
     type: "incomplete",
     description: "Answer stops mid-sentence during explanation.",
     reviewer: {
-      title: "Quantum Mechanics – Wave Functions",
+      title: "Quantum Mechanics â€“ Wave Functions",
       original: "The wave function describes...",
       enhanced:
         "The wave function describes the probability amplitude of a particle...",
@@ -68,3 +68,4 @@ export const getStaticReports = () => [
     created_at: "2025-10-19T15:00:00.000Z",
   },
 ];
+

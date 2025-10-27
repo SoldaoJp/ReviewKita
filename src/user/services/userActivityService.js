@@ -1,4 +1,4 @@
-import httpService from './httpService';
+﻿import httpService from './httpService';
 
 // Log user activity (open reviewer)
 export const logUserActivity = async (activityType, reviewerId) => {
@@ -34,3 +34,4 @@ export const getUserActivityDays = async () => {
     throw error;
   }
 };
+

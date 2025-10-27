@@ -1,5 +1,4 @@
-// src/components/dashboard/QuizProgress.js
-export default function QuizProgress({ quizzes = [] }) {
+﻿export default function QuizProgress({ quizzes = [] }) {
     // fallback demo
     if (!quizzes || quizzes.length === 0) {
       quizzes = [

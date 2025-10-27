@@ -1,5 +1,4 @@
-// src/admin/services/adminService.js
-import httpService from '../../user/services/httpService';
+﻿import httpService from '../../user/services/httpService';
 
 export const getAllUsers = async () => {
   return httpService.get('/admin/users');
@@ -28,5 +27,6 @@ export default {
   getUserActivityAnalytics,
   extractDataset,
 };
+
 
 

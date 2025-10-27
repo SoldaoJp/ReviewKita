@@ -1,5 +1,4 @@
-// src/components/dashboard/QuizAttemptTracker.js
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
+﻿import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
 
 export default function QuizAttemptTracker({ data }) {
   // Fallback data if no data provided
@@ -74,3 +73,4 @@ export default function QuizAttemptTracker({ data }) {
     </div>
   );
 }
+

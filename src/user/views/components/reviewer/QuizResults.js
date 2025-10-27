@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Trophy, Clock, CheckCircle, XCircle, SkipForward, RotateCcw, ArrowLeft } from 'lucide-react';
 
 export default function QuizResults({ quiz, userAnswers, onRetake, onGoBack }) {
@@ -149,5 +149,6 @@ export default function QuizResults({ quiz, userAnswers, onRetake, onGoBack }) {
     </div>
   );
 }
+
 
 

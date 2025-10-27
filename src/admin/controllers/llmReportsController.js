@@ -1,5 +1,4 @@
-// src/admin/controllers/llmReportsController.js
-import { getStaticReports } from "../services/llmReportsService";
+﻿import { getStaticReports } from "../services/llmReportsService";
 
 export const filterReports = (filter, query) => {
   let reports = getStaticReports();
@@ -26,3 +25,4 @@ export const filterReports = (filter, query) => {
 
   return reports;
 };
+

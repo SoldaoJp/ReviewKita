@@ -1,5 +1,4 @@
-// src/components/auth/Signup.js
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import Logo from "../../../assets/logo.png"; // adjust path if needed
 import AuthTopbar from "../components/auth/AuthTopbar";
 import TermsAndConditions from "../components/auth/TermsAndConditions";
@@ -64,7 +63,7 @@ function Signup() {
           <p className="text-sm text-slate-600 mb-6">
             Unlock smarter studying with AI-powered quizzes, flashcards, and
             summaries. Track your progress, stay motivated with achievements,
-            and transform your notes into interactive learning experiences —
+            and transform your notes into interactive learning experiences â€”
             all in one platform.
           </p>
 
@@ -297,3 +296,4 @@ function Signup() {
 }
 
 export default Signup;
+

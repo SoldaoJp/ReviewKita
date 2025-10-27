@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import AuthTopbar from "../components/auth/AuthTopbar";
 import Logo from "../../../assets/logo.png"; // adjust path if needed
 import { useNavigate } from "react-router-dom";
@@ -75,7 +75,7 @@ export default function Login() {
           </h1>
           <p className="text-sm text-slate-600 mb-6">
             Log in to continue your learning journey. Access your personalized
-            quizzes, flashcards, and progress — all powered by AI to help you
+            quizzes, flashcards, and progress â€” all powered by AI to help you
             study smarter every day.
           </p>
 
@@ -189,3 +189,4 @@ export default function Login() {
     </div>
   );
 }
+

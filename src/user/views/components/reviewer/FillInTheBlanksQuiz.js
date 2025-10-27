@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { ChevronLeft, Clock, SkipForward } from "lucide-react";
 
 export default function FillInTheBlanksQuiz({
@@ -167,7 +167,7 @@ export default function FillInTheBlanksQuiz({
           <div className="w-full rounded-xl border-2 shadow-lg p-4 bg-blue-100 border-blue-500">
             <div className="text-center mb-3">
               <span className="font-semibold text-blue-800">
-                {Object.values(correctnessMap).every(c => c) ? '✓ All Correct!' : '✗ Some answers are incorrect'}
+                {Object.values(correctnessMap).every(c => c) ? 'âœ“ All Correct!' : 'âœ— Some answers are incorrect'}
               </span>
             </div>
             {!Object.values(correctnessMap).every(c => c) && (
@@ -192,3 +192,4 @@ export default function FillInTheBlanksQuiz({
     </div>
   );
 }
+

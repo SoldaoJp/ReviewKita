@@ -1,5 +1,4 @@
-// src/services/authService.js
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+﻿const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 console.log('Auth Service initialized with API URL:', API_BASE_URL);
 console.log('Environment variables:', {
@@ -47,7 +46,7 @@ class AuthService {
             const isDev = (process.env.NODE_ENV || 'development') === 'development';
             const devBypass = envBypass || storageBypass || isDev;
             if (devBypass) {
-              console.warn('Backend JWT secret missing — using development bypass to create a local dev token. THIS IS FOR DEVELOPMENT ONLY.');
+              console.warn('Backend JWT secret missing â€” using development bypass to create a local dev token. THIS IS FOR DEVELOPMENT ONLY.');
               const devToken = 'dev-token-' + Math.random().toString(36).slice(2);
               localStorage.setItem('authToken', devToken);
               localStorage.setItem('user', JSON.stringify({ email, isAuthenticated: true, devFallback: true }));

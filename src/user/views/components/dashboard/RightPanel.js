@@ -1,5 +1,4 @@
-// src/components/dashboard/RightPanel.js
-import QuizProgress from "./QuizProgress";
+﻿import QuizProgress from "./QuizProgress";
 
 export default function RightPanel({ data }) {
   // data.streak expected shape: { days: number, marks: number[] }
@@ -38,3 +37,4 @@ export default function RightPanel({ data }) {
     </div>
   );
 }
+

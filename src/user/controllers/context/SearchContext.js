@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+﻿import React, { createContext, useContext, useState } from 'react';
 import { getAllReviewers } from '../../services/reviewerService';
 
 const SearchContext = createContext(null);
@@ -35,7 +35,7 @@ export function SearchProvider({ children }) {
     if (i === -1) return text.slice(0, 120);
     const start = Math.max(0, i - 30);
     const end = Math.min(text.length, i + 90);
-    return (start > 0 ? '…' : '') + text.slice(start, end).replace(/\n+/g, ' ') + (end < text.length ? '…' : '');
+    return (start > 0 ? 'â€¦' : '') + text.slice(start, end).replace(/\n+/g, ' ') + (end < text.length ? 'â€¦' : '');
   };
 
   async function performSearch(query) {
@@ -99,7 +99,7 @@ export function SearchProvider({ children }) {
                   type: 'reviewer-section',
                   category: 'Reviewer Sections',
                   title: title || 'Reviewer',
-                  section: line.length > 60 ? line.slice(0, 60) + '…' : line,
+                  section: line.length > 60 ? line.slice(0, 60) + 'â€¦' : line,
                   description: snippet(line, query),
                   path: `/reviewers/${r._id || r.id}`,
                   date: r.updatedAt || r.createdAt,
@@ -219,3 +219,4 @@ export function useSearch() {
 }
 
 export default SearchContext;
+

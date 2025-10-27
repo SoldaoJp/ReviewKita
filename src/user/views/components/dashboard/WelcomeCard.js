@@ -1,5 +1,4 @@
-// src/components/dashboard/WelcomeCard.js
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { getUserProfile } from "../../../services/userService";
 import Image from "../../../../assets/tasks.png";
 import QuizGenerationModal from "../reviewer/QuizGenerationModal";
@@ -61,3 +60,4 @@ export default function WelcomeCard({ user }) {
     </>
   );
 }
+

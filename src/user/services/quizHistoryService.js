@@ -1,4 +1,4 @@
-// Quiz history service using backend API
+﻿// Quiz history service using backend API
 import httpService from './httpService';
 
 // Submit a new quiz attempt to the backend
@@ -54,3 +54,4 @@ export async function getAttemptById(id) {
     return null;
   }
 }
+

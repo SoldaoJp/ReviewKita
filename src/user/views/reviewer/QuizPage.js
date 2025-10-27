@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getQuizByReviewer, deleteQuiz, submitQuiz } from '../../services/quizService';
 import MultipleChoiceQuiz from '../components/reviewer/MultipleChoiceQuiz';
@@ -378,6 +378,7 @@ function QuizPage() {
 }
 
 export default QuizPage;
+
 
 
 

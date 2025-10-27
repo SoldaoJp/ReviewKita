@@ -1,4 +1,4 @@
-import httpService from './httpService';
+﻿import httpService from './httpService';
 
 // Get user profile
 export const getUserProfile = async () => {
@@ -72,3 +72,4 @@ export default {
     changeUsername,
     changePassword,
 };
+

@@ -1,5 +1,4 @@
-// src/controllers/AuthContext.js
-import React, { createContext, useContext, useState, useEffect } from 'react';
+﻿import { createContext, useContext, useState, useEffect } from 'react';
 import authService from '../services/authService.js';
 import UserModel from '../model/userModel.js';
 import userService from '../services/userService.js';
@@ -141,4 +140,5 @@ export const AuthProvider = ({ children }) => {
 		</AuthContext.Provider>
 	);
 };
+
 

@@ -1,5 +1,4 @@
-// src/components/dashboard/ProgressTracker.js
-import {
+﻿import {
     Area,
     AreaChart,
     CartesianGrid,

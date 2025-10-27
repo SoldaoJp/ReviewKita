@@ -1,4 +1,4 @@
-import AdminLayout from './Layout';
+﻿import AdminLayout from './Layout';
 import { useState, useEffect } from 'react';
 import {
   BarChart,
@@ -425,7 +425,7 @@ export default function AdminAnalytics() {
               {data.improvementRate >= 0 ? '+' : ''}{data.improvementRate}%
             </p>
             <p className="text-xs text-gray-500">
-              {data.previousOverallAccuracy}% → {data.overallAccuracy}%
+              {data.previousOverallAccuracy}% â†’ {data.overallAccuracy}%
             </p>
           </div>
         </div>
@@ -458,9 +458,9 @@ export default function AdminAnalytics() {
               </PieChart>
             </ResponsiveContainer>
             <div className="mt-4 space-y-2 text-sm">
-              <p className="text-green-700">✅ Correct: {data.correctAnswers} ({correctWrongSkippedData[0].percentage}%)</p>
-              <p className="text-red-700">❌ Wrong: {data.wrongAnswers} ({correctWrongSkippedData[1].percentage}%)</p>
-              <p className="text-yellow-700">⏭️ Skipped: {data.skippedAnswers} ({correctWrongSkippedData[2].percentage}%)</p>
+              <p className="text-green-700">âœ… Correct: {data.correctAnswers} ({correctWrongSkippedData[0].percentage}%)</p>
+              <p className="text-red-700">âŒ Wrong: {data.wrongAnswers} ({correctWrongSkippedData[1].percentage}%)</p>
+              <p className="text-yellow-700">â­ï¸ Skipped: {data.skippedAnswers} ({correctWrongSkippedData[2].percentage}%)</p>
             </div>
           </div>
 
@@ -584,7 +584,7 @@ export default function AdminAnalytics() {
               </BarChart>
             </ResponsiveContainer>
             <p className="mt-4 text-sm text-gray-600">
-              🔥 {data.last7DaysParticipation.filter(d => d.active === 1).length} / 7 days active
+              ðŸ”¥ {data.last7DaysParticipation.filter(d => d.active === 1).length} / 7 days active
             </p>
           </div>
         </div>

@@ -1,5 +1,4 @@
-// src/services/llmConfigService.js
-import httpService from './httpService';
+﻿import httpService from './httpService';
 
 export const getAvailableLlmModelsReviewer = async () => {
   // GET /llm-configs/available returns shape: { models: [ { id, model_name, recommends } ] }
@@ -52,3 +51,4 @@ export default {
   rateLlmConfig,
   reportLlmConfigReviewer,
 };
+

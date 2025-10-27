@@ -1,4 +1,4 @@
-import { Search, X as XIcon, Menu, ChevronDown } from 'lucide-react';
+﻿import { Search, X as XIcon, Menu, ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../user/controllers/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -127,3 +127,4 @@ export default function AdminTopbar({ onSearch }) {
     </div>
   );
 }
+

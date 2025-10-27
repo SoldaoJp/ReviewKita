@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+﻿import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../controllers/AuthContext";
 import { useState, useEffect } from "react";
 import { getAllReviewers } from "../../../services/reviewerService";
@@ -258,7 +258,7 @@ function Sidebar() {
                 </div>
               )}
             </div>
-            <button onClick={() => setShowSearchModal(false)} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg">×</button>
+            <button onClick={() => setShowSearchModal(false)} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg">Ã—</button>
           </div>
         </div>
       )}
@@ -291,9 +291,9 @@ function Sidebar() {
             </div>
             <div className="flex justify-end gap-2">
               <button onClick={() => { setShowAddModal(false); setFormData({ title: "", description: "", file: null }); setSelectedModelId(""); }} className="px-4 py-2 border rounded hover:bg-gray-100" disabled={submitting}>Cancel</button>
-              <button onClick={handleAddReviewer} className="px-4 py-2 bg-black text白 rounded hover:bg-gray-800 disabled:bg-gray-400" disabled={submitting}>{submitting ? "Adding..." : "Add"}</button>
+              <button onClick={handleAddReviewer} className="px-4 py-2 bg-black textç™½ rounded hover:bg-gray-800 disabled:bg-gray-400" disabled={submitting}>{submitting ? "Adding..." : "Add"}</button>
             </div>
-            <button onClick={() => { setShowAddModal(false); setFormData({ title: "", description: "", file: null }); setSelectedModelId(""); }} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg" disabled={submitting}>×</button>
+            <button onClick={() => { setShowAddModal(false); setFormData({ title: "", description: "", file: null }); setSelectedModelId(""); }} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg" disabled={submitting}>Ã—</button>
           </div>
         </div>
       )}
@@ -333,6 +333,7 @@ function Sidebar() {
 }
 
 export default Sidebar;
+
 
 
 

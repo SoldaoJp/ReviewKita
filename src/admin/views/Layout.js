@@ -1,4 +1,4 @@
-import "../../index.css";
+﻿import "../../index.css";
 import AdminSidebar from "./Sidebar";
 import AdminTopbar from "./AdminTopbar";
 
@@ -22,5 +22,6 @@ function AdminLayout({ children, topbarProps = {} }) {
 }
 
 export default AdminLayout;
+
 
 

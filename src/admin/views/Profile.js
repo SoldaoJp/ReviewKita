@@ -1,4 +1,4 @@
-import AdminLayout from './Layout';
+﻿import AdminLayout from './Layout';
 import { useAuth } from '../../user/controllers/AuthContext';
 
 export default function AdminProfile() {
@@ -38,6 +38,7 @@ export default function AdminProfile() {
     </AdminLayout>
   );
 }
+
 
 
 

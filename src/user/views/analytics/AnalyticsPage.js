@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import Topbar from '../components/sidebar/Topbar';
 import {
   getOverallAccuracy,
@@ -57,7 +57,6 @@ export default function AnalyticsPage() {
     answerRateTrends: null,
   });
 
-  // Fetch all analytics data
   useEffect(() => {
     const fetchAnalyticsData = async () => {
       try {
@@ -433,7 +432,7 @@ export default function AnalyticsPage() {
       {/* Current Streak */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <p className="text-gray-600 text-sm font-medium mb-2">Current Streak</p>
-        <p className="text-4xl font-bold text-orange-500 mb-2">🔥 {analyticsData.streak?.streakDays || 0}</p>
+        <p className="text-4xl font-bold text-orange-500 mb-2">ðŸ”¥ {analyticsData.streak?.streakDays || 0}</p>
         <p className="text-xs text-gray-500">Consecutive active days</p>
       </div>
 
@@ -444,7 +443,7 @@ export default function AnalyticsPage() {
           <>
             <p className="text-lg font-bold text-red-600 mb-2">{weakestSubject.subject}</p>
             <p className="text-xs text-gray-500">
-              {weakestSubject.accuracy}% — Focus on this next
+              {weakestSubject.accuracy}% â€” Focus on this next
             </p>
           </>
         ) : (
@@ -484,7 +483,7 @@ export default function AnalyticsPage() {
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">✅ {analyticsMetrics.overallAccuracy}% correct answers across all attempts</p>
+            <p className="text-sm text-gray-600 mt-3">âœ… {analyticsMetrics.overallAccuracy}% correct answers across all attempts</p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -511,7 +510,7 @@ export default function AnalyticsPage() {
                 <Line type="monotone" dataKey="skipped" stroke="#F59E0B" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">📈 Correct answers increased by 45% over 4 weeks</p>
+            <p className="text-sm text-gray-600 mt-3">ðŸ“ˆ Correct answers increased by 45% over 4 weeks</p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -536,7 +535,7 @@ export default function AnalyticsPage() {
                 <Bar dataKey="accuracy" fill="#3B82F6" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">🎯 Programming has the highest accuracy (95%)</p>
+            <p className="text-sm text-gray-600 mt-3">ðŸŽ¯ Programming has the highest accuracy (95%)</p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -582,7 +581,7 @@ export default function AnalyticsPage() {
                 <Bar dataKey="avgTime" name="Average Time (seconds)" fill="#8B5CF6" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">⏱️ Programming takes the most time (65s avg)</p>
+            <p className="text-sm text-gray-600 mt-3">â±ï¸ Programming takes the most time (65s avg)</p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -618,7 +617,7 @@ export default function AnalyticsPage() {
                 />
               </ScatterChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">⚡ Science has the fastest response speed (1.5 q/min)</p>
+            <p className="text-sm text-gray-600 mt-3">âš¡ Science has the fastest response speed (1.5 q/min)</p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -657,9 +656,9 @@ export default function AnalyticsPage() {
               </PieChart>
             </ResponsiveContainer>
             <div className="mt-4 space-y-2 text-sm">
-              <p className="text-green-700">✅ Correct: {analyticsData.correctWrongSkipped?.overall.correct} ({((analyticsData.correctWrongSkipped?.overall.correct / analyticsData.correctWrongSkipped?.overall.total) * 100).toFixed(1)}%)</p>
-              <p className="text-red-700">❌ Wrong: {analyticsData.correctWrongSkipped?.overall.wrong} ({((analyticsData.correctWrongSkipped?.overall.wrong / analyticsData.correctWrongSkipped?.overall.total) * 100).toFixed(1)}%)</p>
-              <p className="text-yellow-700">⏭️ Skipped: {analyticsData.correctWrongSkipped?.overall.skipped} ({((analyticsData.correctWrongSkipped?.overall.skipped / analyticsData.correctWrongSkipped?.overall.total) * 100).toFixed(1)}%)</p>
+              <p className="text-green-700">âœ… Correct: {analyticsData.correctWrongSkipped?.overall.correct} ({((analyticsData.correctWrongSkipped?.overall.correct / analyticsData.correctWrongSkipped?.overall.total) * 100).toFixed(1)}%)</p>
+              <p className="text-red-700">âŒ Wrong: {analyticsData.correctWrongSkipped?.overall.wrong} ({((analyticsData.correctWrongSkipped?.overall.wrong / analyticsData.correctWrongSkipped?.overall.total) * 100).toFixed(1)}%)</p>
+              <p className="text-yellow-700">â­ï¸ Skipped: {analyticsData.correctWrongSkipped?.overall.skipped} ({((analyticsData.correctWrongSkipped?.overall.skipped / analyticsData.correctWrongSkipped?.overall.total) * 100).toFixed(1)}%)</p>
             </div>
           </>
         ) : (
@@ -754,7 +753,7 @@ export default function AnalyticsPage() {
                 <Bar dataKey="speed" name="Questions per Minute" fill="#10B981" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">⚡ Science has the fastest response speed (1.5 q/min)</p>
+            <p className="text-sm text-gray-600 mt-3">âš¡ Science has the fastest response speed (1.5 q/min)</p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -802,7 +801,7 @@ export default function AnalyticsPage() {
                 <Bar dataKey="score" name="Score" fill="#F59E0B" radius={[0, 8, 8, 0]} />
               </BarChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">💡 Focus on {processedData.subjectRankingData[0]?.subject} to improve overall score</p>
+            <p className="text-sm text-gray-600 mt-3">ðŸ’¡ Focus on {processedData.subjectRankingData[0]?.subject} to improve overall score</p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -863,8 +862,8 @@ export default function AnalyticsPage() {
             </ResponsiveContainer>
             {analyticsData.improvementTrajectory && (
               <p className="text-sm text-gray-600 mt-3">
-                🔮 Predicted next score: {analyticsData.improvementTrajectory.predictedNextScore}% | 
-                🚀 {analyticsData.improvementTrajectory.improvementPct}% improvement since first attempt
+                ðŸ”® Predicted next score: {analyticsData.improvementTrajectory.predictedNextScore}% | 
+                ðŸš€ {analyticsData.improvementTrajectory.improvementPct}% improvement since first attempt
               </p>
             )}
           </>
@@ -920,7 +919,7 @@ export default function AnalyticsPage() {
               </BarChart>
             </ResponsiveContainer>
             <p className="mt-4 text-sm text-gray-600">
-              🔥 {analyticsData.streak.last7Days.filter(d => d.active === 1).length} / 7 days active | Current streak: {analyticsData.streak.streakDays} days
+              ðŸ”¥ {analyticsData.streak.last7Days.filter(d => d.active === 1).length} / 7 days active | Current streak: {analyticsData.streak.streakDays} days
             </p>
           </>
         ) : (
@@ -950,7 +949,7 @@ export default function AnalyticsPage() {
             </ResponsiveContainer>
             {analyticsData.answerRateTrends?.predicted && (
               <p className="text-sm text-gray-600 mt-3">
-                📈 Predicted {analyticsData.answerRateTrends.predicted.nextMonth}: {analyticsData.answerRateTrends.predicted.predictedCorrectPct}% correct, {analyticsData.answerRateTrends.predicted.predictedWrongPct}% wrong, {analyticsData.answerRateTrends.predicted.predictedSkippedPct}% skipped
+                ðŸ“ˆ Predicted {analyticsData.answerRateTrends.predicted.nextMonth}: {analyticsData.answerRateTrends.predicted.predictedCorrectPct}% correct, {analyticsData.answerRateTrends.predicted.predictedWrongPct}% wrong, {analyticsData.answerRateTrends.predicted.predictedSkippedPct}% skipped
               </p>
             )}
           </>
@@ -1051,3 +1050,4 @@ export default function AnalyticsPage() {
     </div>
   );
 }
+

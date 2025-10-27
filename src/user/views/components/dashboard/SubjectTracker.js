@@ -1,5 +1,4 @@
-// src/components/dashboard/SubjectTracker.js
-import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
+﻿import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
 export default function SubjectTracker({ data }) {
   // Fallback data if no data provided
@@ -69,4 +68,5 @@ export default function SubjectTracker({ data }) {
     </div>
   );
 }
+
 

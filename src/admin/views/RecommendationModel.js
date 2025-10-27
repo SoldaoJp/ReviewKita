@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import AdminLayout from './Layout';
 
 export default function RecommendationModel() {
@@ -121,5 +121,6 @@ simplification_score_threshold: 0.8; }`}
     </AdminLayout>
   );
 }
+
 
 

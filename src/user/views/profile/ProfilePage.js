@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import Topbar from "../components/sidebar/Topbar";
 import { getUserProfile, updateProfilePicture, changeUsername, changePassword } from "../../services/userService";
 import { getAllReviewers } from "../../services/reviewerService";
@@ -230,7 +230,7 @@ function ProfilePage() {
               onClick={() => setShowModal(false)}
               className="absolute top-3 right-3 text-gray-500 hover:text-black text-xl"
             >
-              ×
+              Ã—
             </button>
 
             <h2 className="text-xl font-semibold text-start mb-4">Edit Profile</h2>
@@ -370,3 +370,4 @@ function ProfilePage() {
 }
 
 export default ProfilePage;
+

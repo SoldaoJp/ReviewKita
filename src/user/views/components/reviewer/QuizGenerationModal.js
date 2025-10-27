@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { getAllReviewers } from '../../../services/reviewerService';
 import { useNavigate } from 'react-router-dom';
@@ -533,3 +533,4 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
 }
 
 export default QuizGenerationModal;
+

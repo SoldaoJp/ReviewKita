@@ -1,5 +1,4 @@
-// src/components/dashboard/Dashboard.js
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import Topbar from "../components/sidebar/Topbar";
 import ProgressTracker from "../components/dashboard/ProgressTracker";
@@ -14,7 +13,6 @@ import { useReviewerContext } from "../../controllers/context/ReviewerContext";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
 export default function Dashboard() {
-  // State for selected month/year
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [reviewers, setReviewers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,24 +23,18 @@ export default function Dashboard() {
   const { reviewerUpdateTrigger } = useReviewerContext();
   const navigate = useNavigate();
   
-  // Get month and year from selected date
   const monthName = selectedDate.toLocaleString('default', { month: 'long' });
   const year = selectedDate.getFullYear();
   
-  // Get the first day of the month and total days
   const firstDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1).getDay();
   const daysInMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0).getDate();
   
-  // Active days (days when user opened a reviewer)
-  // Map of day number to activity count
   const [activeDayCounts, setActiveDayCounts] = useState({});
   
-  // Get current date for comparison
   const today = new Date();
   const isCurrentMonth = selectedDate.getMonth() === today.getMonth() && 
                          selectedDate.getFullYear() === today.getFullYear();
   
-  // Navigation handlers
   const goToPreviousMonth = () => {
     setSelectedDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth() - 1, 1));
   };
@@ -55,7 +47,6 @@ export default function Dashboard() {
     setSelectedDate(new Date());
   };
 
-  // Fetch reviewers, user activity days, and analytics for charts
   useEffect(() => {
     const fetchReviewersAndActivity = async () => {
       try {
@@ -71,17 +62,13 @@ export default function Dashboard() {
         } else {
           console.log('Unexpected response format:', response);
         }
-  // Fetch user activity days for calendar
         const activityRes = await getUserActivityDays();
-        // activityRes should be array of YYYY-MM-DD strings
-        // Count occurrences per day in current month
         const dayCounts = {};
         if (Array.isArray(activityRes)) {
           activityRes.forEach(dateStr => {
-            // Expect format YYYY-MM-DD; avoid local timezone offset by parsing parts
             const [y, m, d] = String(dateStr).split('-').map(Number);
             if (!y || !m || !d) return;
-            const monthIdx = m - 1; // JS months 0-11
+            const monthIdx = m - 1;
             if (monthIdx === selectedDate.getMonth() && y === selectedDate.getFullYear()) {
               dayCounts[d] = (dayCounts[d] || 0) + 1;
             }
@@ -90,7 +77,6 @@ export default function Dashboard() {
         console.log('Active day counts for calendar:', dayCounts, 'Raw activity:', activityRes);
         setActiveDayCounts(dayCounts);
 
-        // Fetch analytics for dashboard charts
         try {
           const [coverageRes, trendsRes, attemptsRes] = await Promise.all([
             getPerSubjectCoverage(),
@@ -114,9 +100,7 @@ export default function Dashboard() {
     };
     fetchReviewersAndActivity();
 
-    // Listen for real-time activity logging and refresh calendar
     const onActivityLogged = () => {
-      // Only refresh the activity days quickly (avoid reloading reviewers list)
       (async () => {
         try {
           const activityRes = await getUserActivityDays();
@@ -141,19 +125,16 @@ export default function Dashboard() {
     return () => window.removeEventListener('user-activity-logged', onActivityLogged);
   }, [reviewerUpdateTrigger, selectedDate]);
 
-  // Calculate quiz progress data
   const getQuizProgressData = () => {
     if (loading || reviewers.length === 0) {
       return [];
     }
 
     return reviewers.map(reviewer => {
-      // Find all attempts for this reviewer
       const reviewerAttempts = quizAttempts.filter(
         attempt => attempt.reviewer_id === reviewer._id || attempt.reviewer_title === reviewer.title
       );
 
-      // Calculate average score percent
       const percent = reviewerAttempts.length > 0
         ? Math.round(
             reviewerAttempts.reduce((sum, attempt) => sum + (attempt.score_percent || 0), 0) /
@@ -161,11 +142,9 @@ export default function Dashboard() {
           )
         : 0;
 
-      // Format status as "X attempts"
       const attemptCount = reviewerAttempts.length;
       const status = `${attemptCount} attempt${attemptCount !== 1 ? 's' : ''}`;
 
-      // Set color based on percentage
       let colorClass = "red";
       if (percent >= 75) colorClass = "green";
       else if (percent >= 50) colorClass = "orange";
@@ -179,9 +158,7 @@ export default function Dashboard() {
     });
   };
 
-  // Calculate progress tracker data (quiz scores over time)
   const getProgressTrackerData = () => {
-    // Use real answer rate trends to plot Correct/Wrong/Skipped over months
     if (loading || !answerTrends || answerTrends.length === 0) {
       return { data: [], legends: [] };
     }
@@ -199,9 +176,7 @@ export default function Dashboard() {
     return { data, legends };
   };
 
-  // Calculate subject tracker data (time spent on each reviewer)
   const getSubjectTrackerData = () => {
-    // Use real subject coverage from analytics
     if (loading || !subjectCoverage || subjectCoverage.length === 0) {
       return [];
     }
@@ -215,7 +190,6 @@ export default function Dashboard() {
       }));
   };
 
-  // Calculate quiz stats data (attempts statistics)
   const getQuizStatsData = () => {
     if (!quizAttempts || quizAttempts.length === 0) {
       return [
@@ -227,7 +201,6 @@ export default function Dashboard() {
     
     const totalAttempts = quizAttempts.length;
     
-    // Calculate days with attempts
     const daysWithAttempts = new Set();
     quizAttempts.forEach(attempt => {
       if (attempt.date) {
@@ -471,7 +444,7 @@ export default function Dashboard() {
               </div>
             ) : reviewers.length === 0 ? (
               <div className="text-center py-4">
-                <div className="mb-1 text-lg">📚</div>
+                <div className="mb-1 text-lg">ðŸ“š</div>
                 <p className="text-xs text-gray-600 font-medium">No quiz data yet</p>
               </div>
             ) : (
@@ -607,3 +580,4 @@ export default function Dashboard() {
     </div>
   );
 }
+

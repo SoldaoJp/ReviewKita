@@ -1,4 +1,4 @@
-import AdminLayout from './Layout';
+﻿import AdminLayout from './Layout';
 import { useState, useEffect } from 'react';
 import { getUserActivityAnalytics } from '../services/adminService';
 import httpService from '../../user/services/httpService';
@@ -171,13 +171,13 @@ export default function AdminDashboard() {
               {activitySummary && (
                 <div className="mt-4 flex gap-6 text-sm text-gray-600">
                   <p>
-                    📊 <span className="font-medium">Total Reviewers Reviewed:</span> {activitySummary.totalReviewersReviewed}
+                    ðŸ“Š <span className="font-medium">Total Reviewers Reviewed:</span> {activitySummary.totalReviewersReviewed}
                   </p>
                   <p>
-                    📅 <span className="font-medium">Active Days:</span> {activitySummary.totalActiveDays} days
+                    ðŸ“… <span className="font-medium">Active Days:</span> {activitySummary.totalActiveDays} days
                   </p>
                   <p>
-                    📈 <span className="font-medium">Avg Reviewers/Day:</span> {activitySummary.overallAvgReviewersPerDay.toFixed(1)}
+                    ðŸ“ˆ <span className="font-medium">Avg Reviewers/Day:</span> {activitySummary.overallAvgReviewersPerDay.toFixed(1)}
                   </p>
                 </div>
               )}
@@ -204,10 +204,10 @@ export default function AdminDashboard() {
               </BarChart>
             </ResponsiveContainer>
             {aggLoading ? (
-              <p className="text-sm text-gray-500 mt-3">Loading subject mastery…</p>
+              <p className="text-sm text-gray-500 mt-3">Loading subject masteryâ€¦</p>
             ) : (
               <p className="text-sm text-gray-600 mt-3">
-                � Showing top {masteryData.length} subjects by accuracy
+                ï¿½ Showing top {masteryData.length} subjects by accuracy
               </p>
             )}
           </div>
@@ -229,7 +229,7 @@ export default function AdminDashboard() {
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">🧩 {aggData?.masteryDistribution?.totalMasteryRecords || 0} mastery records analyzed</p>
+            <p className="text-sm text-gray-600 mt-3">ðŸ§© {aggData?.masteryDistribution?.totalMasteryRecords || 0} mastery records analyzed</p>
           </div>
           <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
             <h2 className="text-xl font-semibold text-gray-700 mb-2">Difficulty Breakdown</h2>
@@ -245,7 +245,7 @@ export default function AdminDashboard() {
                 <Bar dataKey="fail" fill="#EF4444" radius={[6, 6, 0, 0]} name="Estimated Incorrect" />
               </BarChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">✅ Built from {aggData?.performanceMetrics?.accuracyRate ?? 0}% overall accuracy</p>
+            <p className="text-sm text-gray-600 mt-3">âœ… Built from {aggData?.performanceMetrics?.accuracyRate ?? 0}% overall accuracy</p>
           </div>
           <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
             <h2 className="text-xl font-semibold text-gray-700 mb-2">Answer Distribution</h2>
@@ -271,12 +271,13 @@ export default function AdminDashboard() {
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">📦 Total questions: {aggData?.systemOverview?.totalQuestions || 0}</p>
+            <p className="text-sm text-gray-600 mt-3">ðŸ“¦ Total questions: {aggData?.systemOverview?.totalQuestions || 0}</p>
           </div>
         </div>
       </div>
     </AdminLayout>
   );
 }
+
 
 

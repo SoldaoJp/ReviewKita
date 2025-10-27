@@ -1,5 +1,4 @@
-// src/controllers/authController.js
-import authService from '../services/authService.js';
+﻿import authService from '../services/authService.js';
 
 class AuthController {
   // Handle login

@@ -1,4 +1,4 @@
-// Get finished quiz history
+﻿// Get finished quiz history
 export const getQuizHistory = async () => {
   try {
     // Backend reference: GET /api/quizzes/history (or similar)
@@ -127,3 +127,4 @@ export const deleteRetakeQuiz = async (retakeQuizId) => {
     throw error;
   }
 };
+

@@ -1,5 +1,4 @@
-// src/models/userModel.js
-class UserModel {
+﻿class UserModel {
   constructor(userData = {}) {
     this.id = userData.id || null;
     this.username = userData.username || '';

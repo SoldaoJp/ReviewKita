@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Logo from "../../../assets/logo.png"; // use same logo as signup
@@ -59,14 +59,14 @@ function ForgotPassword() {
             onClick={() => navigate(-1)}
             className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center mb-6"
           >
-            ←
+            â†
           </button>
 
           <h2 className="text-2xl font-bold text-gray-900 mb-3">
-            Lost access? Let’s get you back on track.
+            Lost access? Letâ€™s get you back on track.
           </h2>
           <p className="text-gray-600 text-sm mb-6">
-            Enter your registered email and we’ll send a secure link to reset your password.
+            Enter your registered email and weâ€™ll send a secure link to reset your password.
           </p>
           <form onSubmit={handleSubmit} className="space-y-4">
             <input

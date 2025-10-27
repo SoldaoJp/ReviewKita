@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { ChevronLeft, Clock, SkipForward } from "lucide-react";
 
 export default function EssayQuiz({
@@ -117,3 +117,4 @@ export default function EssayQuiz({
     </div>
   );
 }
+
