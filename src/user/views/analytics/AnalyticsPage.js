@@ -1007,7 +1007,7 @@ export default function AnalyticsPage() {
           <Topbar />
 
           <div className="mb-6 flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-gray-800">Analytics</h1>
+            <h1 className="text-xl font-bold text-gray-800">Analytics</h1>
             <div className="flex items-center gap-3">
               <div className="relative">
                 <select

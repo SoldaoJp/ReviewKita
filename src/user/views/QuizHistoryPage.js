@@ -56,7 +56,7 @@ export default function QuizHistoryPage() {
   return (
     <div className="p-8 max-w-[1800px] mx-auto">
       <Topbar />
-      <h1 className="text-2xl font-bold mb-6">Quiz History</h1>
+      <h1 className="text-xl font-bold mb-6">Quiz History</h1>
 
       {loading ? (
         <div className="text-gray-500">Loading...</div>
@@ -65,7 +65,7 @@ export default function QuizHistoryPage() {
       ) : filtered.length === 0 ? (
         <div className="text-gray-500">No finished quizzes yet.</div>
       ) : (
-        <div className="overflow-x-auto bg-white rounded-xl shadow border border-gray-100">
+        <div className="overflow-x-auto bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb]">
           <table className="min-w-full text-sm">
             <thead className="bg-gray-50 text-gray-600">
               <tr>
