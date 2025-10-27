@@ -94,7 +94,7 @@ export default function IdentificationQuiz({
           <div className={`w-full rounded-xl border-2 shadow-lg p-4 ${isCorrect ? 'bg-green-100 border-green-500' : 'bg-red-100 border-red-500'}`}>
             <div className="text-center mb-3">
               <span className={`font-semibold ${isCorrect ? 'text-green-800' : 'text-red-800'}`}>
-                {isCorrect ? 'âœ“ Correct!' : 'âœ— Incorrect'}
+                {isCorrect ? '✓ Correct!' : '✗ Incorrect'}
               </span>
             </div>
             {!isCorrect && (

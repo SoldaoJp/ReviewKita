@@ -17,9 +17,18 @@ export default function FillInTheBlanksQuiz({
   const [showFeedback, setShowFeedback] = useState(false);
   const [correctnessMap, setCorrectnessMap] = useState({});
 
+  // Helper function to safely convert blank_answers to array
+  const getBlankAnswersArray = (blankAnswers) => {
+    if (Array.isArray(blankAnswers)) return blankAnswers;
+    if (blankAnswers && typeof blankAnswers === 'object') {
+      return Object.values(blankAnswers);
+    }
+    return [];
+  };
+
   const parseQuestion = () => {
     const text = question.question || "";
-    const blanks = question.fill_in_the_blank_answers || [];
+    const blanks = getBlankAnswersArray(question.fill_in_the_blank_answers);
     
     const parts = text.split(/(___|blank|\[blank\])/gi);
     let blankIndex = 0;
@@ -47,7 +56,7 @@ export default function FillInTheBlanksQuiz({
     
     if (!allAnswersFilled) return;
 
-    const correctAnswers = question.fill_in_the_blank_answers || [];
+    const correctAnswers = getBlankAnswersArray(question.fill_in_the_blank_answers);
     const correctnessResults = {};
     
     Object.keys(answers).forEach((blankIndex) => {
@@ -164,14 +173,14 @@ export default function FillInTheBlanksQuiz({
           <div className="w-full rounded-xl border-2 shadow-lg p-4 bg-blue-100 border-blue-500">
             <div className="text-center mb-3">
               <span className="font-semibold text-blue-800">
-                {Object.values(correctnessMap).every(c => c) ? 'âœ“ All Correct!' : 'âœ— Some answers are incorrect'}
+                {Object.values(correctnessMap).every(c => c) ? '✓ All Correct!' : '✗ Some answers are incorrect'}
               </span>
             </div>
             {!Object.values(correctnessMap).every(c => c) && (
               <div className="mb-3">
                 <p className="text-sm text-blue-700 mb-2"><strong>Correct answers:</strong></p>
                 <ul className="text-sm text-blue-700 list-disc list-inside">
-                  {(question.fill_in_the_blank_answers || []).map((answer, idx) => (
+                  {getBlankAnswersArray(question.fill_in_the_blank_answers).map((answer, idx) => (
                     <li key={idx}>Blank {idx + 1}: {answer}</li>
                   ))}
                 </ul>
