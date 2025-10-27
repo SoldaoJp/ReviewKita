@@ -93,7 +93,7 @@ export default function Topbar() {
             onClick={handleClearSearch}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg"
           >
-            Ã—
+            ×
           </button>
         )}
 
@@ -130,10 +130,10 @@ export default function Topbar() {
                           )}
                         </div>
                         <div className="flex items-center gap-2 mt-1">
-                          {result.type === "reviewer" && <span className="text-xs text-blue-600">ðŸ“„ Reviewer</span>}
-                          {result.type === "reviewer-section" && <span className="text-xs text-indigo-600">ðŸ“‘ {result.section}</span>}
-                          {result.type === "page" && <span className="text-xs text-green-600">ðŸ“ Page</span>}
-                          {result.type === "section" && <span className="text-xs text-purple-600">ðŸ”– {result.section}</span>}
+                          {result.type === "reviewer" && <span className="text-xs text-blue-600">📄 Reviewer</span>}
+                          {result.type === "reviewer-section" && <span className="text-xs text-indigo-600">📑 {result.section}</span>}
+                          {result.type === "page" && <span className="text-xs text-green-600">📄 Page</span>}
+                          {result.type === "section" && <span className="text-xs text-purple-600">🔖 {result.section}</span>}
                         </div>
                       </button>
                     ))}
@@ -143,7 +143,7 @@ export default function Topbar() {
             )}
 
             {searchQuery.length === 0 && (
-              <div className="p-4 text-center text-gray-500 text-sm">Suggestions shown â€” start typing to narrow results</div>
+              <div className="p-4 text-center text-gray-500 text-sm">Suggestions shown — start typing to narrow results</div>
             )}
           </div>
         )}

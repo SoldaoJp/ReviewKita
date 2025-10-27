@@ -18,7 +18,7 @@ Output format requirements (strict):
   [SECTION: <SECTION_KEY>]
   where <SECTION_KEY> is an UPPER_SNAKE_CASE identifier (e.g., CORE_CONCEPTS, METHODS, FINDINGS, LIMITATIONS, NEXT_STEPS).
 - Follow each header with clear, concise bullet points ("- ") summarizing the most important points for that topic.
-- Optionally include 1â€“2 short lines labeled "Summary:" at the end of the group if helpful.
+- Optionally include 1–2 short lines labeled "Summary:" at the end of the group if helpful.
 - End each group with a line: [END_SECTION]
 - Do not include any other markup, code fences, or prose outside these sections.
 - If a point contains subpoints, keep them brief using indented dashes ("  - ").
@@ -247,7 +247,7 @@ export default function AdminLlmConfigsView() {
                 </div>
                 {form.use_case === 'quiz' && (
                   <p className="text-sm text-blue-600 bg-blue-50 border border-blue-200 rounded px-3 py-2">
-                    â„¹ï¸ System prompt is automatically filled with the quiz template and cannot be modified.
+                    ℹ️ System prompt is automatically filled with the quiz template and cannot be modified.
                   </p>
                 )}
                 <div className="grid grid-cols-3 gap-3">
@@ -272,7 +272,7 @@ export default function AdminLlmConfigsView() {
                 <button onClick={()=>setShowModal(false)} className="px-4 py-2 border rounded hover:bg-gray-100">Cancel</button>
                 <button onClick={saveConfig} className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800">Save</button>
               </div>
-              <button onClick={()=>setShowModal(false)} className="absolute top-2 right-3 text-gray-400 hover:text-gray-600 text-lg">Ã—</button>
+              <button onClick={()=>setShowModal(false)} className="absolute top-2 right-3 text-gray-400 hover:text-gray-600 text-lg">×</button>
             </div>
           </div>
         )}

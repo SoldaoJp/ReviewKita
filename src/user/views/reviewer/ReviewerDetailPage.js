@@ -608,7 +608,7 @@ function ReviewerDetailPage() {
             onClick={() => navigate("/reviewer")}
             className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center hover:bg-blue-200 transition-colors"
           >
-            <span className="text-xl">â†</span>
+            <span className="text-xl">←</span>
           </button>
           <div>
             <h1 className="text-2xl font-bold">{reviewer.title}</h1>
@@ -679,7 +679,7 @@ function ReviewerDetailPage() {
                   className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors text-sm"
                   disabled={saving}
                 >
-                  {saving ? "Saving..." : "ðŸ’¾ Save"}
+                  {saving ? "Saving..." : "💾 Save"}
                 </button>
               </>
             ) : (
@@ -687,7 +687,7 @@ function ReviewerDetailPage() {
                 onClick={handleEdit}
                 className="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors text-sm"
               >
-                ðŸ“ Edit
+                📝 Edit
               </button>
             )
           ) : (
@@ -697,13 +697,13 @@ function ReviewerDetailPage() {
                 className="px-4 py-2 bg-purple-100 text-purple-600 rounded-lg hover:bg-purple-200 transition-colors text-sm"
                 disabled={reEnhancing}
               >
-                {reEnhancing ? "Re-enhancing..." : "âœ¨ Re-enhance"}
+                {reEnhancing ? "Re-enhancing..." : "✨ Re-enhance"}
               </button>
               <button 
                 onClick={() => setShowReportModal(true)}
                 className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors text-sm"
               >
-                ðŸš© Report
+                🚩 Report
               </button>
               <button 
                 onClick={handleRecommendModel}
@@ -717,8 +717,8 @@ function ReviewerDetailPage() {
                 {recommending 
                   ? "Processing..." 
                   : reviewer.userHasRecommendedModel 
-                    ? "âŒ Remove Recommendation"
-                    : "ðŸ‘ Recommend Model"}
+                    ? "❌ Remove Recommendation"
+                    : "👍 Recommend Model"}
               </button>
             </>
           )}
@@ -789,13 +789,13 @@ function ReviewerDetailPage() {
             {reviewer.hasQuiz && (
               <div className="flex gap-2 flex-wrap">
                 {reviewer.quizzes?.easy?.quizId && (
-                  <span className="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">Easy âœ“</span>
+                  <span className="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">Easy ✓</span>
                 )}
                 {reviewer.quizzes?.medium?.quizId && (
-                  <span className="px-2 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded-full">Medium âœ“</span>
+                  <span className="px-2 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded-full">Medium ✓</span>
                 )}
                 {reviewer.quizzes?.hard?.quizId && (
-                  <span className="px-2 py-0.5 text-xs bg-red-100 text-red-700 rounded-full">Hard âœ“</span>
+                  <span className="px-2 py-0.5 text-xs bg-red-100 text-red-700 rounded-full">Hard ✓</span>
                 )}
               </div>
             )}
@@ -872,7 +872,7 @@ function ReviewerDetailPage() {
               onClick={() => setShowDeleteModal(false)}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-lg"
             >
-              Ã—
+              ×
             </button>
           </div>
         </div>
@@ -938,7 +938,7 @@ function ReviewerDetailPage() {
               onClick={handleReportCancel}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-lg"
             >
-              Ã—
+              ×
             </button>
           </div>
         </div>
@@ -1079,7 +1079,7 @@ function ReviewerDetailPage() {
                       : 'bg-green-500 text-white hover:bg-green-600'
                   }`}
                 >
-                  Easy {reviewer?.quizzes?.easy?.quizId && 'âœ“'}
+                  Easy {reviewer?.quizzes?.easy?.quizId && '✓'}
                 </button>
                 {hoveredQuiz === 'easy' && reviewer?.quizzes?.easy?.quizId && (
                   <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-3 rounded whitespace-nowrap">
@@ -1102,7 +1102,7 @@ function ReviewerDetailPage() {
                       : 'bg-yellow-500 text-white hover:bg-yellow-600'
                   }`}
                 >
-                  Medium {reviewer?.quizzes?.medium?.quizId && 'âœ“'}
+                  Medium {reviewer?.quizzes?.medium?.quizId && '✓'}
                 </button>
                 {hoveredQuiz === 'medium' && reviewer?.quizzes?.medium?.quizId && (
                   <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-3 rounded whitespace-nowrap">
@@ -1125,7 +1125,7 @@ function ReviewerDetailPage() {
                       : 'bg-red-500 text-white hover:bg-red-600'
                   }`}
                 >
-                  Hard {reviewer?.quizzes?.hard?.quizId && 'âœ“'}
+                  Hard {reviewer?.quizzes?.hard?.quizId && '✓'}
                 </button>
                 {hoveredQuiz === 'hard' && reviewer?.quizzes?.hard?.quizId && (
                   <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-3 rounded whitespace-nowrap">

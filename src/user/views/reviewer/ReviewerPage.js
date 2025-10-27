@@ -20,7 +20,7 @@ const colors = [
 
 const SUBJECT_CATEGORIES = {
   "elementary_jhs": {
-    label: "ðŸ“š Elementary & Junior High School (Kâ€“10)",
+    label: "📚 Elementary & Junior High School (K–10)",
     subjects: [
       "English", "Filipino", "Mathematics", "Science", "Araling Panlipunan (Social Studies)",
       "Edukasyon sa Pagpapakatao (Values Education)", "MAPEH (Music, Arts, PE, and Health)",
@@ -29,7 +29,7 @@ const SUBJECT_CATEGORIES = {
     ]
   },
   "shs_core": {
-    label: "ðŸŽ“ Senior High School Core Subjects (Grades 11â€“12)",
+    label: "🎓 Senior High School Core Subjects (Grades 11–12)",
     subjects: [
       "Oral Communication", "Reading and Writing Skills", "21st Century Literature from the Philippines and the World",
       "Komunikasyon at Pananaliksik sa Wika at Kulturang Pilipino", "Pagbasa at Pagsusuri ng Iba't Ibang Teksto Tungo sa Pananaliksik",
@@ -39,7 +39,7 @@ const SUBJECT_CATEGORIES = {
     ]
   },
   "shs_specialized": {
-    label: "ðŸ’¼ Senior High School Applied & Specialized Subjects",
+    label: "🧰 Senior High School Applied & Specialized Subjects",
     subjects: [
       "Research in Daily Life 1", "Research in Daily Life 2", "Inquiries, Investigations, and Immersion",
       "Entrepreneurship", "Creative Writing", "Fundamentals of Accountancy, Business, and Management 1",
@@ -50,13 +50,13 @@ const SUBJECT_CATEGORIES = {
     ]
   },
   "college": {
-    label: "ðŸŽ“ College General Education & Major Subjects",
+    label: "🎓 College General Education & Major Subjects",
     courses: {
       "General Education": [
         "Purposive Communication", "The Contemporary World", "Science, Technology, and Society", "Readings in Philippine History",
         "Art Appreciation", "Ethics", "Mathematics in the Modern World", "Understanding the Self", "Philippine Politics and Governance",
-        "Environmental Science", "Life and Works of Rizal", "Physical Education 1 â€“ Fitness and Wellness",
-        "Physical Education 2 â€“ Rhythmic Activities", "Physical Education 3 â€“ Individual/Dual Sports", "Physical Education 4 â€“ Team Sports",
+        "Environmental Science", "Life and Works of Rizal", "Physical Education 1 – Fitness and Wellness",
+        "Physical Education 2 – Rhythmic Activities", "Physical Education 3 – Individual/Dual Sports", "Physical Education 4 – Team Sports",
         "NSTP 1 (Civic Welfare Training Service / ROTC / LTS)", "NSTP 2 (Civic Welfare Training Service / ROTC / LTS)",
         "Filipino sa Iba't Ibang Disiplina", "World Religions and Belief Systems", "Gender and Society"
       ],
@@ -93,7 +93,7 @@ const SUBJECT_CATEGORIES = {
       "Education": [
         "Facilitating Learner-Centered Teaching", "Assessment in Learning", "The Teaching Profession", "Curriculum Development",
         "Child and Adolescent Development", "Educational Technology", "Principles of Teaching 1 & 2", "Foundations of Education",
-        "Field Study 1â€“6", "Practice Teaching / Internship", "Teaching Strategies and Methods", "Classroom Management",
+        "Field Study 1–6", "Practice Teaching / Internship", "Teaching Strategies and Methods", "Classroom Management",
         "Research in Education", "Inclusive Education"
       ],
       "Criminology": [
@@ -402,8 +402,8 @@ function ReviewerPage({ title }) {
           >
             <option value="">Newest First</option>
             <option value="oldest">Oldest First</option>
-            <option value="a->z">A â†’ Z</option>
-            <option value="z->a">Z â†’ A</option>
+            <option value="a->z">A → Z</option>
+            <option value="z->a">Z → A</option>
           </select>
           
           <button
@@ -510,7 +510,7 @@ function ReviewerPage({ title }) {
                   className="absolute top-2 right-2 text-red-500 hover:text-red-700"
                   title="Delete Reviewer"
                 >
-                  ðŸ—‘
+                  🗑️
                 </button>
               </div>
             );
@@ -541,7 +541,7 @@ function ReviewerPage({ title }) {
                 className="text-blue-500 cursor-help" 
                 title="We use this subject field to categorize your quiz subject type and for our analytics to improve our app and ensure it meets its goals."
               >
-                â„¹ï¸
+                ℹ️
               </span>
             </label>
             
@@ -567,7 +567,7 @@ function ReviewerPage({ title }) {
                 <div className="mb-4">
                   <input
                     type="text"
-                    placeholder="ðŸ” Search subjects..."
+                    placeholder="🔍 Search subjects..."
                     value={subjectSearch}
                     onChange={(e) => setSubjectSearch(e.target.value)}
                     className="w-full px-3 py-2 border rounded-t focus:ring-2 focus:ring-cyan-400 text-sm"
@@ -590,19 +590,20 @@ function ReviewerPage({ title }) {
                               {course}
                             </div>
                             {filteredSubjects.map((subject, idx) => (
-                              <button
+                              <div
                                 key={`${course}-${idx}`}
-                                type="button"
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
                                   setShowCustomSubject(false);
                                   setFormData({ ...formData, subject: subject });
                                 }}
-                                className={`w-full text-left px-3 py-2 hover:bg-cyan-100 active:bg-cyan-200 transition-colors text-sm ${
+                                className={`w-full text-left px-3 py-2 hover:bg-cyan-100 active:bg-cyan-200 transition-colors text-sm cursor-pointer ${
                                   formData.subject === subject ? 'bg-cyan-200 font-semibold' : ''
                                 }`}
                               >
                                 {subject}
-                              </button>
+                              </div>
                             ))}
                           </div>
                         ) : null;
@@ -614,28 +615,27 @@ function ReviewerPage({ title }) {
                           subject.toLowerCase().includes(subjectSearch.toLowerCase())
                         )
                         .map((subject, idx) => (
-                          <button
+                          <div
                             key={idx}
-                            type="button"
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
                               setShowCustomSubject(false);
                               setFormData({ ...formData, subject: subject });
                             }}
-                            className={`w-full text-left px-3 py-2 hover:bg-cyan-100 active:bg-cyan-200 transition-colors text-sm ${
+                            className={`w-full text-left px-3 py-2 hover:bg-cyan-100 active:bg-cyan-200 transition-colors text-sm cursor-pointer ${
                               formData.subject === subject ? 'bg-cyan-200 font-semibold' : ''
                             }`}
                           >
                             {subject}
-                          </button>
+                          </div>
                         ))
                     )}
                     
                     {/* Custom subject option */}
                     {subjectSearch === '' && (
                       <>
-                        <div className="border-t px-3 py-2 text-gray-400 text-xs">
-                          â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-                        </div>
+                        <div className="border-t px-3 py-2 text-gray-400 text-xs">────────────────────</div>
                         <button
                           type="button"
                           onClick={() => {
@@ -644,7 +644,7 @@ function ReviewerPage({ title }) {
                           }}
                           className="w-full text-left px-3 py-2 hover:bg-blue-100 active:bg-blue-200 transition-colors text-sm font-medium text-blue-600"
                         >
-                          âœï¸ Specify Unlisted Subject
+                          ✏️ Specify Unlisted Subject
                         </button>
                       </>
                     )}
@@ -757,7 +757,7 @@ function ReviewerPage({ title }) {
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg"
               disabled={submitting}
             >
-              Ã—
+              ×
             </button>
           </div>
         </div>
@@ -799,7 +799,7 @@ function ReviewerPage({ title }) {
               onClick={() => setShowLearnModal(false)}
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg"
             >
-              Ã—
+              ×
             </button>
           </div>
         </div>
@@ -838,7 +838,7 @@ function ReviewerPage({ title }) {
               onClick={handleCancelDelete}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-lg"
             >
-              Ã—
+              ×
             </button>
           </div>
         </div>
@@ -950,7 +950,7 @@ function ReviewerPage({ title }) {
                       : 'bg-green-500 text-white hover:bg-green-600'
                   }`}
                 >
-                  Easy {selectedReviewer?.hasEasyQuiz && 'âœ“'}
+                  Easy {selectedReviewer?.hasEasyQuiz && '✓'}
                 </button>
                 {hoveredQuiz === 'easy' && selectedReviewer?.hasEasyQuiz && (
                   <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-3 rounded whitespace-nowrap">
@@ -974,7 +974,7 @@ function ReviewerPage({ title }) {
                       : 'bg-yellow-500 text-white hover:bg-yellow-600'
                   }`}
                 >
-                  Medium {selectedReviewer?.hasMediumQuiz && 'âœ“'}
+                  Medium {selectedReviewer?.hasMediumQuiz && '✓'}
                 </button>
                 {hoveredQuiz === 'medium' && selectedReviewer?.hasMediumQuiz && (
                   <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-3 rounded whitespace-nowrap">
@@ -998,7 +998,7 @@ function ReviewerPage({ title }) {
                       : 'bg-red-500 text-white hover:bg-red-600'
                   }`}
                 >
-                  Hard {selectedReviewer?.hasHardQuiz && 'âœ“'}
+                  Hard {selectedReviewer?.hasHardQuiz && '✓'}
                 </button>
                 {hoveredQuiz === 'hard' && selectedReviewer?.hasHardQuiz && (
                   <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-3 rounded whitespace-nowrap">

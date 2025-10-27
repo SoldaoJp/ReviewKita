@@ -149,9 +149,9 @@ export default function QuizHistoryPage() {
             <div className="px-5 py-3 border-b flex items-center justify-between">
               <div>
                 <div className="text-lg font-semibold">{selected.title}</div>
-                <div className="text-xs text-gray-500">{selected.reviewer_title || 'Unknown reviewer'} â€¢ {new Date(selected.submitted_at).toLocaleString()}</div>
+                <div className="text-xs text-gray-500">{selected.reviewer_title || 'Unknown reviewer'} • {new Date(selected.submitted_at).toLocaleString()}</div>
               </div>
-              <button onClick={() => setSelectedId(null)} className="text-gray-500 hover:text-gray-700">âœ•</button>
+              <button onClick={() => setSelectedId(null)} className="text-gray-500 hover:text-gray-700">✕</button>
             </div>
             <div className="p-5 overflow-y-auto">
               <div className="mb-4">
@@ -169,7 +169,7 @@ export default function QuizHistoryPage() {
                   <div key={idx} className="border rounded p-3">
                     <div className="font-medium text-gray-800 mb-2">{detail.numberedQuestion}</div>
                     <div className="text-sm space-y-1">
-                      <div><strong>Your answer:</strong> {detail.userAnswer || 'â€”'}</div>
+                      <div><strong>Your answer:</strong> {detail.userAnswer || '—'}</div>
                       <div><strong>Correct answer:</strong> {detail.correctAnswer}</div>
                     </div>
                     {detail.explanation && (
