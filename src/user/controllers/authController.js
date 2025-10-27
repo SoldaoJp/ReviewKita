@@ -1,11 +1,9 @@
 ﻿import authService from '../services/authService.js';
 
 class AuthController {
-  // Handle login
   async handleLogin(formData, navigate, setError, setLoading) {
     const { email, password } = formData;
 
-    // Basic validation
     if (!email || !password) {
       setError('Please fill in all fields');
       return false;
@@ -32,7 +30,6 @@ class AuthController {
       console.log('AuthController: Login response received:', response);
       
       if (response.token) {
-        // Login successful; prefer backend user role for routing
         const role = response?.user?.role || 'user';
         console.log('AuthController: Login successful, role:', role);
         navigate(role === 'admin' ? '/admin' : '/dashboard');
@@ -44,7 +41,6 @@ class AuthController {
     } catch (error) {
       console.error('AuthController: Login failed with error:', error);
       
-      // Handle specific backend errors
       if (error.message.includes('JWT_SECRET')) {
         setError('Backend authentication service configuration error. Please contact support.');
       } else if (error.message.includes('verify your email')) {
@@ -60,11 +56,9 @@ class AuthController {
     }
   }
 
-  // Handle registration
   async handleRegister(formData, navigate, setError, setLoading, setSuccess) {
     const { username, email, password, confirmPassword } = formData;
 
-    // Validation
     if (!username || !email || !password || !confirmPassword) {
       setError('Please fill in all fields');
       return false;
@@ -101,10 +95,8 @@ class AuthController {
         confirmPassword
       });
       
-      // Registration successful
       setSuccess('Registration successful! Please check your email to verify your account before logging in.');
       
-      // Optional: Auto-redirect to login after delay
       setTimeout(() => {
         navigate('/login');
       }, 3000);
@@ -118,24 +110,20 @@ class AuthController {
     }
   }
 
-  // Handle logout
   handleLogout(navigate) {
     authService.logout();
     navigate('/login');
   }
 
-  // Email validation helper
   isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
 
-  // Check if user is authenticated
   isAuthenticated() {
     return authService.isAuthenticated();
   }
 
-  // Get current user
   getCurrentUser() {
     return authService.getCurrentUser();
   }

@@ -70,13 +70,11 @@ function QuizPage() {
     const currentQuestion = quiz.questions[currentQuestionIndex];
     let isCorrect = null;
     
-    // Determine correctness based on question type
     if (currentQuestion.type === 'multiple-choice') {
       isCorrect = answer === currentQuestion.correct_answer;
     } else if (currentQuestion.type === 'identification') {
       isCorrect = answer.toLowerCase().trim() === currentQuestion.identification_answer.toLowerCase().trim();
     } else if (currentQuestion.type === 'fill-in-the-blanks') {
-      // For fill-in-the-blanks, answer is an object with blank indices as keys
       const correctAnswers = currentQuestion.blank_answers || [];
       isCorrect = Object.keys(answer).every((blankIndex) => {
         const userAnswer = answer[blankIndex].trim().toLowerCase();
@@ -84,8 +82,7 @@ function QuizPage() {
         return userAnswer === correctAnswer;
       });
     } else if (currentQuestion.type === 'open-ended') {
-      // Open-ended questions are subjectively graded, mark as answered (not auto-graded)
-      isCorrect = null; // No auto-grading for open-ended
+      isCorrect = null;
     }
     
     const updatedAnswers = [...userAnswers];
@@ -100,7 +97,6 @@ function QuizPage() {
     if (currentQuestionIndex < quiz.questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
     } else {
-      // Use the freshest answers to avoid missing the last response
       handleQuizComplete(false, updatedAnswers);
     }
   };
@@ -118,7 +114,6 @@ function QuizPage() {
     if (currentQuestionIndex < quiz.questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
     } else {
-      // Use the freshest answers on final skip
       handleQuizComplete(false, updatedAnswers);
     }
   };
@@ -126,25 +121,21 @@ function QuizPage() {
   const handleQuizComplete = async (timeUp = false, answersOverride = null) => {
     const answers = answersOverride || userAnswers;
     
-    // Prepare answers in the format expected by the backend
     const formattedAnswers = answers.map((ans, idx) => ({
-      questionId: idx + 1, // 1-based question number
+      questionId: idx + 1,
       answer: ans?.answer || undefined,
       isSkipped: ans?.isSkipped || false,
       timePerQuestionSeconds: ans?.timePerQuestionSeconds || 0
     }));
 
     try {
-      // Submit regular quiz
       const submitResponse = await submitQuiz(quiz._id, formattedAnswers);
       
-      // Extract result from backend response
       const result = submitResponse.result || {};
       const total = result.total || quiz.questions.length;
       const correct = result.correct || 0;
       const percentage = result.scorePercent || 0;
 
-      // Save to quiz history
       try {
         await saveQuizAttempt({
           reviewerId,
@@ -163,7 +154,6 @@ function QuizPage() {
       setIsCompleted(true);
     } catch (error) {
       console.error('Failed to submit quiz:', error);
-      // Fallback to client-side calculation if backend fails
       const total = quiz.questions.length;
       const correct = answers.filter(a => a?.isCorrect === true).length;
       const percentage = Math.round((correct / total) * 100);
@@ -256,7 +246,6 @@ function QuizPage() {
 
   const currentQuestion = quiz.questions[currentQuestionIndex];
 
-  // Render Multiple Choice Quiz
   if (currentQuestion.type === 'multiple-choice') return (
     <>
       <MultipleChoiceQuiz
@@ -286,7 +275,6 @@ function QuizPage() {
     </>
   );
 
-  // Render Essay Quiz (open-ended questions)
   if (currentQuestion.type === 'open-ended') return (
     <>
       <EssayQuiz
@@ -316,7 +304,6 @@ function QuizPage() {
     </>
   );
 
-  // Render Fill in the Blanks Quiz
   if (currentQuestion.type === 'fill-in-the-blanks') return (
     <>
       <FillInTheBlanksQuiz
@@ -346,7 +333,6 @@ function QuizPage() {
     </>
   );
 
-  // Render Identification Quiz (default/fallback)
   return (
     <>
       <IdentificationQuiz
@@ -378,7 +364,5 @@ function QuizPage() {
 }
 
 export default QuizPage;
-
-
 
 

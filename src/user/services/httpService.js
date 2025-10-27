@@ -20,7 +20,6 @@ class HttpService {
     try {
       const response = await fetch(url, config);
       
-      // Handle 401 Unauthorized - token might be expired
       if (response.status === 401) {
         authService.logout();
         window.location.href = '/login';
@@ -30,7 +29,6 @@ class HttpService {
       const data = await response.json();
 
       if (!response.ok) {
-        // Create error object with response data
         const error = new Error(data.error || data.message || 'Request failed');
         error.response = { data, status: response.status };
         throw error;
@@ -69,12 +67,10 @@ class HttpService {
     return this.request(endpoint, { method: 'DELETE', ...options });
   }
 
-  // Handle file uploads
   async uploadFile(endpoint, formData, options = {}) {
     const config = {
       headers: {
         ...authService.getAuthHeader(),
-        // Don't set Content-Type for FormData, browser will set it automatically
       },
       method: 'POST',
       body: formData,

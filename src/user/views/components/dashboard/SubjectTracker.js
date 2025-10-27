@@ -1,7 +1,6 @@
 ﻿import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
 export default function SubjectTracker({ data }) {
-  // Fallback data if no data provided
   const items = data && data.length > 0 ? data : [
     { name: "No reviewers yet", value: 100, color: "#3B82F6" },
   ];

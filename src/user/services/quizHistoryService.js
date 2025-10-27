@@ -1,10 +1,7 @@
-﻿// Quiz history service using backend API
-import httpService from './httpService';
+﻿import httpService from './httpService';
 
-// Submit a new quiz attempt to the backend
 export async function addAttempt(attempt) {
   try {
-    // POST /api/quizzes/history
     const response = await httpService.post('/quizzes/history', {
       reviewer_id: attempt.reviewerId,
       reviewer_title: attempt.reviewerTitle,
@@ -32,11 +29,9 @@ export async function addAttempt(attempt) {
   }
 }
 
-// Fetch all quiz attempts from the backend
 export async function getAllAttempts() {
   try {
     const response = await httpService.get('/quizzes/history');
-    // Backend returns { history: [...] }
     return response.history || [];
   } catch (error) {
     console.error('Failed to fetch quiz history:', error);
@@ -44,7 +39,6 @@ export async function getAllAttempts() {
   }
 }
 
-// Get a single attempt by ID
 export async function getAttemptById(id) {
   try {
     const all = await getAllAttempts();

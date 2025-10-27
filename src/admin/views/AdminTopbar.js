@@ -20,7 +20,6 @@ export default function AdminTopbar({ onSearch }) {
       if (profileRef.current && !profileRef.current.contains(e.target)) setShowProfileDropdown(false);
     }
     function handleKey(e) {
-      // Press `/` to focus search (ignore when typing in inputs)
       if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
         e.preventDefault();
         inputRef.current?.focus();

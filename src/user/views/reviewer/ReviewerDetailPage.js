@@ -14,7 +14,7 @@ function ReviewerDetailPage() {
   const [reviewer, setReviewer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeView, setActiveView] = useState("original"); // "original" or "enhanced"
+  const [activeView, setActiveView] = useState("original");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showQuizModal, setShowQuizModal] = useState(false);
   const [showDifficultyModal, setShowDifficultyModal] = useState(false);
@@ -33,41 +33,37 @@ function ReviewerDetailPage() {
   const [selectedModelId, setSelectedModelId] = useState(null);
   const [loadingModels, setLoadingModels] = useState(false);
   const [recommending, setRecommending] = useState(false);
-  const [notification, setNotification] = useState(null); // { type: 'success' | 'error', message: string }
+  const [notification, setNotification] = useState(null);
   const [showRetakeModal, setShowRetakeModal] = useState(false);
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [isRating, setIsRating] = useState(false);
 
-  // Debug log for userRating changes
   useEffect(() => {
     console.log('userRating state updated:', userRating);
   }, [userRating]);
 
   useEffect(() => {
       fetchReviewerDetail();
-      // Log activity only if the user stays on the page for at least 60 seconds
       let timerId;
       if (id) {
         timerId = setTimeout(() => {
           logUserActivity('open_reviewer', id).catch((err) => {
             console.error('Failed to log user activity:', err);
           });
-        }, 60_000); // 60 seconds
+        }, 60_000);
       }
       return () => {
         if (timerId) clearTimeout(timerId);
       };
     }, [id]);
 
-  // Fetch available models when reviewer is loaded
   useEffect(() => {
     if (reviewer) {
       fetchAvailableModels();
     }
   }, [reviewer?.modelId]);
 
-  // Auto-hide notification after 5 seconds
   useEffect(() => {
     if (notification) {
       const timer = setTimeout(() => {
@@ -92,7 +88,6 @@ function ReviewerDetailPage() {
       const response = await getAvailableLlmModels('reviewer');
       if (response.models) {
         setAvailableModels(response.models);
-        // Set the current model as selected if not already set
         if (reviewer?.modelId && !selectedModelId) {
           setSelectedModelId(reviewer.modelId.toString());
         }
@@ -106,7 +101,6 @@ function ReviewerDetailPage() {
   };
 
   const handleEnhancedTabClick = () => {
-    // Simply switch to enhanced view
     setActiveView("enhanced");
   };
 
@@ -120,14 +114,12 @@ function ReviewerDetailPage() {
     try {
       setReEnhancing(true);
       
-      // Call the re-enhance endpoint with the selected model
       const response = await reenhanceReviewerContent(id, { 
         revisionNotes: '', 
         model_id: newModelId 
       });
       
       if (response.success) {
-        // Update the reviewer with new enhanced content and model info
         setReviewer(prev => ({
           ...prev,
           enhancedContentByAI: response.data.enhancedContentByAI,
@@ -140,7 +132,6 @@ function ReviewerDetailPage() {
     } catch (err) {
       console.error("Error enhancing content:", err);
       showNotification('error', err.response?.data?.message || 'Failed to enhance content. Please try again.');
-      // Revert to previous model on error
       setSelectedModelId(reviewer?.modelId?.toString() || '');
     } finally {
       setReEnhancing(false);
@@ -158,7 +149,6 @@ function ReviewerDetailPage() {
       const isRemoving = reviewer.userHasRecommendedModel;
       await recommendLlmConfig(reviewer.modelId, isRemoving);
       
-      // Update local state
       setReviewer(prev => ({
         ...prev,
         userHasRecommendedModel: !isRemoving
@@ -177,19 +167,18 @@ function ReviewerDetailPage() {
     try {
       setLoading(true);
       const response = await getReviewerById(id);
-      console.log('Reviewer API Response:', response); // Debug log
+      console.log('Reviewer API Response:', response);
       if (response.success && response.data) {
         setReviewer(response.data);
-        console.log('Reviewer Data:', response.data); // Debug log
-        console.log('Rated:', response.data.rated, 'UserRating:', response.data.userRating); // Debug log
+        console.log('Reviewer Data:', response.data);
+        console.log('Rated:', response.data.rated, 'UserRating:', response.data.userRating);
         
-        // Set user rating if available
         if (response.data.userRating) {
           setUserRating(response.data.userRating);
-          console.log('Setting userRating to:', response.data.userRating); // Debug log
+          console.log('Setting userRating to:', response.data.userRating);
         } else {
           setUserRating(0);
-          console.log('No rating found, setting to 0'); // Debug log
+          console.log('No rating found, setting to 0');
         }
       }
       setError(null);
@@ -211,7 +200,6 @@ function ReviewerDetailPage() {
       setIsRating(true);
       const response = await rateLlmConfig(reviewer.modelId, rating);
       
-      // Update local state
       setUserRating(rating);
       setReviewer(prev => ({
         ...prev,
@@ -231,7 +219,7 @@ function ReviewerDetailPage() {
   const handleDelete = async () => {
     try {
       await deleteReviewer(id);
-      triggerReviewerUpdate(); // Notify sidebar to refresh
+      triggerReviewerUpdate();
       navigate("/reviewer");
     } catch (err) {
       console.error("Error deleting reviewer:", err);
@@ -250,7 +238,6 @@ function ReviewerDetailPage() {
   };
 
   const handleSave = async () => {
-    // Validate that content is not empty
     if (!editedContent || editedContent.trim() === '') {
       showNotification('error', 'Content cannot be empty. Please enter some text.');
       return;
@@ -258,10 +245,8 @@ function ReviewerDetailPage() {
 
     try {
       setSaving(true);
-      // Include current model_id with originalContent for sync enhancement
       const response = await updateReviewer(id, { originalContent: editedContent.trim(), model_id: reviewer.modelId });
       if (response.success) {
-        // Update the local reviewer state with new content
         const updatedReviewer = {
           ...reviewer,
           originalContent: response.data.originalContent,
@@ -318,7 +303,7 @@ function ReviewerDetailPage() {
       const reportData = {
         type: reportIssue,
         description: reportDetails.trim(),
-        reviewer_id: id // Add the reviewer ID from URL params
+        reviewer_id: id
       };
 
       const response = await reportLlmConfigReviewer(reviewer.modelId, reportData);
@@ -326,7 +311,6 @@ function ReviewerDetailPage() {
       if (response.success || response.report) {
         showNotification('success', 'Report submitted successfully. Thank you for helping improve our content!');
         
-        // Reset and close modal
         setReportIssue("");
         setReportDetails("");
         setShowReportModal(false);
@@ -347,7 +331,6 @@ function ReviewerDetailPage() {
     try {
       showNotification('loading', `Generating ${selectedDifficulty} quiz...`);
       
-      // Add difficulty to quiz data
       const quizDataWithDifficulty = {
         ...quizData,
         difficulty: selectedDifficulty
@@ -358,7 +341,6 @@ function ReviewerDetailPage() {
       showNotification('success', 'Quiz generated successfully! Redirecting...');
       setShowQuizModal(false);
       
-      // Navigate to quiz page after a brief delay
       setTimeout(() => {
         navigate(`/quiz/${id}`);
       }, 1500);
@@ -366,7 +348,6 @@ function ReviewerDetailPage() {
       console.error('Error generating quiz:', error);
       console.error('Error details:', error.response?.data);
       
-      // Extract detailed error message
       let errorMessage = 'Failed to generate quiz. Please try again.';
       if (error.response?.data?.error) {
         errorMessage = error.response.data.error;
@@ -385,14 +366,11 @@ function ReviewerDetailPage() {
     setSelectedDifficulty(difficulty);
     setShowDifficultyModal(false);
     
-    // Check if this difficulty already has a quiz
     const hasQuizForDifficulty = reviewer?.quizzes?.[difficulty]?.quizId;
     
     if (hasQuizForDifficulty) {
-      // Show retake confirmation
       setShowRetakeModal(true);
     } else {
-      // Show quiz generation modal
       setShowQuizModal(true);
     }
   };
@@ -404,24 +382,20 @@ function ReviewerDetailPage() {
       setShowRetakeModal(false);
       showNotification('loading', `Generating new ${selectedDifficulty} quiz...`);
       
-      // Get the quiz ID for the selected difficulty
       const quizId = reviewer?.quizzes?.[selectedDifficulty]?.quizId;
       
       if (!quizId) {
         throw new Error('Quiz ID not found for selected difficulty');
       }
       
-      // Use retake endpoint to create a new quiz with same settings
       const response = await createRetakeQuiz(quizId);
       console.log('Retake quiz created successfully:', response);
       
-      // Get the retake quiz ID from response
       const retakeQuizId = response.retake?._id || response._id;
       
       showNotification('success', 'New quiz generated successfully! Redirecting...');
       
       setTimeout(() => {
-        // Navigate to retake quiz using the retake quiz ID
         navigate(`/retake-quiz/${retakeQuizId}`);
       }, 1500);
     } catch (error) {
@@ -446,9 +420,6 @@ function ReviewerDetailPage() {
     return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
   };
 
-  // Parse content supporting the new tagged format:
-  // [SECTION: KEY]\n[Human Title]\n...content...\n[END_SECTION]
-  // Falls back to heuristic parsing if no tags are found
   const parseContentSections = (content) => {
     if (!content) return [];
     const lines = content.split('\n');
@@ -478,7 +449,6 @@ function ReviewerDetailPage() {
           if (curr.trim().length > 0) contentLines.push(curr);
           j++;
         }
-        // advance past END_SECTION if present
         i = j + 1;
         sections.push({ key, title, content: contentLines });
         continue;
@@ -488,7 +458,6 @@ function ReviewerDetailPage() {
 
     if (foundTagged) return sections;
 
-    // Fallback heuristic parsing (legacy content)
     const result = [];
     let current = { title: 'Content', content: [] };
     for (const raw of lines) {
@@ -509,7 +478,6 @@ function ReviewerDetailPage() {
     return result.length > 0 ? result : [{ title: 'Content', content: lines }];
   };
 
-  // Render content with bullet list and inline **bold** support
   const renderSectionContent = (contentLines) => {
     const blocks = [];
     let i = 0;
@@ -520,15 +488,12 @@ function ReviewerDetailPage() {
     const extractBoldOnly = (l) => (l.match(/^\s*\*\*([^*].*?)\*\*\s*$/) || [,''])[1];
 
     const renderInline = (text) => {
-      // Supports existing **bold** syntax and also bolds words enclosed in [brackets]
       const parts = String(text).split(/(\*\*[^*]+\*\*|\[[^\]]+\])/g);
       return parts.map((part, idx) => {
-        // Markdown-style bold
         const boldMatch = part.match(/^\*\*(.+)\*\*$/);
         if (boldMatch) {
           return <strong key={idx}>{boldMatch[1]}</strong>;
         }
-        // Bracketed text: render brackets normally and bold the inner content
         const bracketMatch = part.match(/^\[([^\]]+)\]$/);
         if (bracketMatch) {
           const inner = bracketMatch[1];
@@ -536,7 +501,6 @@ function ReviewerDetailPage() {
             <span key={idx}>[<strong>{inner}</strong>]</span>
           );
         }
-        // Plain text
         return <span key={idx}>{part}</span>;
       });
     };
@@ -602,10 +566,8 @@ function ReviewerDetailPage() {
     activeView === "enhanced" ? reviewer.enhancedContentByAI : reviewer.originalContent
   ) : [];
 
-  // Update sections when reviewer content changes
   useEffect(() => {
     if (reviewer) {
-      // Reset section refs when content changes
       sectionRefs.current = [];
     }
   }, [reviewer?.originalContent, reviewer?.enhancedContentByAI, activeView]);

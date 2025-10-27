@@ -1,7 +1,6 @@
 ﻿import httpService from './httpService';
 
 export const getAvailableLlmModelsReviewer = async () => {
-  // GET /llm-configs/available returns shape: { models: [ { id, model_name, recommends } ] }
   return httpService.get('/llm-configs/available?use_type=reviewer');
 };
 
@@ -10,7 +9,6 @@ export const getAvailableLlmModels = async (useType) => {
   return httpService.get(`/llm-configs/available${qs}`);
 };
 
-// Admin management endpoints for LLM configs
 export const getAllLlmConfigs = async () => {
   return httpService.get('/llm-configs');
 };

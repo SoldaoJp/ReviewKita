@@ -1,7 +1,7 @@
 ﻿import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Logo from "../../../assets/logo.png"; // use same logo as signup
+import Logo from "../../../assets/logo.png";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -16,18 +16,11 @@ function ForgotPassword() {
     setError("");
     setLoading(true);
     
-    // Simulate API call since backend routes don't exist yet
-    // TODO: Replace with actual API call when backend is implemented
     try {
-      // Simulate network delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Mock successful response
       setSuccess("A reset link has been sent to your email address. (Demo mode - backend not implemented)");
       
-      // Uncomment below when backend is ready:
-      // await axios.post("/api/auth/forgot-password", { email });
-      // setSuccess("A reset link has been sent to your email address.");
     } catch (err) {
       setError(err.response?.data?.message || "Failed to send reset link. Please try again.");
     } finally {

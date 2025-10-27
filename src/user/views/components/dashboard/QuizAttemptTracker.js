@@ -1,7 +1,6 @@
 ﻿import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
 
 export default function QuizAttemptTracker({ data }) {
-  // Fallback data if no data provided
   const chartData = data && data.length > 0 ? data : [
     { name: "Mon", attempts: 0 },
     { name: "Tue", attempts: 0 },
@@ -10,7 +9,6 @@ export default function QuizAttemptTracker({ data }) {
     { name: "Fri", attempts: 0 },
   ];
 
-  // Calculate total and average attempts
   const totalAttempts = chartData.reduce((sum, item) => sum + (item.attempts || 0), 0);
   const avgAttempts = chartData.length > 0 ? Math.round(totalAttempts / chartData.length) : 0;
 

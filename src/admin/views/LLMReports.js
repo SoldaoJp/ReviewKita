@@ -12,7 +12,6 @@ export default function LLMReports() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Helper function to parse sections from content
   const parseSections = (content) => {
     if (!content) return [];
     
@@ -31,7 +30,6 @@ export default function LLMReports() {
     return sections;
   };
 
-  // Helper function to render section content
   const renderSectionContent = (content) => {
     if (!content) return null;
     
@@ -42,7 +40,6 @@ export default function LLMReports() {
     });
   };
 
-  // Fetch reports on mount and when filters change
   useEffect(() => {
     loadReports();
   }, [selectedFilter, searchQuery]);
@@ -54,12 +51,10 @@ export default function LLMReports() {
       
       const filters = {};
       
-      // Search always filters by model name
       if (searchQuery) {
         filters.model_name = searchQuery;
       }
       
-      // Map sort filters
       if (selectedFilter === 'Sort Ascending') {
         filters.sort = 'ascending';
       } else if (selectedFilter === 'Sort Descending') {

@@ -1,5 +1,5 @@
 ﻿import React, { useState } from "react";
-import Logo from "../../../assets/logo.png"; // adjust path if needed
+import Logo from "../../../assets/logo.png";
 import AuthTopbar from "../components/auth/AuthTopbar";
 import TermsAndConditions from "../components/auth/TermsAndConditions";
 import { useNavigate } from "react-router-dom";
@@ -8,11 +8,9 @@ import authController from "../../controllers/authController.js";
 function Signup() {
   const navigate = useNavigate();
 
-  // states for password toggles
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
-  // form state
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -31,7 +29,6 @@ function Signup() {
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
     if (error) setError('');
     if (success) setSuccess('');
   };
@@ -128,7 +125,6 @@ function Signup() {
                 disabled={loading}
               >
                 {showPassword ? (
-                  // Eye open SVG
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5"
@@ -150,7 +146,6 @@ function Signup() {
                     />
                   </svg>
                 ) : (
-                  // Eye closed SVG
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5"
@@ -201,7 +196,6 @@ function Signup() {
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
               >
                 {showConfirmPassword ? (
-                  // Eye open SVG
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5"
@@ -223,7 +217,6 @@ function Signup() {
                     />
                   </svg>
                 ) : (
-                  // Eye closed SVG
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5"

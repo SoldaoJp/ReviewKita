@@ -10,7 +10,6 @@ export default function QuizHistoryPage() {
   const [selectedId, setSelectedId] = useState(null);
   const [expandedQuizId, setExpandedQuizId] = useState(null);
 
-  // Function to get color based on score percentage
   const getScoreColor = (percent) => {
     if (percent >= 80) {
       return { bg: 'bg-green-100', text: 'text-green-700', border: 'border-green-300' };
@@ -189,6 +188,5 @@ export default function QuizHistoryPage() {
     </div>
   );
 }
-
 
 

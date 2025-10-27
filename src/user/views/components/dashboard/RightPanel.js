@@ -1,7 +1,6 @@
 ﻿import QuizProgress from "./QuizProgress";
 
 export default function RightPanel({ data }) {
-  // data.streak expected shape: { days: number, marks: number[] }
   const streak = data?.streak ?? { days: 5, marks: [2,13,14,9,12,5,17,23,25] };
 
   return (

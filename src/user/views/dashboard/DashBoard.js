@@ -51,7 +51,7 @@ export default function Dashboard() {
     const fetchReviewersAndActivity = async () => {
       try {
         setLoading(true);
-        const response = await getAllReviewers(1000); // Pass limit as first parameter
+        const response = await getAllReviewers(1000);
         console.log('Fetched reviewers response:', response);
         if (response.success && Array.isArray(response.data)) {
           console.log('Setting reviewers from response.data:', response.data);
@@ -211,7 +211,6 @@ export default function Dashboard() {
     
     const avgPerDay = daysWithAttempts.size > 0 ? Math.round(totalAttempts / daysWithAttempts.size) : 0;
     
-    // Count attempts this month
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
@@ -270,7 +269,6 @@ export default function Dashboard() {
                             if (attempt.date) {
                               try {
                                 const date = new Date(attempt.date);
-                                // Ensure valid date
                                 if (!isNaN(date.getTime())) {
                                   const dayName = dayNames[date.getDay()];
                                   attemptsByDay[dayName] = (attemptsByDay[dayName] || 0) + 1;
@@ -385,7 +383,6 @@ export default function Dashboard() {
                 const count = activeDayCounts[day] || 0;
                 const isActive = count > 0;
                 const isToday = isCurrentMonth && day === today.getDate();
-                // Color scale: 1 = blue-200, 2 = blue-400, 3+ = blue-600
                 let bgColor = 'bg-gray-100 text-gray-600';
                 if (isActive) {
                   if (count >= 3) bgColor = 'bg-blue-600 text-white';
@@ -455,13 +452,11 @@ export default function Dashboard() {
                     attempt => attempt.reviewer_id === reviewers[idx]?._id || attempt.reviewer_title === quiz.name
                   );
 
-                  // Prepare data for ring chart
                   const chartData = [
                     { name: 'Score', value: quiz.percent },
                     { name: 'Remaining', value: Math.max(0, 100 - quiz.percent) }
                   ];
 
-                  // Get color and gradient based on score
                   const isGreen = quiz.colorClass === 'green';
                   const isOrange = quiz.colorClass === 'orange';
                   const scoreColor = isGreen ? '#10b981' : isOrange ? '#f59e0b' : '#ef4444';

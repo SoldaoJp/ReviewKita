@@ -1,5 +1,4 @@
-﻿    // src/components/auth/ResetPassword.js
-    import React, { useState } from "react";
+﻿    import React, { useState } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
     import { useNavigate } from "react-router-dom";
@@ -13,7 +12,6 @@ import { useLocation } from "react-router-dom";
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
-    // Get token from URL
     const params = new URLSearchParams(location.search);
     const token = params.get("token");
 
@@ -34,18 +32,11 @@ import { useLocation } from "react-router-dom";
         }
         setLoading(true);
         
-        // Simulate API call since backend routes don't exist yet
-        // TODO: Replace with actual API call when backend is implemented
         try {
-            // Simulate network delay
             await new Promise(resolve => setTimeout(resolve, 1000));
             
-            // Mock successful response and navigate to confirmation
             navigate("/confirm-reset");
             
-            // Uncomment below when backend is ready:
-            // await axios.post("/api/auth/reset-password", { token, password });
-            // navigate("/confirm-reset");
         } catch (err) {
             setError(err.response?.data?.message || "Failed to reset password. Please try again.");
         } finally {

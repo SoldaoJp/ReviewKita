@@ -212,7 +212,7 @@ function ReviewerPage({ title }) {
     try {
       await deleteReviewer(selectedReviewer._id);
       setReviewers((prev) => prev.filter((r) => r._id !== selectedReviewer._id));
-      triggerReviewerUpdate(); // Notify sidebar to refresh
+      triggerReviewerUpdate();
       setShowDeleteModal(false);
       setSelectedReviewer(null);
     } catch (err) {
@@ -266,8 +266,8 @@ function ReviewerPage({ title }) {
         setSubjectSearch("");
         setShowCustomSubject(false);
         setSelectedModelId("");
-        fetchReviewers(); // Refresh the list
-        triggerReviewerUpdate(); // Notify sidebar to refresh
+        fetchReviewers();
+        triggerReviewerUpdate();
       }
     } catch (err) {
       console.error("Error creating reviewer:", err);
@@ -290,14 +290,11 @@ function ReviewerPage({ title }) {
     setSelectedDifficulty(difficulty);
     setShowDifficultyModal(false);
     
-    // Check if this difficulty already has a quiz
     const hasQuizForDifficulty = selectedReviewer?.quizzes?.[difficulty]?.quizId;
     
     if (hasQuizForDifficulty) {
-      // Show retake confirmation
       setShowRetakeModal(true);
     } else {
-      // Show quiz generation modal
       setShowQuizModal(true);
     }
   };
@@ -309,24 +306,20 @@ function ReviewerPage({ title }) {
       setShowRetakeModal(false);
       showNotification('loading', `Generating new ${selectedDifficulty} quiz...`);
       
-      // Get the quiz ID for the selected difficulty
       const quizId = selectedReviewer.quizzes?.[selectedDifficulty]?.quizId;
       
       if (!quizId) {
         throw new Error('Quiz ID not found for selected difficulty');
       }
       
-      // Use retake endpoint to create a new quiz with same settings
       const response = await createRetakeQuiz(quizId);
       console.log('Retake quiz created successfully:', response);
       
-      // Get the retake quiz ID from response
       const retakeQuizId = response.retake?._id || response._id;
       
       showNotification('success', 'New quiz generated successfully! Redirecting...');
       
       setTimeout(() => {
-        // Navigate to retake quiz using the retake quiz ID
         navigate(`/retake-quiz/${retakeQuizId}`);
       }, 1500);
     } catch (error) {
@@ -351,7 +344,6 @@ function ReviewerPage({ title }) {
     try {
       showNotification('loading', `Generating ${selectedDifficulty} quiz...`);
       
-      // Add difficulty to quiz data
       const quizDataWithDifficulty = {
         ...quizData,
         difficulty: selectedDifficulty
@@ -362,7 +354,6 @@ function ReviewerPage({ title }) {
       showNotification('success', 'Quiz generated successfully! Redirecting...');
       setShowQuizModal(false);
       
-      // Navigate to quiz page after a brief delay
       setTimeout(() => {
         navigate(`/quiz/${selectedReviewer._id}`);
       }, 1500);
@@ -370,7 +361,6 @@ function ReviewerPage({ title }) {
       console.error('Error generating quiz:', error);
       console.error('Error details:', error.response?.data);
       
-      // Extract detailed error message
       let errorMessage = 'Failed to generate quiz. Please try again.';
       if (error.response?.data?.error) {
         errorMessage = error.response.data.error;
@@ -587,7 +577,6 @@ function ReviewerPage({ title }) {
                   <div className="w-full border border-t-0 rounded-b bg-white max-h-64 overflow-y-auto">
                     {/* Render subjects based on category */}
                     {subjectCategory === 'college' ? (
-                      // For college: group by course
                       Object.entries(SUBJECT_CATEGORIES[subjectCategory].courses).map(([course, subjects]) => {
                         const filteredSubjects = subjects.filter(subject => 
                           subjectSearch === '' || 
@@ -619,7 +608,6 @@ function ReviewerPage({ title }) {
                         ) : null;
                       })
                     ) : (
-                      // For other categories: simple list
                       SUBJECT_CATEGORIES[subjectCategory].subjects
                         .filter(subject => 
                           subjectSearch === '' || 

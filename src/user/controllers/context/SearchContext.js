@@ -21,7 +21,6 @@ export function SearchProvider({ children }) {
     { type: 'section', title: 'Welcome', section: 'Welcome', path: '/dashboard#welcome' },
     { type: 'section', title: 'Progress', section: 'Progress', path: '/profile#progress' },
     { type: 'section', title: 'Mastery', section: 'Mastery', path: '/profile#mastery' },
-    // Dashboard-specific sections we added to markup
     { type: 'section', title: 'Welcome Card', section: 'welcome', path: '/dashboard#welcome' },
     { type: 'section', title: 'Progress Tracker', section: 'progress', path: '/dashboard#progress' },
     { type: 'section', title: 'Subject Tracker', section: 'subjects', path: '/dashboard#subjects' },
@@ -44,7 +43,6 @@ export function SearchProvider({ children }) {
     setShowResults(true);
 
     try {
-      // If empty query, return suggested sections immediately
       if (!query || query.trim().length === 0) {
         const suggestions = pageSections.map((s) => ({ ...s, category: 'Suggestions', title: s.title }));
         setSearchResults(suggestions);
@@ -55,23 +53,20 @@ export function SearchProvider({ children }) {
       const q = query.trim().toLowerCase();
       const results = [];
 
-      // Search static pages
       for (const p of staticPages) {
         if (p.title.toLowerCase().includes(q) || (p.description || '').toLowerCase().includes(q)) {
           results.push({ ...p, category: 'Pages', type: 'page', title: p.title, description: p.description });
         }
       }
 
-      // Search page sections
       for (const s of pageSections) {
         if ((s.section || '').toLowerCase().includes(q) || (s.title || '').toLowerCase().includes(q)) {
           results.push({ ...s, category: 'Sections', type: 'section', title: s.title, section: s.section });
         }
       }
 
-      // Fetch reviewers and search them
       try {
-        const resp = await getAllReviewers(500); // Pass limit as first parameter
+        const resp = await getAllReviewers(500);
         const reviewers = Array.isArray(resp) ? resp : (resp?.data || resp?.reviewers || []);
 
         for (const r of reviewers) {
@@ -79,7 +74,6 @@ export function SearchProvider({ children }) {
           const desc = r.description || r.summary || '';
           const contentFields = [r.originalContent || '', r.enhancedContent || r.enhancedContentByAI || ''].join('\n');
 
-          // match title/description
           if ((title && title.toLowerCase().includes(q)) || (desc && desc.toLowerCase().includes(q))) {
             results.push({
               type: 'reviewer',
@@ -90,7 +84,6 @@ export function SearchProvider({ children }) {
               date: r.updatedAt || r.createdAt,
             });
           } else if (contentFields.toLowerCase().includes(q)) {
-            // Try to surface matching sections within content
             const lines = contentFields.split(/\n+/).map((l) => l.trim()).filter(Boolean);
             let pushedSection = false;
             for (const line of lines) {
@@ -110,11 +103,8 @@ export function SearchProvider({ children }) {
           }
         }
       } catch (err) {
-        // network or auth error while fetching reviewers - ignore gracefully
-        // console.warn('Search: failed to fetch reviewers', err);
       }
 
-      // Basic relevance: keep as-is (could sort by type/rank)
       setSearchResults(results);
       setIsSearching(false);
       return results;
@@ -124,9 +114,7 @@ export function SearchProvider({ children }) {
     }
   }
 
-  // Highlight element on the page and scroll into view. selector is the value of data-search-section
   function highlightAndNavigate(path, selector) {
-    // If path is same page, try to highlight; otherwise navigate then try to highlight after load
     const scrollAndHighlight = () => {
       try {
         let el = null;
@@ -134,7 +122,6 @@ export function SearchProvider({ children }) {
           el = document.querySelector(`[data-search-section="${selector}"]`);
         }
         if (!el && selector) {
-          // try id
           el = document.getElementById(selector);
         }
         if (el) {
@@ -144,7 +131,6 @@ export function SearchProvider({ children }) {
           return true;
         }
       } catch (e) {
-        // ignore
       }
       return false;
     };
@@ -158,7 +144,6 @@ export function SearchProvider({ children }) {
       scrollAndHighlight();
     } else {
       window.location.href = path || targetPath;
-      // after navigation, attempt highlighting after a short delay
       setTimeout(() => {
         if (selectorFromPath) highlightAndNavigate(targetPath, selectorFromPath);
       }, 600);
@@ -203,7 +188,6 @@ export function SearchProvider({ children }) {
 export function useSearch() {
   const ctx = useContext(SearchContext);
   if (!ctx) {
-    // Provide a fallback so components don't crash if provider isn't mounted
     return {
       searchQuery: '',
       searchResults: [],

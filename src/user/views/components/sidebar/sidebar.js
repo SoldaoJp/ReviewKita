@@ -58,7 +58,7 @@ function Sidebar() {
   const fetchReviewers = async () => {
     try {
       setLoading(true);
-      const response = await getAllReviewers(100); // Pass limit as first parameter
+      const response = await getAllReviewers(100);
       console.log('Sidebar - Fetched reviewers:', response);
       if (response.success) {
         setReviewers(response.data);
@@ -333,7 +333,5 @@ function Sidebar() {
 }
 
 export default Sidebar;
-
-
 
 

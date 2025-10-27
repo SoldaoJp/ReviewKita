@@ -22,13 +22,12 @@ function ProfilePage() {
   const [profilePicPreview, setProfilePicPreview] = useState(null);
   const [reviewerCount, setReviewerCount] = useState(0);
   const [notification, setNotification] = useState(null);
-  const [quizCount] = useState(12); // static value
-  const [masteredCount] = useState(3); // static value
+  const [quizCount] = useState(12);
+  const [masteredCount] = useState(3);
 
-  // Fetch reviewer count
   const fetchReviewerCount = async () => {
     try {
-      const response = await getAllReviewers(1000); // Pass limit as first parameter
+      const response = await getAllReviewers(1000);
       console.log('ProfilePage - Fetched reviewers:', response);
       if (response.success && Array.isArray(response.data)) {
         setReviewerCount(response.data.length);
@@ -81,25 +80,22 @@ function ProfilePage() {
     e.preventDefault();
     
     try {
-      // Upload profile picture if changed
       if (profilePicFile) {
         await updateProfilePicture(profilePicFile);
       }
 
-      // Update username if changed
       if (formData.username !== userData.username) {
         await changeUsername(formData.username);
       }
 
-      // Update password if provided
       if (formData.currentPassword && formData.newPassword) {
         await changePassword(formData.currentPassword, formData.newPassword);
       }
 
       showNotification('Profile updated successfully!', 'success');
       setShowModal(false);
-      await fetchUserProfile(); // Refresh profile data
-      await refreshUser(); // Refresh user context for topbar and other components
+      await fetchUserProfile();
+      await refreshUser();
       setFormData(prev => ({ ...prev, currentPassword: '', newPassword: '' }));
       setProfilePicFile(null);
       setProfilePicPreview(null);
@@ -109,7 +105,6 @@ function ProfilePage() {
     }
   };
 
-  // Notification helper
   const showNotification = (message, type = 'info', duration = 4000) => {
     setNotification({ message, type });
     if (duration > 0) {

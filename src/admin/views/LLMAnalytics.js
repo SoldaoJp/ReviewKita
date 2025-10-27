@@ -80,7 +80,6 @@ export default function LLMAnalytics() {
 
   const COLORS = ["#3B82F6", "#22C55E", "#FACC15", "#F97316", "#EC4899", "#8B5CF6", "#06B6D4"];
 
-  // Prepare data for charts
   const modelRatingsData = Object.entries(analytics.models_rating || {}).map(([name, value]) => ({
     name,
     rating: value
@@ -101,14 +100,13 @@ export default function LLMAnalytics() {
     recommendations: value
   }));
 
-  // Prepare model comparison radar chart data
   const radarData = analytics.model_rankings?.map(model => ({
     model: model.model_name,
     rating: model.rating_percentage,
     recommendations: model.recommendations,
-    uses: model.total_uses / 10, // Scale down for better visualization
+    uses: model.total_uses / 10,
     reviewers: model.total_reviewers,
-    reports: model.total_reports * 10 // Scale up for better visualization
+    reports: model.total_reports * 10
   })) || [];
 
   return (

@@ -10,7 +10,6 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
     timerMinutes: 0,
     difficulty: preSelectedDifficulty || 'medium',
     provideScenarios: false,
-  // removed scheduledAt
   });
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -19,7 +18,6 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
   const [loadingReviewers, setLoadingReviewers] = useState(false);
   const navigate = useNavigate();
 
-  // Mixed type configuration
   const [mixedTypeConfig, setMixedTypeConfig] = useState({
     'multiple-choice': { enabled: false, count: 0 },
     'identification': { enabled: false, count: 0 },
@@ -27,7 +25,6 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
     'fill-in-the-blanks': { enabled: false, count: 0 },
   });
 
-  // Fetch reviewers when opened from dashboard
   useEffect(() => {
     if (fromDashboard && isOpen) {
       const fetchReviewers = async () => {
@@ -49,7 +46,6 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
     }
   }, [fromDashboard, isOpen]);
 
-  // Update difficulty when preSelectedDifficulty changes
   useEffect(() => {
     if (preSelectedDifficulty && isOpen) {
       setFormData(prev => ({ ...prev, difficulty: preSelectedDifficulty }));
@@ -63,7 +59,6 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
 
   const handleNumberChange = (e) => {
     const { name, value } = e.target;
-    // Ensure positive numbers only
     const numValue = Math.max(0, parseInt(value) || 0);
     setFormData((prev) => ({ ...prev, [name]: numValue }));
   };
@@ -72,7 +67,6 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
     setFormData((prev) => ({ ...prev, provideScenarios: !prev.provideScenarios }));
   };
 
-  // Handle mixed type checkbox toggle
   const handleMixedTypeToggle = (type) => {
     setMixedTypeConfig(prev => ({
       ...prev,
@@ -84,14 +78,12 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
     }));
   };
 
-  // Handle mixed type count change
   const handleMixedTypeCountChange = (type, value) => {
     const numValue = Math.max(0, parseInt(value) || 0);
     const totalOtherTypes = Object.entries(mixedTypeConfig)
       .filter(([t]) => t !== type)
       .reduce((sum, [, config]) => sum + config.count, 0);
     
-    // Ensure total doesn't exceed numQuestions
     const maxAllowed = formData.numQuestions - totalOtherTypes;
     const finalCount = Math.min(numValue, maxAllowed);
     
@@ -104,7 +96,6 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
     }));
   };
 
-  // Calculate total mixed questions
   const getTotalMixedQuestions = () => {
     return Object.values(mixedTypeConfig).reduce((sum, config) => sum + config.count, 0);
   };
@@ -112,19 +103,16 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validation
     if (formData.numQuestions < 1) {
       alert('Number of questions must be at least 1');
       return;
     }
 
-    // Validate reviewer selection when from dashboard
     if (fromDashboard && !selectedReviewerId) {
       alert('Please select a reviewer');
       return;
     }
 
-    // Validate mixed type configuration
     if (formData.questionType === 'mixed') {
       const totalMixed = getTotalMixedQuestions();
       const enabledTypes = Object.entries(mixedTypeConfig).filter(([, config]) => config.enabled);
@@ -143,14 +131,10 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
     try {
       setIsGenerating(true);
       
-      // Use selected reviewer ID from dropdown if from dashboard, otherwise use passed reviewerId
       const targetReviewerId = fromDashboard ? selectedReviewerId : reviewerId;
       
-      // Prepare question types array based on selection
       let questionTypesArray;
       if (formData.questionType === 'mixed') {
-        // For mixed type, create array with counts (backend needs to support this)
-        // Format: repeat each type based on its count
         questionTypesArray = [];
         Object.entries(mixedTypeConfig).forEach(([type, config]) => {
           if (config.enabled && config.count > 0) {
@@ -163,27 +147,21 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
         questionTypesArray = [formData.questionType];
       }
       
-      // Ensure all data types match backend expectations
       const quizPayload = {
-        reviewerId: String(targetReviewerId), // Ensure string
-        numQuestions: parseInt(formData.numQuestions), // Ensure integer
-        questionTypes: questionTypesArray, // Array of strings
-        timerMinutes: parseInt(formData.timerMinutes), // Ensure integer
-        difficulty: formData.difficulty, // String enum
-        provideScenarios: Boolean(formData.provideScenarios), // Ensure boolean
+        reviewerId: String(targetReviewerId),
+        numQuestions: parseInt(formData.numQuestions),
+        questionTypes: questionTypesArray,
+        timerMinutes: parseInt(formData.timerMinutes),
+        difficulty: formData.difficulty,
+        provideScenarios: Boolean(formData.provideScenarios),
       };
       
-      // removed scheduledAt logic
       
-      // If from dashboard and onGenerate is not provided, navigate to quiz page
       if (fromDashboard && !onGenerate) {
-        // Import and use quiz service to create quiz
         const { createQuiz } = await import('../../../services/quizService');
         const result = await createQuiz(quizPayload);
         
-        // Navigate to quiz page using reviewerId (not quizId) because the route expects reviewerId
         if (result.quiz && result.quiz.reviewer) {
-          // Use the reviewer ID from the quiz response to navigate
           navigate(`/quiz/${result.quiz.reviewer}`);
         } else {
           throw new Error('Invalid quiz response structure');
@@ -192,14 +170,12 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
         await onGenerate(quizPayload);
       }
       
-      // Reset form
       setFormData({
         numQuestions: 10,
         questionType: 'multiple-choice',
         timerMinutes: 0,
         difficulty: 'medium',
         provideScenarios: false,
-  // removed scheduledAt
       });
       setSelectedReviewerId('');
       setMixedTypeConfig({

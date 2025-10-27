@@ -27,7 +27,6 @@ export default function AdminAnalytics() {
   const [exportProgress, setExportProgress] = useState(0);
 
   useEffect(() => {
-    // Fetch analytics data from backend
     const fetchAnalyticsData = async () => {
       try {
         const response = await httpService.get('/admin/analytics/aggregate');
@@ -35,9 +34,7 @@ export default function AdminAnalytics() {
         if (response && response.data) {
           const apiData = response.data;
           
-          // Transform API data to match component needs
           const transformedData = {
-            // System Overview
             totalUsers: apiData.systemOverview.totalUsers,
             totalQuizzes: apiData.systemOverview.totalQuizzes,
             totalRetakes: apiData.systemOverview.totalRetakes,
@@ -45,18 +42,15 @@ export default function AdminAnalytics() {
             totalQuestions: apiData.systemOverview.totalQuestions,
             overallAccuracy: apiData.systemOverview.overallAccuracy.replace('%', ''),
             
-            // Performance Metrics
             correctAnswers: apiData.performanceMetrics.correctAnswers,
             wrongAnswers: apiData.performanceMetrics.wrongAnswers,
             skippedAnswers: apiData.performanceMetrics.skippedAnswers,
             accuracyRate: apiData.performanceMetrics.accuracyRate,
             averageTimePerQuestion: apiData.performanceMetrics.avgTimePerQuestion.replace('s', ''),
             
-            // Improvement
             previousOverallAccuracy: apiData.improvement.earlyAccuracy.replace('%', ''),
             improvementRate: apiData.improvement.improvementRate.replace('%', ''),
             
-            // Subject Analysis - Normalize subject names
             subjects: apiData.subjectAnalysis.perSubjectAccuracy
               .slice(0, 5)
               .map(s => ({
@@ -66,7 +60,6 @@ export default function AdminAnalytics() {
                 accuracy: s.accuracy,
                 totalItems: s.totalQuestions,
                 correctItems: Math.round((s.accuracy / 100) * s.totalQuestions),
-                // Use per-subject average time from backend
                 timePerQuestion: s.avgSecondsPerQuestion || 0,
                 mastery: s.accuracy
               })),
@@ -85,43 +78,33 @@ export default function AdminAnalytics() {
                   : 'General'
               })),
             
-            // Difficulty Analysis
             difficultyAnalysis: apiData.difficultyAnalysis,
             
-            // Top Performers
             topPerformers: apiData.topPerformers,
             
-            // Most Active Users
             mostActiveUsers: apiData.mostActiveUsers,
             
-            // User Averages
             avgQuizzesPerUser: apiData.userAverages.avgQuizzesPerUser,
             avgRetakesPerUser: apiData.userAverages.avgRetakesPerUser,
             avgReviewersPerUser: apiData.userAverages.avgReviewersPerUser,
             avgActiveDaysPerUser: apiData.userAverages.avgActiveDaysPerUser,
             
-            // Activity Metrics
             activityMetrics: apiData.activityMetrics,
             
-            // Mastery Distribution
             masteryDistribution: apiData.masteryDistribution,
             
-            // Calculate Last 7 Days Participation from activity metrics
-            // Since backend doesn't provide daily breakdown, we'll use avgActiveDaysPerUser to estimate
             last7DaysParticipation: (() => {
               const avgActiveDays = apiData.userAverages.avgActiveDaysPerUser;
               const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
               const activeDaysCount = Math.round(avgActiveDays);
               
               return days.map((day, index) => {
-                // Mark days as active based on average, spread across the week
                 const isActive = index < activeDaysCount ? 1 : 0;
-                // Use activity count from activityMetrics for value
                 const avgActivity = Math.round(apiData.activityMetrics.totalReviewerActivities / 7);
                 return {
                   day,
                   active: isActive,
-                  value: isActive ? avgActivity + (Math.random() * 20 - 10) : 0 // Add slight variation
+                  value: isActive ? avgActivity + (Math.random() * 20 - 10) : 0
                 };
               });
             })(),
@@ -131,7 +114,6 @@ export default function AdminAnalytics() {
         }
       } catch (error) {
         console.error('Error fetching analytics data:', error);
-        // Fallback to mock data on error
         setAnalyticsData(getMockAnalyticsData());
       } finally {
         setLoading(false);
@@ -141,7 +123,6 @@ export default function AdminAnalytics() {
     fetchAnalyticsData();
   }, []);
 
-  // Mock data fallback
   const getMockAnalyticsData = () => {
     return {
       totalUsers: 109,
@@ -224,13 +205,11 @@ export default function AdminAnalytics() {
 
   const data = analyticsData;
 
-  // Export dataset to CSV
   const handleExportDataset = async () => {
     try {
       setExporting(true);
       setExportProgress(0);
 
-      // Simulate progress for fetching data
       setExportProgress(20);
       const response = await extractDataset();
       setExportProgress(50);
@@ -243,7 +222,6 @@ export default function AdminAnalytics() {
 
       const dataset = response.dataset;
 
-      // Validate dataset is an array
       if (!Array.isArray(dataset)) {
         throw new Error('Invalid dataset structure: expected an array');
       }
@@ -252,12 +230,10 @@ export default function AdminAnalytics() {
         throw new Error('Dataset is empty');
       }
       
-      // Convert dataset to CSV format
       setExportProgress(70);
       const csvContent = convertDatasetToCSV(dataset);
       setExportProgress(90);
 
-      // Download CSV file
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
@@ -281,9 +257,7 @@ export default function AdminAnalytics() {
     }
   };
 
-  // Convert dataset to CSV format
   const convertDatasetToCSV = (dataset) => {
-    // Helper function to safely escape CSV values
     const escapeCSV = (value) => {
       if (value === null || value === undefined) return '';
       const str = String(value);
@@ -295,7 +269,6 @@ export default function AdminAnalytics() {
 
     let csv = '';
 
-    // Get all unique keys from all objects (in case some objects have different keys)
     const allKeys = new Set();
     dataset.forEach(record => {
       Object.keys(record).forEach(key => allKeys.add(key));
@@ -303,10 +276,8 @@ export default function AdminAnalytics() {
 
     const headers = Array.from(allKeys);
 
-    // Add header row
     csv += headers.map(header => escapeCSV(header)).join(',') + '\n';
 
-    // Add data rows
     dataset.forEach(record => {
       const row = headers.map(header => escapeCSV(record[header]));
       csv += row.join(',') + '\n';
@@ -315,19 +286,16 @@ export default function AdminAnalytics() {
     return csv;
   };
 
-  // Calculate weakest subject
   const weakestSubject = data.subjects.reduce((min, current) =>
     current.accuracy < min.accuracy ? current : min
   );
 
-  // Correct vs Wrong vs Skipped data
   const correctWrongSkippedData = [
     { name: 'Correct', value: data.correctAnswers, percentage: ((data.correctAnswers / (data.correctAnswers + data.wrongAnswers + data.skippedAnswers)) * 100).toFixed(1) },
     { name: 'Wrong', value: data.wrongAnswers, percentage: ((data.wrongAnswers / (data.correctAnswers + data.wrongAnswers + data.skippedAnswers)) * 100).toFixed(1) },
     { name: 'Skipped', value: data.skippedAnswers, percentage: ((data.skippedAnswers / (data.correctAnswers + data.wrongAnswers + data.skippedAnswers)) * 100).toFixed(1) },
   ];
 
-  // Subject coverage data (by questions attempted)
   const totalQuestionsAttempted = data.subjects.reduce((sum, s) => sum + s.totalItems, 0);
   const subjectCoverageData = data.subjects.map(subject => ({
     name: subject.name,

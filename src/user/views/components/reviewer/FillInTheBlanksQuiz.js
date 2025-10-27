@@ -17,12 +17,10 @@ export default function FillInTheBlanksQuiz({
   const [showFeedback, setShowFeedback] = useState(false);
   const [correctnessMap, setCorrectnessMap] = useState({});
 
-  // Parse the question to identify blanks (e.g., "The ___ is blue" or "The [blank] is blue")
   const parseQuestion = () => {
     const text = question.question || "";
     const blanks = question.fill_in_the_blank_answers || [];
     
-    // Split by ___ or [blank] patterns
     const parts = text.split(/(___|blank|\[blank\])/gi);
     let blankIndex = 0;
     
@@ -49,7 +47,6 @@ export default function FillInTheBlanksQuiz({
     
     if (!allAnswersFilled) return;
 
-    // Check correctness for each blank
     const correctAnswers = question.fill_in_the_blank_answers || [];
     const correctnessResults = {};
     

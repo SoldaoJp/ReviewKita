@@ -7,7 +7,6 @@ console.log('Environment variables:', {
 });
 
 class AuthService {
-  // Login user
   async login(email, password) {
     try {
       console.log('Attempting login to:', `${API_BASE_URL}/auth/login`);
@@ -34,13 +33,9 @@ class AuthService {
       }
 
       if (!response.ok) {
-        // Handle specific server errors with detailed messages
         if (response.status === 500) {
           console.error('Server error details:', data);
-          // Check for specific JWT error
           if (data.error && data.error.includes('secretOrPrivateKey')) {
-            // If developer has enabled a dev bypass, issue a local dev token so dev flow can continue
-            // Allow runtime override via localStorage for development convenience
             const envBypass = (process.env.REACT_APP_DEV_BYPASS_AUTH || 'false').toLowerCase() === 'true';
             const storageBypass = (typeof window !== 'undefined' && localStorage.getItem('REACT_APP_DEV_BYPASS_AUTH') === 'true');
             const isDev = (process.env.NODE_ENV || 'development') === 'development';
@@ -62,10 +57,8 @@ class AuthService {
         throw new Error(data.error || `Server error: ${response.status}`);
       }
 
-      // Store token and user in localStorage
       if (data.token) {
         localStorage.setItem('authToken', data.token);
-        // Prefer backend-provided user payload when available (includes role)
         if (data.user) {
           const storedUser = {
             id: data.user.id || data.user._id,
@@ -98,7 +91,6 @@ class AuthService {
     }
   }
 
-  // Register user
   async register(userData) {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/register`, {
@@ -113,7 +105,6 @@ class AuthService {
 
       if (!response.ok) {
         if (data.errors && Array.isArray(data.errors)) {
-          // Handle validation errors
           const errorMessages = data.errors.map(err => err.msg).join(', ');
           throw new Error(errorMessages);
         }
@@ -126,31 +117,26 @@ class AuthService {
     }
   }
 
-  // Logout user
   logout() {
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
   }
 
-  // Check if user is authenticated
   isAuthenticated() {
     const token = localStorage.getItem('authToken');
     const user = localStorage.getItem('user');
     return !!(token && user);
   }
 
-  // Get current user
   getCurrentUser() {
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;
   }
 
-  // Get auth token
   getToken() {
     return localStorage.getItem('authToken');
   }
 
-  // Set auth header for API requests
   getAuthHeader() {
     const token = this.getToken();
     return token ? { Authorization: `Bearer ${token}` } : {};

@@ -1,10 +1,9 @@
 ﻿import React, { useState, useEffect } from "react";
 import AuthTopbar from "../components/auth/AuthTopbar";
-import Logo from "../../../assets/logo.png"; // adjust path if needed
+import Logo from "../../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../controllers/AuthContext.js";
 import authService from '../../services/authService.js';
-// import BackendDiagnostic from "../common/BackendDiagnostic.js";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -31,7 +30,6 @@ export default function Login() {
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
     if (error) setError('');
   };
 
@@ -42,13 +40,11 @@ export default function Login() {
     try {
       const success = await login(formData.email, formData.password);
       if (success) {
-        // Ensure auth token/data was persisted before navigating.
         if (authService.isAuthenticated()) {
           const stored = localStorage.getItem('user');
           const u = stored ? JSON.parse(stored) : null;
           if (u?.role === 'admin') navigate('/admin'); else navigate('/dashboard');
         }
-        // Otherwise, the useEffect watching isAuthenticated will handle navigation after context updates.
       } else {
         setError('Login failed. Please check your credentials.');
       }
@@ -118,7 +114,6 @@ export default function Login() {
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
-                  // Eye open SVG
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5"
@@ -140,7 +135,6 @@ export default function Login() {
                     />
                   </svg>
                 ) : (
-                  // Eye closed SVG
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5"

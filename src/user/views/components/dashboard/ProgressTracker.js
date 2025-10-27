@@ -9,7 +9,6 @@
   } from "recharts";
   
   export default function ProgressTracker({ data, legends, quizStats }) {
-    // Fallback data if no data provided
     const chartData = data && data.length > 0 ? data : [
       { date: "09/20", correct: 0, wrong: 0, skipped: 0 },
       { date: "09/22", correct: 0, wrong: 0, skipped: 0 },

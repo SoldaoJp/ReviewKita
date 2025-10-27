@@ -71,15 +71,12 @@ export default function QuizResults({ quiz, userAnswers, onRetake, onGoBack }) {
               const isCorrect = userAnswer.isCorrect === true;
               const isSkipped = userAnswer.isSkipped === true;
               
-              // Helper function to get option text from array format
               const getOptionText = (optionKey) => {
                 if (!question.options) return '';
                 if (Array.isArray(question.options)) {
-                  // Array format: ["A) text", "B) text", ...]
                   const option = question.options.find(opt => opt.startsWith(optionKey + ')'));
                   return option || '';
                 } else {
-                  // Object format: { A: "text", B: "text", ... }
                   return question.options[optionKey] || '';
                 }
               };
@@ -149,6 +146,5 @@ export default function QuizResults({ quiz, userAnswers, onRetake, onGoBack }) {
     </div>
   );
 }
-
 
 

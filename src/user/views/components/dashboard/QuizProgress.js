@@ -1,5 +1,4 @@
 ﻿export default function QuizProgress({ quizzes = [] }) {
-    // fallback demo
     if (!quizzes || quizzes.length === 0) {
       quizzes = [
         { title: "Advanced Programming", pct: 0, done: 0 },

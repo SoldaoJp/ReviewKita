@@ -1,6 +1,5 @@
 ﻿import httpService from './httpService';
 
-// Get user profile
 export const getUserProfile = async () => {
     try {
         console.log('Fetching user profile...');
@@ -8,7 +7,6 @@ export const getUserProfile = async () => {
         console.log('Base URL:', httpService.baseURL);
         const response = await httpService.get('/user/profile');
         console.log('User profile response:', response);
-        // Backend returns data in response.data
         return response.data || response;
     } catch (error) {
         console.error('Error fetching user profile:', error);
@@ -16,7 +14,6 @@ export const getUserProfile = async () => {
     }
 };
 
-// Update profile picture
 export const updateProfilePicture = async (file) => {
     try {
         const token = localStorage.getItem('authToken');
@@ -43,7 +40,6 @@ export const updateProfilePicture = async (file) => {
     }
 };
 
-// Change username
 export const changeUsername = async (newUsername) => {
     try {
         const response = await httpService.put('/user/change-username', { newUsername });
@@ -53,7 +49,6 @@ export const changeUsername = async (newUsername) => {
     }
 };
 
-// Change password
 export const changePassword = async (currentPassword, newPassword) => {
     try {
         const response = await httpService.put('/user/change-password', { 

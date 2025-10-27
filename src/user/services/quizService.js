@@ -1,7 +1,5 @@
-﻿// Get finished quiz history
-export const getQuizHistory = async () => {
+﻿export const getQuizHistory = async () => {
   try {
-    // Backend reference: GET /api/quizzes/history (or similar)
     const response = await httpService.get('/quizzes/history');
     return response.data || response;
   } catch (error) {
@@ -29,7 +27,7 @@ export const getQuizByReviewer = async (reviewerId) => {
     console.log('Fetching quiz for reviewer:', reviewerId);
     const response = await httpService.get(`/quizzes/reviewer/${reviewerId}`);
     console.log('Quiz fetch response:', response);
-    return response; // Backend returns { quiz: {...} }
+    return response;
   } catch (error) {
     console.error('Error fetching quiz:', error);
     console.error('Error response:', error.response);
@@ -42,7 +40,7 @@ export const submitQuizAnswer = async (quizId, answerData) => {
     console.log('Submitting quiz answer:', { quizId, answerData });
     const response = await httpService.post(`/quizzes/${quizId}/answer`, answerData);
     console.log('Submit answer response:', response);
-    return response; // Return the full response
+    return response;
   } catch (error) {
     console.error('Error submitting quiz answer:', error);
     console.error('Error response:', error.response);
@@ -94,7 +92,7 @@ export const getRetakeQuiz = async (retakeQuizId) => {
     console.log('Fetching retake quiz:', retakeQuizId);
     const response = await httpService.get(`/quiz-retakes/${retakeQuizId}`);
     console.log('Retake quiz fetch response:', response);
-    return response; // Backend returns { quiz: {...} }
+    return response;
   } catch (error) {
     console.error('Error fetching retake quiz:', error);
     console.error('Error response:', error.response);

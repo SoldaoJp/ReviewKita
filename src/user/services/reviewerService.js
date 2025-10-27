@@ -1,6 +1,5 @@
 ﻿import httpService from './httpService';
 
-// Get all reviewers for the logged-in user
 export const getAllReviewers = async (limit = 100, cursor = null, sort = null) => {
     try {
         let url = `/reviewers?limit=${limit}`;
@@ -14,7 +13,6 @@ export const getAllReviewers = async (limit = 100, cursor = null, sort = null) =
     }
 };
 
-// Get a specific reviewer by ID
 export const getReviewerById = async (id) => {
     try {
         const response = await httpService.get(`/reviewers/${id}`);
@@ -24,10 +22,8 @@ export const getReviewerById = async (id) => {
     }
 };
 
-// Create a new reviewer
 export const createReviewer = async (formData) => {
     try {
-        // For multipart/form-data, we need to use fetch directly with proper headers
         const token = localStorage.getItem('authToken');
         
         if (!token) {
@@ -57,7 +53,6 @@ export const createReviewer = async (formData) => {
     }
 };
 
-// Update a reviewer
 export const updateReviewer = async (id, data) => {
     try {
         const response = await httpService.put(`/reviewers/${id}`, data);
@@ -67,7 +62,6 @@ export const updateReviewer = async (id, data) => {
     }
 };
 
-// Delete a reviewer
 export const deleteReviewer = async (id) => {
     try {
         const response = await httpService.delete(`/reviewers/${id}`);
@@ -77,7 +71,6 @@ export const deleteReviewer = async (id) => {
     }
 };
 
-// Re-enhance reviewer content using current model (or provided model_id)
 export const reenhanceReviewerContent = async (id, { revisionNotes = '', model_id } = {}) => {
     try {
         const payload = { revisionNotes };
@@ -89,7 +82,6 @@ export const reenhanceReviewerContent = async (id, { revisionNotes = '', model_i
     }
 };
 
-// Report enhanced content issues
 export const reportReviewer = async (id, reportData) => {
     try {
         const response = await httpService.post(`/reviewers/${id}/report`, reportData);

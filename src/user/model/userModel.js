@@ -10,7 +10,6 @@
     this.createdAt = userData.createdAt || null;
   }
 
-  // Create user from API response
   static fromApiResponse(apiData) {
     return new UserModel({
       id: apiData.id || apiData._id,
@@ -24,7 +23,6 @@
     });
   }
 
-  // Convert to plain object for storage
   toPlainObject() {
     return {
       id: this.id,
@@ -38,7 +36,6 @@
     };
   }
 
-  // Validation methods
   static validateLoginData(email, password) {
     const errors = [];
 
@@ -100,17 +97,14 @@
     return emailRegex.test(email);
   }
 
-  // Get display name
   getDisplayName() {
     return this.username || this.email.split('@')[0];
   }
 
-  // Check if user has role
   hasRole(role) {
     return this.role === role;
   }
 
-  // Check if user is admin
   isAdmin() {
     return this.role === 'admin';
   }

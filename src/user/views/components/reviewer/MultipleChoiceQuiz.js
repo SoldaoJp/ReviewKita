@@ -27,10 +27,8 @@ export default function MultipleChoiceQuiz({
     }, 3000);
   };
 
-  // Handle both array format ["A) text", "B) text"] and object format {A: "text", B: "text"}
   const options = question.options ? (() => {
     if (Array.isArray(question.options)) {
-      // Array format: ["A) 0 m/sÂ²", "B) 9.8 m/sÂ²", ...]
       return question.options.map(opt => {
         const match = opt.match(/^([A-D])\)\s*(.+)$/);
         if (match) {
@@ -39,7 +37,6 @@ export default function MultipleChoiceQuiz({
         return null;
       }).filter(Boolean);
     } else {
-      // Object format: { A: "text", B: "text", ... }
       return [
         { key: 'A', text: question.options.A },
         { key: 'B', text: question.options.B },
@@ -140,6 +137,5 @@ export default function MultipleChoiceQuiz({
     </div>
   );
 }
-
 
 

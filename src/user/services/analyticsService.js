@@ -1,6 +1,5 @@
 ﻿import httpService from './httpService';
 
-// Get overall accuracy analytics
 export const getOverallAccuracy = async () => {
   try {
     const response = await httpService.get('/analytics/overall-accuracy');
@@ -11,7 +10,6 @@ export const getOverallAccuracy = async () => {
   }
 };
 
-// Get correct/wrong/skipped weekly data
 export const getCorrectWrongSkipped = async () => {
   try {
     const response = await httpService.get('/analytics/correct-wrong-skipped');
@@ -22,7 +20,6 @@ export const getCorrectWrongSkipped = async () => {
   }
 };
 
-// Get per-subject accuracy
 export const getPerSubjectAccuracy = async () => {
   try {
     const response = await httpService.get('/analytics/per-subject-accuracy');
@@ -33,7 +30,6 @@ export const getPerSubjectAccuracy = async () => {
   }
 };
 
-// Get per-subject coverage
 export const getPerSubjectCoverage = async () => {
   try {
     const response = await httpService.get('/analytics/per-subject-coverage');
@@ -44,7 +40,6 @@ export const getPerSubjectCoverage = async () => {
   }
 };
 
-// Get average time per question
 export const getAverageTime = async () => {
   try {
     const response = await httpService.get('/analytics/average-time');
@@ -55,7 +50,6 @@ export const getAverageTime = async () => {
   }
 };
 
-// Get per-subject speed
 export const getPerSubjectSpeed = async () => {
   try {
     const response = await httpService.get('/analytics/per-subject-speed');
@@ -66,7 +60,6 @@ export const getPerSubjectSpeed = async () => {
   }
 };
 
-// Get weakest subject
 export const getWeakestSubject = async () => {
   try {
     const response = await httpService.get('/analytics/weakest-subject');
@@ -77,7 +70,6 @@ export const getWeakestSubject = async () => {
   }
 };
 
-// Get streak data
 export const getStreak = async () => {
   try {
     const response = await httpService.get('/analytics/streak');
@@ -88,7 +80,6 @@ export const getStreak = async () => {
   }
 };
 
-// Get subject mastery
 export const getSubjectMastery = async () => {
   try {
     const response = await httpService.get('/analytics/subject-mastery');
@@ -99,7 +90,6 @@ export const getSubjectMastery = async () => {
   }
 };
 
-// Get subject ranking
 export const getSubjectRanking = async () => {
   try {
     const response = await httpService.get('/analytics/subject-ranking');
@@ -110,7 +100,6 @@ export const getSubjectRanking = async () => {
   }
 };
 
-// Get difficulty analysis
 export const getDifficultyAnalysis = async () => {
   try {
     const response = await httpService.get('/analytics/difficulty-analysis');
@@ -121,7 +110,6 @@ export const getDifficultyAnalysis = async () => {
   }
 };
 
-// Get improvement trajectory
 export const getImprovementTrajectory = async () => {
   try {
     const response = await httpService.get('/analytics/improvement-trajectory');
@@ -132,7 +120,6 @@ export const getImprovementTrajectory = async () => {
   }
 };
 
-// Get answer rate trends
 export const getAnswerRateTrends = async () => {
   try {
     const response = await httpService.get('/analytics/answer-rate-trends');

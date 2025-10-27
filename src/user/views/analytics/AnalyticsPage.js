@@ -116,9 +116,7 @@ export default function AnalyticsPage() {
     fetchAnalyticsData();
   }, []);
 
-  // Process data from API
   const processedData = {
-    // Overall Accuracy Pie Data
     overallAccuracyData: analyticsData.overallAccuracy
       ? [
           { name: 'Correct', value: analyticsData.overallAccuracy.totalCorrect, color: '#22C55E' },
@@ -127,7 +125,6 @@ export default function AnalyticsPage() {
         ]
       : [],
 
-    // Analytics Metrics
     analyticsMetrics: analyticsData.overallAccuracy
       ? {
           overallAccuracy: analyticsData.overallAccuracy.accuracyPct,
@@ -150,7 +147,6 @@ export default function AnalyticsPage() {
           totalAttempts: 0,
         },
 
-    // Correct vs Wrong vs Skipped Weekly Data
     correctVsWrongData: analyticsData.correctWrongSkipped?.weeks?.map((week) => ({
       week: `Week ${week.week}`,
       correct: week.correct,
@@ -158,42 +154,37 @@ export default function AnalyticsPage() {
       skipped: week.skipped,
     })) || [],
 
-    // Per Subject Accuracy Data
     perSubjectAccuracyData: analyticsData.perSubjectAccuracy?.perSubject?.map((subject) => ({
       subject: subject.subject,
       accuracy: subject.accuracyPct,
       totalItems: subject.totalQuestions,
       correctItems: subject.correct,
-      timePerQuestion: 0, // Will be filled from averageTime
-      mastery: subject.accuracyPct, // Use accuracy as mastery for now
+      timePerQuestion: 0,
+      mastery: subject.accuracyPct,
       quizCount: subject.quizCount,
       wrong: subject.wrong,
       skipped: subject.skipped,
     })) || [],
 
-    // Subject Coverage Data
     subjectCoverageData: analyticsData.perSubjectCoverage?.coverage?.map((subject) => ({
       name: subject.subject,
       coverage: subject.coveragePct.toFixed(1),
       totalQuestions: subject.totalQuestions,
     })) || [],
 
-    // Average Time per Question Data
     avgTimePerQuestionData: analyticsData.averageTime?.perSubject?.map((subject) => ({
       subject: subject.subject,
       avgTime: subject.avgTimePerQSec.toFixed(1),
       totalQuestions: subject.totalQuestions,
     })) || [],
 
-    // Per Subject Speed Data
     perSubjectSpeedData: analyticsData.perSubjectSpeed?.perSubjectSpeed?.map((subject) => ({
       subject: subject.subject,
-      speed: (60 / subject.avgTimePerQSec).toFixed(2), // Convert to questions per minute
+      speed: (60 / subject.avgTimePerQSec).toFixed(2),
       avgTimePerQSec: subject.avgTimePerQSec,
       totalQuestions: subject.totalQuestions,
     })) || [],
 
-    // Subject Mastery Data
     subjectMasteryData: analyticsData.subjectMastery?.mastery?.map((subject) => ({
       subject: subject.subject,
       mastery: subject.masteryPct,
@@ -201,7 +192,6 @@ export default function AnalyticsPage() {
       totalCorrect: subject.totalCorrect,
     })) || [],
 
-    // Answer Distribution Data (from correct-wrong-skipped overall)
     answerDistributionData: analyticsData.correctWrongSkipped?.overall
       ? [
           { name: 'Correct', value: analyticsData.correctWrongSkipped.overall.correct, color: '#22C55E' },
@@ -210,7 +200,6 @@ export default function AnalyticsPage() {
         ]
       : [],
 
-    // Subject Ranking Data (weakest subjects)
     subjectRankingData: analyticsData.subjectRanking?.ranking?.map((item) => ({
       subject: item.subject,
       score: item.score,
@@ -223,7 +212,6 @@ export default function AnalyticsPage() {
       totalQuestions: item.totalQuestions,
     })) || [],
 
-    // Difficulty Performance Data
     difficultyPerformanceData: analyticsData.difficultyAnalysis?.difficulty
       ? [
           {
@@ -250,7 +238,6 @@ export default function AnalyticsPage() {
         ]
       : [],
 
-    // Improvement Trajectory Data
     improvementTrajectoryData: analyticsData.improvementTrajectory?.attempts?.map((attempt) => ({
       attempt: attempt.attemptNumber,
       score: attempt.averageScore,
@@ -258,7 +245,6 @@ export default function AnalyticsPage() {
       totalQuizzes: attempt.totalQuizzes,
     })) || [],
 
-    // Answer Rate Trends Data
     answerRateTrendsData: analyticsData.answerRateTrends?.monthly?.map((month) => ({
       month: month.monthName,
       correct: month.correctPct,
@@ -268,7 +254,6 @@ export default function AnalyticsPage() {
     })) || [],
   };
 
-  // Merge time data into perSubjectAccuracyData
   if (analyticsData.averageTime?.perSubject) {
     processedData.perSubjectAccuracyData = processedData.perSubjectAccuracyData.map((subject) => {
       const timeData = analyticsData.averageTime.perSubject.find(
@@ -281,7 +266,6 @@ export default function AnalyticsPage() {
     });
   }
 
-  // Get weakest subject from API or calculate from processed data
   const weakestSubject = analyticsData.weakestSubject?.weakestSubject
     ? {
         subject: analyticsData.weakestSubject.stats.subject,
@@ -294,7 +278,6 @@ export default function AnalyticsPage() {
       }
     : null;
 
-  // Custom Tooltip for charts with additional info
   const CustomTooltip = ({ active, payload, label, additionalData }) => {
     if (active && payload && payload.length) {
       const subject = label || payload[0].payload.subject;
@@ -341,16 +324,13 @@ export default function AnalyticsPage() {
     return null;
   };
 
-  // Sample data - replace with real API data
   const overallAccuracyData = processedData.overallAccuracyData;
   const analyticsMetrics = processedData.analyticsMetrics;
 
   const perSubjectAccuracyData = processedData.perSubjectAccuracyData;
 
-  // Subject coverage data (use processedData instead)
   const subjectCoverageData = processedData.subjectCoverageData;
 
-  // Use processed data with fallback
   const avgTimePerQuestionData = processedData.avgTimePerQuestionData;
 
   const correctVsWrongData = processedData.correctVsWrongData;

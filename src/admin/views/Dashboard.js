@@ -22,7 +22,6 @@ export default function AdminDashboard() {
   const [userActivityData, setUserActivityData] = useState([]);
   const [activityLoading, setActivityLoading] = useState(true);
   const [activitySummary, setActivitySummary] = useState(null);
-  // Aggregated analytics for real charts below
   const [aggLoading, setAggLoading] = useState(true);
   const [aggData, setAggData] = useState(null);
 
@@ -32,7 +31,6 @@ export default function AdminDashboard() {
         setActivityLoading(true);
         const response = await getUserActivityAnalytics(30);
         if (response.success && response.data) {
-          // Format data for the chart
           const formattedData = response.data.dailyStats.map(stat => ({
             date: new Date(stat.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
             fullDate: stat.date,
@@ -53,7 +51,6 @@ export default function AdminDashboard() {
       try {
         setAggLoading(true);
         const resp = await httpService.get('/admin/analytics/aggregate');
-        // resp has shape { success, data }
         if (resp && resp.data) {
           setAggData(resp.data);
         }
@@ -68,7 +65,6 @@ export default function AdminDashboard() {
     fetchAggregate();
   }, []);
 
-  // Custom tooltip for user activity chart
   const CustomActivityTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -90,7 +86,6 @@ export default function AdminDashboard() {
     return null;
   };
 
-  // Build real data from aggregated analytics
   const masteryData = (aggData?.subjectAnalysis?.perSubjectAccuracy || [])
     .slice(0, 5)
     .map(s => ({ topic: s.subject || 'General', mastery: s.accuracy }));
@@ -278,6 +273,5 @@ export default function AdminDashboard() {
     </AdminLayout>
   );
 }
-
 
 
