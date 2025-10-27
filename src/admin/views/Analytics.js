@@ -66,8 +66,8 @@ export default function AdminAnalytics() {
                 accuracy: s.accuracy,
                 totalItems: s.totalQuestions,
                 correctItems: Math.round((s.accuracy / 100) * s.totalQuestions),
-                // Use overall average time per question for subjects since backend doesn't provide per-subject time
-                timePerQuestion: parseFloat(apiData.performanceMetrics.avgTimePerQuestion.replace('s', '')),
+                // Use per-subject average time from backend
+                timePerQuestion: s.avgSecondsPerQuestion || 0,
                 mastery: s.accuracy
               })),
             topSubjects: (apiData.subjectAnalysis.topSubjects || [])

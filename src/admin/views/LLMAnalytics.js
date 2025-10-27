@@ -153,19 +153,19 @@ export default function LLMAnalytics() {
         <div className="bg-white/50 p-6 rounded-2xl shadow-sm border border-[#eef3fb] mb-8">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Monthly Reviewers Trend</h3>
           <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={analytics.monthly_chart_data || []}>
+            <LineChart data={analytics.monthly_reviewers || []}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
+              <XAxis dataKey="date_label" />
               <YAxis />
               <Tooltip />
               <Legend />
               <Line
                 type="monotone"
-                dataKey="reviewers"
+                dataKey="created_reviewers"
                 stroke="#3B82F6"
                 strokeWidth={3}
                 dot={{ r: 5 }}
-                name="Reviewers"
+                name="Created Reviewers"
               />
             </LineChart>
           </ResponsiveContainer>
