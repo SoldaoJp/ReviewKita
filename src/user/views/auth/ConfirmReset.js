@@ -31,7 +31,7 @@ export default function ConfirmReset() {
             Your password has been reset.
           </h2>
           <p className="text-gray-600 text-sm mb-6">
-            Log in to pick up where you left offâ€”your reviewers, progress, and study goals are waiting.
+            Log in to pick up where you left off—your reviewers, progress, and study goals are waiting.
           </p>
 
           <button

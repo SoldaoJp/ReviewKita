@@ -60,7 +60,7 @@ function Signup() {
           <p className="text-sm text-slate-600 mb-6">
             Unlock smarter studying with AI-powered quizzes, flashcards, and
             summaries. Track your progress, stay motivated with achievements,
-            and transform your notes into interactive learning experiences â€”
+            and transform your notes into interactive learning experiences —
             all in one platform.
           </p>
 

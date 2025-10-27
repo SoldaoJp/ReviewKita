@@ -117,6 +117,40 @@ class AuthService {
     }
   }
 
+  async forgotPassword(email) {
+    try {
+      console.log('Sending forgot password request to:', `${API_BASE_URL}/auth/forgot-password`);
+      console.log('Email:', email);
+      
+      const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+      console.log('Forgot password response:', data);
+
+      if (!response.ok) {
+        if (data.errors && Array.isArray(data.errors)) {
+          const errorMessages = data.errors.map(err => err.msg).join(', ');
+          throw new Error(errorMessages);
+        }
+        throw new Error(data.error || data.message || 'Failed to send reset link');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        throw new Error('Cannot connect to server. Please ensure the backend is running.');
+      }
+      throw error;
+    }
+  }
+
   logout() {
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');

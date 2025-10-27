@@ -71,7 +71,7 @@ export default function Login() {
           </h1>
           <p className="text-sm text-slate-600 mb-6">
             Log in to continue your learning journey. Access your personalized
-            quizzes, flashcards, and progress â€” all powered by AI to help you
+            quizzes, flashcards, and progress — all powered by AI to help you
             study smarter every day.
           </p>
 

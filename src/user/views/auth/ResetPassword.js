@@ -67,7 +67,7 @@ import { useLocation } from "react-router-dom";
                         Time to refresh your access.
                     </h2>
                     <p className="text-gray-600 text-sm mb-6">
-                        Enter your new password below and confirm it to complete the reset. Make sure itâ€™s strong, memorable, and uniquely yoursâ€”your reviewers and progress are waiting.
+                        Enter your new password below and confirm it to complete the reset. Make sure it's strong, memorable, and uniquely yours—your reviewers and progress are waiting.
                     </p>
 
                     {error && <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm">{error}</div>}
