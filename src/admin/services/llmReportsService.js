@@ -28,7 +28,7 @@ export const getStaticReports = () => [
     type: "hallucination",
     description: "Incorrect facts in section 2",
     reviewer: {
-      title: "Cell Biology â€“ Photosynthesis",
+  title: "Cell Biology – Photosynthesis",
       original: "The process occurs in mitochondria...",
       enhanced:
         "The process occurs in chloroplasts where sunlight converts CO2...",
@@ -60,7 +60,7 @@ export const getStaticReports = () => [
     type: "incomplete",
     description: "Answer stops mid-sentence during explanation.",
     reviewer: {
-      title: "Quantum Mechanics â€“ Wave Functions",
+  title: "Quantum Mechanics – Wave Functions",
       original: "The wave function describes...",
       enhanced:
         "The wave function describes the probability amplitude of a particle...",

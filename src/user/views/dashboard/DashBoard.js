@@ -441,7 +441,7 @@ export default function Dashboard() {
               </div>
             ) : reviewers.length === 0 ? (
               <div className="text-center py-4">
-                <div className="mb-1 text-lg">ðŸ“š</div>
+                <div className="mb-1 text-lg">📚</div>
                 <p className="text-xs text-gray-600 font-medium">No quiz data yet</p>
               </div>
             ) : (

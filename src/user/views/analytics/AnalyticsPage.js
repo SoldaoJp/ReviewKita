@@ -266,6 +266,34 @@ export default function AnalyticsPage() {
     });
   }
 
+  // Derived KPIs for cards
+  let previousOverallAccuracy = 0;
+  let improvementRate = 0;
+  if (analyticsData.improvementTrajectory?.attempts?.length >= 2) {
+    const attempts = analyticsData.improvementTrajectory.attempts;
+    const last = attempts[attempts.length - 1]?.averageScore ?? 0;
+    const prev = attempts[attempts.length - 2]?.averageScore ?? 0;
+    previousOverallAccuracy = prev;
+    improvementRate = +(last - prev).toFixed(1);
+  } else if (analyticsData.overallAccuracy?.accuracyPct != null) {
+    previousOverallAccuracy = analyticsData.overallAccuracy.accuracyPct;
+    improvementRate = 0;
+  }
+
+  let averageTimePerQuestion = 0;
+  if (analyticsData.averageTime?.perSubject?.length) {
+    const per = analyticsData.averageTime.perSubject;
+    const hasTotals = per.every(s => typeof s.totalQuestions === 'number' && s.totalQuestions > 0);
+    if (hasTotals) {
+      const totalWeighted = per.reduce((acc, s) => acc + (s.avgTimePerQSec * s.totalQuestions), 0);
+      const qCount = per.reduce((acc, s) => acc + s.totalQuestions, 0);
+      averageTimePerQuestion = qCount > 0 ? +(totalWeighted / qCount).toFixed(1) : 0;
+    } else {
+      const sum = per.reduce((acc, s) => acc + s.avgTimePerQSec, 0);
+      averageTimePerQuestion = per.length > 0 ? +(sum / per.length).toFixed(1) : 0;
+    }
+  }
+
   const weakestSubject = analyticsData.weakestSubject?.weakestSubject
     ? {
         subject: analyticsData.weakestSubject.stats.subject,
@@ -394,18 +422,18 @@ export default function AnalyticsPage() {
       {/* Improvement Rate */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <p className="text-gray-600 text-sm font-medium mb-2">Improvement Rate</p>
-        <p className={`text-4xl font-bold mb-2 ${analyticsMetrics.improvementRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-          {analyticsMetrics.improvementRate >= 0 ? '+' : ''}{analyticsMetrics.improvementRate}%
+        <p className={`text-4xl font-bold mb-2 ${improvementRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          {improvementRate >= 0 ? '+' : ''}{improvementRate}%
         </p>
         <p className="text-xs text-gray-500">
-          vs previous: {analyticsMetrics.previousOverallAccuracy}%
+          vs previous: {previousOverallAccuracy}%
         </p>
       </div>
 
       {/* Average Time per Question */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <p className="text-gray-600 text-sm font-medium mb-2">Avg Time/Question</p>
-        <p className="text-4xl font-bold text-[#2472B5] mb-2">{analyticsMetrics.averageTimePerQuestion}s</p>
+        <p className="text-4xl font-bold text-[#2472B5] mb-2">{averageTimePerQuestion}s</p>
         <p className="text-xs text-gray-500">Overall speed indicator</p>
       </div>
 

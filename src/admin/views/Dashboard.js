@@ -199,10 +199,10 @@ export default function AdminDashboard() {
               </BarChart>
             </ResponsiveContainer>
             {aggLoading ? (
-              <p className="text-sm text-gray-500 mt-3">Loading subject mastery€¦</p>
+              <p className="text-sm text-gray-500 mt-3">Loading subject masteryâ€¦</p>
             ) : (
               <p className="text-sm text-gray-600 mt-3">
-                ï¿½ Showing top {masteryData.length} subjects by accuracy
+                â€¢ Showing top {masteryData.length} subjects by accuracy
               </p>
             )}
           </div>
@@ -240,7 +240,7 @@ export default function AdminDashboard() {
                 <Bar dataKey="fail" fill="#EF4444" radius={[6, 6, 0, 0]} name="Estimated Incorrect" />
               </BarChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">œ… Built from {aggData?.performanceMetrics?.accuracyRate ?? 0}% overall accuracy</p>
+            <p className="text-sm text-gray-600 mt-3">âœ… Built from {aggData?.performanceMetrics?.accuracyRate ?? 0}% overall accuracy</p>
           </div>
           <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
             <h2 className="text-xl font-semibold text-gray-700 mb-2">Answer Distribution</h2>
