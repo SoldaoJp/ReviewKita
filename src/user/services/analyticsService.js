@@ -130,6 +130,16 @@ export const getAnswerRateTrends = async () => {
   }
 };
 
+export const extractUserDataset = async () => {
+  try {
+    const response = await httpService.get('/user/extract-dataset');
+    return response;
+  } catch (error) {
+    console.error('Error extracting user dataset:', error);
+    throw error;
+  }
+};
+
 export default {
   getOverallAccuracy,
   getCorrectWrongSkipped,
@@ -144,5 +154,6 @@ export default {
   getDifficultyAnalysis,
   getImprovementTrajectory,
   getAnswerRateTrends,
+  extractUserDataset,
 };
 

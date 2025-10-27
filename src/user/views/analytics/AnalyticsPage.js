@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import Topbar from '../components/sidebar/Topbar';
 import {
   getOverallAccuracy,
@@ -14,6 +14,7 @@ import {
   getDifficultyAnalysis,
   getImprovementTrajectory,
   getAnswerRateTrends,
+  extractUserDataset,
 } from '../../services/analyticsService';
 import {
   BarChart,
@@ -41,6 +42,8 @@ import {
 export default function AnalyticsPage() {
   const [selectedCluster, setSelectedCluster] = useState('overall');
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
   const [analyticsData, setAnalyticsData] = useState({
     overallAccuracy: null,
     correctWrongSkipped: null,
@@ -115,6 +118,78 @@ export default function AnalyticsPage() {
 
     fetchAnalyticsData();
   }, []);
+
+  // Export user dataset to CSV
+  const handleExportDataset = async () => {
+    try {
+      setExporting(true);
+      setExportProgress(0);
+
+      // Progress: Fetching data
+      setExportProgress(20);
+      const response = await extractUserDataset();
+      setExportProgress(50);
+
+      console.log('Export response:', response);
+
+      if (!response || !response.data) {
+        throw new Error('No data returned from server');
+      }
+
+      const userData = response.data;
+
+      // Progress: Converting to CSV
+      setExportProgress(70);
+      const csvContent = convertDataToCSV(userData);
+      setExportProgress(90);
+
+      // Download CSV file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `My_ReviewKita_Data_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setExportProgress(100);
+      setTimeout(() => {
+        setExporting(false);
+        setExportProgress(0);
+      }, 500);
+    } catch (error) {
+      console.error('Error exporting dataset:', error);
+      alert('Failed to export your data. Please try again.');
+      setExporting(false);
+      setExportProgress(0);
+    }
+  };
+
+  // Convert user data to CSV format
+  const convertDataToCSV = (data) => {
+    const escapeCSV = (value) => {
+      if (value === null || value === undefined) return '';
+      const str = String(value);
+      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    // Get all keys from the data object
+    const headers = Object.keys(data);
+    
+    // Create header row
+    let csv = headers.map(header => escapeCSV(header)).join(',') + '\n';
+    
+    // Create data row
+    const row = headers.map(header => escapeCSV(data[header]));
+    csv += row.join(',') + '\n';
+
+    return csv;
+  };
 
   const processedData = {
     overallAccuracyData: analyticsData.overallAccuracy
@@ -1029,17 +1104,51 @@ export default function AnalyticsPage() {
                 </select>
               </div>
               <button
-                title="Export (not implemented)"
-                onClick={(e) => { e.preventDefault(); }}
-                aria-disabled="true"
-                className="inline-flex items-center gap-2 bg-white/50 border border-[#eef3fb] text-sm text-gray-700 px-3 py-2 rounded-lg hover:bg-white/80 hover:text-gray-900 hover:shadow-sm transition-colors duration-150"
+                onClick={handleExportDataset}
+                disabled={exporting}
+                className={`inline-flex items-center gap-2 bg-white/50 border border-[#eef3fb] text-sm text-gray-700 px-3 py-2 rounded-lg hover:bg-white/80 hover:text-gray-900 hover:shadow-sm transition-colors duration-150 ${exporting ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v12m0 0l-4-4m4 4 4-4M4 20h16" />
-                </svg>
-                Export
+                {exporting ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v12m0 0l-4-4m4 4 4-4M4 20h16" />
+                    </svg>
+                    Export My Data
+                  </>
+                )}
               </button>
             </div>
+
+            {/* Export Progress Bar */}
+            {exporting && (
+              <div className="mb-6 bg-white/50 rounded-xl shadow-sm border border-[#eef3fb] p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700">Exporting your data...</span>
+                  <span className="text-sm font-medium text-blue-600">{exportProgress}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div 
+                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                    style={{ width: `${exportProgress}%` }}
+                  ></div>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  {exportProgress < 30 && 'Fetching your data from server...'}
+                  {exportProgress >= 30 && exportProgress < 60 && 'Processing your analytics data...'}
+                  {exportProgress >= 60 && exportProgress < 85 && 'Converting to CSV format...'}
+                  {exportProgress >= 85 && exportProgress < 100 && 'Preparing download...'}
+                  {exportProgress === 100 && 'Complete! Download started.'}
+                </p>
+              </div>
+            )}
           </div>
 
           {selectedCluster === 'overall' && (
