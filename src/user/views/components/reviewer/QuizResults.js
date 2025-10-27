@@ -101,9 +101,29 @@ export default function QuizResults({ quiz, userAnswers, onRetake, onGoBack }) {
                           <p className="text-gray-600"><strong>Correct answer:</strong> {question.identification_answer}</p>
                         </div>
                       )}
+                      {question.type === 'fill-in-the-blanks' && (
+                        <div className="space-y-1 text-sm">
+                          <p className="text-gray-600"><strong>Your answer:</strong> {isSkipped ? 'Skipped' : userAnswer.answer || 'No answer'}</p>
+                          <p className="text-gray-600"><strong>Correct answer:</strong> {question.blank_answers?.join(', ') || 'N/A'}</p>
+                        </div>
+                      )}
+                      {question.type === 'open-ended' && (
+                        <div className="space-y-1 text-sm">
+                          <p className="text-gray-600 italic">{isSkipped ? 'Skipped' : 'Your essay response will be graded by the system.'}</p>
+                          {!isSkipped && userAnswer.answer && (
+                            <div className="mt-2 p-2 bg-gray-50 rounded border border-gray-200">
+                              <p className="text-xs text-gray-500 mb-1">Your Response:</p>
+                              <p className="text-sm text-gray-700">{userAnswer.answer}</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <div className="ml-4">
-                      {isSkipped ? <SkipForward className="w-5 h-5 text-gray-400" /> : isCorrect ? <CheckCircle className="w-5 h-5 text-green-500" /> : <XCircle className="w-5 h-5 text-red-500" />}
+                      {question.type === 'open-ended' 
+                        ? (isSkipped ? <SkipForward className="w-5 h-5 text-gray-400" /> : <Clock className="w-5 h-5 text-blue-500" title="Pending review" />)
+                        : (isSkipped ? <SkipForward className="w-5 h-5 text-gray-400" /> : isCorrect ? <CheckCircle className="w-5 h-5 text-green-500" /> : <XCircle className="w-5 h-5 text-red-500" />)
+                      }
                     </div>
                   </div>
                   {question.explanation && (

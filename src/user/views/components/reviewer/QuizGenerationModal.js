@@ -3,12 +3,12 @@ import { X } from 'lucide-react';
 import { getAllReviewers } from '../../../services/reviewerService';
 import { useNavigate } from 'react-router-dom';
 
-function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDashboard = false }) {
+function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDashboard = false, preSelectedDifficulty = null }) {
   const [formData, setFormData] = useState({
     numQuestions: 10,
     questionType: 'multiple-choice',
     timerMinutes: 0,
-    difficulty: 'medium',
+    difficulty: preSelectedDifficulty || 'medium',
     provideScenarios: false,
   // removed scheduledAt
   });
@@ -48,6 +48,13 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
       fetchReviewers();
     }
   }, [fromDashboard, isOpen]);
+
+  // Update difficulty when preSelectedDifficulty changes
+  useEffect(() => {
+    if (preSelectedDifficulty && isOpen) {
+      setFormData(prev => ({ ...prev, difficulty: preSelectedDifficulty }));
+    }
+  }, [preSelectedDifficulty, isOpen]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -441,23 +448,41 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
             <p className="text-xs text-gray-500 mt-1">Set to 0 for no timer</p>
           </div>
 
-          {/* Difficulty */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Difficulty
-            </label>
-            <select
-              name="difficulty"
-              value={formData.difficulty}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-              disabled={isGenerating}
-            >
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
-          </div>
+          {/* Difficulty - Only show if not pre-selected */}
+          {!preSelectedDifficulty && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Difficulty
+              </label>
+              <select
+                name="difficulty"
+                value={formData.difficulty}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                disabled={isGenerating}
+              >
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+          )}
+
+          {/* Show selected difficulty as info when pre-selected */}
+          {preSelectedDifficulty && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Difficulty
+              </label>
+              <div className={`w-full px-3 py-2 border-2 rounded-lg font-medium ${
+                preSelectedDifficulty === 'easy' ? 'bg-green-50 border-green-300 text-green-700' :
+                preSelectedDifficulty === 'medium' ? 'bg-yellow-50 border-yellow-300 text-yellow-700' :
+                'bg-red-50 border-red-300 text-red-700'
+              }`}>
+                {preSelectedDifficulty.charAt(0).toUpperCase() + preSelectedDifficulty.slice(1)}
+              </div>
+            </div>
+          )}
 
           {/* removed schedule field */}
 

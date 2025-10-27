@@ -1092,6 +1092,7 @@ function ReviewerDetailPage() {
         }}
         onGenerate={handleGenerateQuiz}
         reviewerId={id}
+        preSelectedDifficulty={selectedDifficulty}
       />
 
       {/* Difficulty Selection Modal */}
