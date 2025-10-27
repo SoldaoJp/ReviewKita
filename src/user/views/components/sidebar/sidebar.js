@@ -100,7 +100,7 @@ function Sidebar() {
 
   return (
     <div className="p-2 h-screen flex flex-col w-48">
-      <div className="bg-white/60 backdrop-blur-sm border border-white/30 rounded-[25px] shadow-lg flex flex-col overflow-hidden">
+      <div className="bg-white/60 backdrop-blur-sm border border-white/30 rounded-[25px] shadow-lg flex flex-col overflow-hidden h-full">
         {/* Header - Fixed */}
         <div className="flex-shrink-0">
           <div className="flex items-center gap-2 px-4 py-4">
