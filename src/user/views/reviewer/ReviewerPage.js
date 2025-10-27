@@ -590,22 +590,8 @@ function ReviewerPage({ title }) {
                     className="w-full px-3 py-2 border rounded-t focus:ring-2 focus:ring-cyan-400 text-sm"
                   />
                   
-                  <select
-                    value={showCustomSubject ? "custom" : formData.subject}
-                    onChange={(e) => {
-                      if (e.target.value === "custom") {
-                        setShowCustomSubject(true);
-                        setFormData({ ...formData, subject: "" });
-                      } else {
-                        setShowCustomSubject(false);
-                        setFormData({ ...formData, subject: e.target.value });
-                      }
-                    }}
-                    className="w-full px-3 py-2 border border-t-0 rounded-b focus:ring-2 focus:ring-cyan-400"
-                    size="8"
-                  >
-                    <option value="">Select a subject...</option>
-                    
+                  {/* Custom scrollable subject list */}
+                  <div className="w-full border border-t-0 rounded-b bg-white max-h-64 overflow-y-auto">
                     {/* Render subjects based on category */}
                     {subjectCategory === 'college' ? (
                       // For college: group by course
@@ -617,13 +603,26 @@ function ReviewerPage({ title }) {
                         );
                         
                         return filteredSubjects.length > 0 ? (
-                          <optgroup key={course} label={`${course}`}>
+                          <div key={course}>
+                            <div className="sticky top-0 px-3 py-2 bg-gray-100 border-b text-sm font-semibold text-gray-700">
+                              {course}
+                            </div>
                             {filteredSubjects.map((subject, idx) => (
-                              <option key={`${course}-${idx}`} value={subject}>
+                              <button
+                                key={`${course}-${idx}`}
+                                type="button"
+                                onClick={() => {
+                                  setShowCustomSubject(false);
+                                  setFormData({ ...formData, subject: subject });
+                                }}
+                                className={`w-full text-left px-3 py-2 hover:bg-cyan-100 active:bg-cyan-200 transition-colors text-sm ${
+                                  formData.subject === subject ? 'bg-cyan-200 font-semibold' : ''
+                                }`}
+                              >
                                 {subject}
-                              </option>
+                              </button>
                             ))}
-                          </optgroup>
+                          </div>
                         ) : null;
                       })
                     ) : (
@@ -634,18 +633,41 @@ function ReviewerPage({ title }) {
                           subject.toLowerCase().includes(subjectSearch.toLowerCase())
                         )
                         .map((subject, idx) => (
-                          <option key={idx} value={subject}>{subject}</option>
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => {
+                              setShowCustomSubject(false);
+                              setFormData({ ...formData, subject: subject });
+                            }}
+                            className={`w-full text-left px-3 py-2 hover:bg-cyan-100 active:bg-cyan-200 transition-colors text-sm ${
+                              formData.subject === subject ? 'bg-cyan-200 font-semibold' : ''
+                            }`}
+                          >
+                            {subject}
+                          </button>
                         ))
                     )}
                     
                     {/* Custom subject option */}
                     {subjectSearch === '' && (
                       <>
-                        <option disabled>─────────────────────</option>
-                        <option value="custom">✏️ Specify Unlisted Subject</option>
+                        <div className="border-t px-3 py-2 text-gray-400 text-xs">
+                          ─────────────────────
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowCustomSubject(true);
+                            setFormData({ ...formData, subject: "" });
+                          }}
+                          className="w-full text-left px-3 py-2 hover:bg-blue-100 active:bg-blue-200 transition-colors text-sm font-medium text-blue-600"
+                        >
+                          ✏️ Specify Unlisted Subject
+                        </button>
                       </>
                     )}
-                  </select>
+                  </div>
                 </div>
 
                 {/* Custom Subject Input */}
