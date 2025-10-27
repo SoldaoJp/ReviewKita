@@ -207,7 +207,7 @@ export default function LLMReports() {
 
         {/* Report Details Modal */}
         {selectedReport && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20 p-4">
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
             <div className="bg-white rounded-lg shadow-lg w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
               <div className="flex justify-between items-center p-6 border-b border-gray-200">
                 <h2 className="text-2xl font-semibold">Report Details</h2>

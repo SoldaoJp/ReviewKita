@@ -2,8 +2,8 @@
 import { useAuth } from "../../../controllers/AuthContext";
 import { useState, useEffect } from "react";
 import { getAllReviewers } from "../../../services/reviewerService";
-import { getAvailableLlmModelsReviewer } from "../../../services/llmConfigService";
 import { useReviewerContext } from "../../../controllers/context/ReviewerContext";
+import AddReviewerModal from "../reviewer/AddReviewerModal";
 import Logo from "../../../../assets/logo.png";
 import Search from "../../../../assets/Search.svg";
 import Plus from "../../../../assets/Plus.svg";
@@ -37,12 +37,7 @@ function Sidebar() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredReviewers, setFilteredReviewers] = useState([]);
-  const [formData, setFormData] = useState({ title: "", description: "", file: null });
-  const [submitting, setSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
-  const [availableModels, setAvailableModels] = useState([]);
-  const [loadingModels, setLoadingModels] = useState(false);
-  const [selectedModelId, setSelectedModelId] = useState("");
 
   useEffect(() => {
     if (notification && notification.type !== 'loading') {
@@ -99,72 +94,15 @@ function Sidebar() {
 
   const handleAddClick = async () => {
     setShowAddModal(true);
-    setFormData({ title: "", description: "", file: null });
-    setSelectedModelId("");
-    try {
-      setLoadingModels(true);
-      const response = await getAvailableLlmModelsReviewer();
-      if (response && response.models) {
-        setAvailableModels(response.models);
-        setSelectedModelId(response.models[0]?.id || "");
-      }
-    } catch (error) {
-      console.error('Error fetching models:', error);
-      setAvailableModels([]);
-    } finally {
-      setLoadingModels(false);
-    }
   };
 
   const showNotification = (type, message) => setNotification({ type, message });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setFormData(prev => ({ ...prev, file }));
-  };
-
-  const handleAddReviewer = async () => {
-    if (!formData.title.trim()) return showNotification('error', 'Please enter a title');
-    if (!formData.description.trim()) return showNotification('error', 'Please enter a description');
-    if (!formData.file) return showNotification('error', 'Please select a file');
-    if (!selectedModelId) return showNotification('error', 'Please select an AI model');
-
-    try {
-      setSubmitting(true);
-      showNotification('loading', 'Creating reviewer...');
-      const formDataToSend = new FormData();
-      formDataToSend.append('title', formData.title);
-      formDataToSend.append('description', formData.description);
-      formDataToSend.append('file', formData.file);
-      formDataToSend.append('model_id', selectedModelId);
-  const { createReviewer } = await import('../../../services/reviewerService');
-      const response = await createReviewer(formDataToSend);
-      if (response.success) {
-        showNotification('success', 'Reviewer added successfully!');
-        setShowAddModal(false);
-        setFormData({ title: "", description: "", file: null });
-        setSelectedModelId("");
-        triggerReviewerUpdate();
-      } else {
-        showNotification('error', response.message || 'Failed to create reviewer');
-      }
-    } catch (error) {
-      console.error('Error creating reviewer:', error);
-      showNotification('error', error.message || 'An error occurred while creating the reviewer');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   return (
     <div className="p-2 h-screen flex flex-col w-48">
-      <div className="flex-1 bg-white/60 backdrop-blur-sm border border-white/30 rounded-[25px] shadow-lg flex flex-col overflow-hidden">
-        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+      <div className="bg-white/60 backdrop-blur-sm border border-white/30 rounded-[25px] shadow-lg flex flex-col overflow-hidden">
+        {/* Header - Fixed */}
+        <div className="flex-shrink-0">
           <div className="flex items-center gap-2 px-4 py-4">
             <img src={Logo} alt="ReviewKita Logo" className="h-8 w-8 object-contain" />
             <span className="font-bold text-sm text-gray-800">ReviewKita</span>
@@ -197,7 +135,8 @@ function Sidebar() {
             </NavLink>
           </nav>
 
-          <div className="mt-8 px-4">
+          {/* My Reviewers Header - Fixed */}
+          <div className="mt-8 px-4 flex-shrink-0">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-gray-800 text-xs font-bold">My Reviewers</h3>
               <div className="flex items-center gap-1">
@@ -209,27 +148,32 @@ function Sidebar() {
                 </button>
               </div>
             </div>
-            <div className="flex flex-col gap-1">
-              {loading ? (
-                <p className="text-xs text-gray-500 text-center py-2">Loading...</p>
-              ) : reviewers.length === 0 ? (
-                <p className="text-xs text-gray-500 text-center py-2">No reviewers yet</p>
-              ) : (
-                reviewers.map((reviewer, index) => (
-                  <NavLink key={reviewer._id} to={`/reviewer/${reviewer._id}`} className={({ isActive }) => `flex items-center gap-1 px-2 py-1 rounded-lg justify-between transition-all text-xs ${isActive ? "bg-white/70 shadow-sm" : "hover:bg-white/40"}`} title={reviewer.title}>
-                    <div className="flex items-center gap-1 min-w-0 flex-1">
-                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${getColorForIndex(index)}`}></span>
-                      <span className="text-xs text-gray-700 truncate">{reviewer.title.substring(0, 12)}{reviewer.title.length > 12 ? '...' : ''}</span>
-                    </div>
-                    <img src={ForwardIcon} alt="Forward" className="h-2.5 w-2.5 opacity-60 flex-shrink-0" />
-                  </NavLink>
-                ))
-              )}
-            </div>
           </div>
         </div>
 
-        <div className="px-4 py-3">
+        {/* Reviewers List - Scrollable */}
+        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent px-4 pb-3">
+          <div className="flex flex-col gap-1">
+            {loading ? (
+              <p className="text-xs text-gray-500 text-center py-2">Loading...</p>
+            ) : reviewers.length === 0 ? (
+              <p className="text-xs text-gray-500 text-center py-2">No reviewers yet</p>
+            ) : (
+              reviewers.map((reviewer, index) => (
+                <NavLink key={reviewer._id} to={`/reviewer/${reviewer._id}`} className={({ isActive }) => `flex items-center gap-1 px-2 py-1 rounded-lg justify-between transition-all text-xs ${isActive ? "bg-white/70 shadow-sm" : "hover:bg-white/40"}`} title={reviewer.title}>
+                  <div className="flex items-center gap-1 min-w-0 flex-1">
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${getColorForIndex(index)}`}></span>
+                    <span className="text-xs text-gray-700 truncate">{reviewer.title.substring(0, 12)}{reviewer.title.length > 12 ? '...' : ''}</span>
+                  </div>
+                  <img src={ForwardIcon} alt="Forward" className="h-2.5 w-2.5 opacity-60 flex-shrink-0" />
+                </NavLink>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Logout Button - Fixed */}
+        <div className="flex-shrink-0 px-4 py-3">
           <button className="w-full py-2 px-3 rounded-lg transition-all text-xs text-red-600 hover:bg-red-50 border border-gray-200 hover:border-red-200 flex items-center justify-center gap-2" onClick={handleLogout}>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -264,38 +208,15 @@ function Sidebar() {
       )}
 
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-96 relative">
-            <h2 className="text-lg font-bold mb-4">Add Reviewer</h2>
-            <label className="block mb-2 text-sm font-medium">Subject Title</label>
-            <input type="text" name="title" value={formData.title} onChange={handleInputChange} placeholder="e.g. Mathematics" className="w-full px-3 py-2 border rounded mb-4 focus:ring-2 focus:ring-cyan-400" />
-            <label className="block mb-2 text-sm font-medium">Description</label>
-            <textarea name="description" value={formData.description} onChange={handleInputChange} placeholder="add description here...." className="w-full px-3 py-2 border rounded mb-4 focus:ring-2 focus:ring-cyan-400" rows="3" />
-            <label className="block mb-2 text-sm font-medium">AI Model</label>
-            {loadingModels ? (
-              <div className="w-full px-3 py-2 border rounded mb-4 text-gray-500 text-sm">Loading models...</div>
-            ) : availableModels.length === 0 ? (
-              <div className="w-full px-3 py-2 border rounded mb-4 text-red-500 text-sm">No models available</div>
-            ) : (
-              <select value={selectedModelId} onChange={(e) => setSelectedModelId(e.target.value)} className="w-full px-3 py-2 border rounded mb-4 focus:ring-2 focus:ring-cyan-400">
-                <option value="">Select an AI model</option>
-                {availableModels.map((model) => (
-                  <option key={model.id} value={model.id}>{model.model_name} - {model.provider}</option>
-                ))}
-              </select>
-            )}
-            <label className="block mb-2 text-sm font-medium">Import File (PDF, DOC, DOCX, TXT)</label>
-            <div className="w-full border border-dashed border-gray-300 rounded p-4 mb-4 text-center">
-              <input type="file" className="hidden" id="file-upload-sidebar" accept=".pdf,.doc,.docx,.txt" onChange={handleFileChange} />
-              <label htmlFor="file-upload-sidebar" className="cursor-pointer text-blue-500">{formData.file ? formData.file.name : "Choose file or drag & drop"}</label>
-            </div>
-            <div className="flex justify-end gap-2">
-              <button onClick={() => { setShowAddModal(false); setFormData({ title: "", description: "", file: null }); setSelectedModelId(""); }} className="px-4 py-2 border rounded hover:bg-gray-100" disabled={submitting}>Cancel</button>
-              <button onClick={handleAddReviewer} className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 disabled:bg-gray-400" disabled={submitting}>{submitting ? "Adding..." : "Add"}</button>
-            </div>
-            <button onClick={() => { setShowAddModal(false); setFormData({ title: "", description: "", file: null }); setSelectedModelId(""); }} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-lg" disabled={submitting}>×</button>
-          </div>
-        </div>
+        <AddReviewerModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          onSuccess={() => {
+            triggerReviewerUpdate();
+            fetchReviewers();
+          }}
+          showNotification={showNotification}
+        />
       )}
 
       {notification && (
