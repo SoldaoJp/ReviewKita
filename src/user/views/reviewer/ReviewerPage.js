@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect } from "react";
 import Topbar from "../components/sidebar/Topbar";
-import { getAllReviewers, deleteReviewer } from "../../services/reviewerService";
+import { getAllReviewers, deleteReviewer, getReviewerById } from "../../services/reviewerService";
 import { createQuiz, createRetakeQuiz } from "../../services/quizService";
 import { useNavigate } from "react-router-dom";
 import { useReviewerContext } from "../../controllers/context/ReviewerContext";
@@ -97,9 +97,17 @@ function ReviewerPage({ title }) {
     navigate(`/reviewer/${reviewerId}`);
   };
 
-  const handleGenerateQuizClick = (reviewer) => {
-    setSelectedReviewer(reviewer);
-    setShowDifficultyModal(true);
+  const handleGenerateQuizClick = async (reviewer) => {
+    try {
+      const fullReviewer = await getReviewerById(reviewer._id);
+      if (fullReviewer.success) {
+        setSelectedReviewer(fullReviewer.data);
+        setShowDifficultyModal(true);
+      }
+    } catch (err) {
+      console.error("Error fetching reviewer:", err);
+      showNotification('error', 'Failed to load reviewer data');
+    }
   };
 
   const handleDifficultySelect = (difficulty) => {
@@ -291,13 +299,13 @@ function ReviewerPage({ title }) {
                   {/* Difficulty Badges */}
                   {reviewer.hasQuiz && (
                     <div className="flex gap-2 mt-2">
-                      {reviewer.hasEasyQuiz && (
+                      {reviewer.quizzes?.easy?.quizId && (
                         <span className="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">Easy</span>
                       )}
-                      {reviewer.hasMediumQuiz && (
+                      {reviewer.quizzes?.medium?.quizId && (
                         <span className="px-2 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded-full">Medium</span>
                       )}
-                      {reviewer.hasHardQuiz && (
+                      {reviewer.quizzes?.hard?.quizId && (
                         <span className="px-2 py-0.5 text-xs bg-red-100 text-red-700 rounded-full">Hard</span>
                       )}
                     </div>
@@ -521,21 +529,21 @@ function ReviewerPage({ title }) {
               {/* Easy Button */}
               <div 
                 className="relative"
-                onMouseEnter={() => selectedReviewer?.hasEasyQuiz && setHoveredQuiz('easy')}
+                onMouseEnter={() => selectedReviewer?.quizzes?.easy?.quizId && setHoveredQuiz('easy')}
                 onMouseLeave={() => setHoveredQuiz(null)}
               >
                 <button
                   onClick={() => handleDifficultySelect('easy')}
                   disabled={false}
                   className={`w-full py-3 px-4 rounded-lg font-medium transition-all ${
-                    selectedReviewer?.hasEasyQuiz
+                    selectedReviewer?.quizzes?.easy?.quizId
                       ? 'bg-green-100 text-green-700 border-2 border-green-300 hover:bg-green-200'
                       : 'bg-green-500 text-white hover:bg-green-600'
                   }`}
                 >
-                  Easy {selectedReviewer?.hasEasyQuiz && '✓'}
+                  Easy {selectedReviewer?.quizzes?.easy?.quizId && '✓'}
                 </button>
-                {hoveredQuiz === 'easy' && selectedReviewer?.hasEasyQuiz && (
+                {hoveredQuiz === 'easy' && selectedReviewer?.quizzes?.easy?.quizId && (
                   <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-3 rounded whitespace-nowrap">
                     Practice more
                   </div>
@@ -545,21 +553,21 @@ function ReviewerPage({ title }) {
               {/* Medium Button */}
               <div 
                 className="relative"
-                onMouseEnter={() => selectedReviewer?.hasMediumQuiz && setHoveredQuiz('medium')}
+                onMouseEnter={() => selectedReviewer?.quizzes?.medium?.quizId && setHoveredQuiz('medium')}
                 onMouseLeave={() => setHoveredQuiz(null)}
               >
                 <button
                   onClick={() => handleDifficultySelect('medium')}
                   disabled={false}
                   className={`w-full py-3 px-4 rounded-lg font-medium transition-all ${
-                    selectedReviewer?.hasMediumQuiz
+                    selectedReviewer?.quizzes?.medium?.quizId
                       ? 'bg-yellow-100 text-yellow-700 border-2 border-yellow-300 hover:bg-yellow-200'
                       : 'bg-yellow-500 text-white hover:bg-yellow-600'
                   }`}
                 >
-                  Medium {selectedReviewer?.hasMediumQuiz && '✓'}
+                  Medium {selectedReviewer?.quizzes?.medium?.quizId && '✓'}
                 </button>
-                {hoveredQuiz === 'medium' && selectedReviewer?.hasMediumQuiz && (
+                {hoveredQuiz === 'medium' && selectedReviewer?.quizzes?.medium?.quizId && (
                   <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-3 rounded whitespace-nowrap">
                     Practice more
                   </div>
@@ -569,21 +577,21 @@ function ReviewerPage({ title }) {
               {/* Hard Button */}
               <div 
                 className="relative"
-                onMouseEnter={() => selectedReviewer?.hasHardQuiz && setHoveredQuiz('hard')}
+                onMouseEnter={() => selectedReviewer?.quizzes?.hard?.quizId && setHoveredQuiz('hard')}
                 onMouseLeave={() => setHoveredQuiz(null)}
               >
                 <button
                   onClick={() => handleDifficultySelect('hard')}
                   disabled={false}
                   className={`w-full py-3 px-4 rounded-lg font-medium transition-all ${
-                    selectedReviewer?.hasHardQuiz
+                    selectedReviewer?.quizzes?.hard?.quizId
                       ? 'bg-red-100 text-red-700 border-2 border-red-300 hover:bg-red-200'
                       : 'bg-red-500 text-white hover:bg-red-600'
                   }`}
                 >
-                  Hard {selectedReviewer?.hasHardQuiz && '✓'}
+                  Hard {selectedReviewer?.quizzes?.hard?.quizId && '✓'}
                 </button>
-                {hoveredQuiz === 'hard' && selectedReviewer?.hasHardQuiz && (
+                {hoveredQuiz === 'hard' && selectedReviewer?.quizzes?.hard?.quizId && (
                   <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-3 rounded whitespace-nowrap">
                     Practice more
                   </div>
