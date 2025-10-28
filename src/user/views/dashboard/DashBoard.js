@@ -5,7 +5,7 @@ import ProgressTracker from "../components/dashboard/ProgressTracker";
 import RightPanel from "../components/dashboard/RightPanel";
 import SubjectTracker from "../components/dashboard/SubjectTracker";
 import WelcomeCard from "../components/dashboard/WelcomeCard";
-import { getAllReviewers } from "../../services/reviewerService";
+import { getAllReviewers, getSubjectDistribution } from "../../services/reviewerService";
 import { getUserActivityDays } from "../../services/userActivityService";
 import { getPerSubjectCoverage, getAnswerRateTrends } from "../../services/analyticsService";
 import { getAllAttempts } from "../../services/quizHistoryService";
@@ -17,6 +17,7 @@ export default function Dashboard() {
   const [reviewers, setReviewers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [subjectCoverage, setSubjectCoverage] = useState([]);
+  const [subjectDistribution, setSubjectDistribution] = useState(null);
   const [answerTrends, setAnswerTrends] = useState([]);
   const [quizAttempts, setQuizAttempts] = useState([]);
   const [expandedQuizzes, setExpandedQuizzes] = useState({});
@@ -78,19 +79,22 @@ export default function Dashboard() {
         setActiveDayCounts(dayCounts);
 
         try {
-          const [coverageRes, trendsRes, attemptsRes] = await Promise.all([
+          const [coverageRes, trendsRes, attemptsRes, distributionRes] = await Promise.all([
             getPerSubjectCoverage(),
             getAnswerRateTrends(),
             getAllAttempts(),
+            getSubjectDistribution(),
           ]);
           setSubjectCoverage(Array.isArray(coverageRes?.coverage) ? coverageRes.coverage : []);
           setAnswerTrends(Array.isArray(trendsRes?.monthly) ? trendsRes.monthly : []);
           setQuizAttempts(Array.isArray(attemptsRes) ? attemptsRes : []);
+          setSubjectDistribution(distributionRes?.data || null);
         } catch (innerErr) {
           console.warn('Optional analytics fetch failed:', innerErr);
           setSubjectCoverage([]);
           setAnswerTrends([]);
           setQuizAttempts([]);
+          setSubjectDistribution(null);
         }
       } catch (error) {
         console.error('Error fetching reviewers or activity days:', error);
@@ -177,6 +181,19 @@ export default function Dashboard() {
   };
 
   const getSubjectTrackerData = () => {
+    // Use new subject distribution API data if available
+    if (subjectDistribution && subjectDistribution.subject_distribution) {
+      const colors = ['#3B82F6', '#22C55E', '#FACC15', '#F97316', '#8B5CF6', '#06B6D4'];
+      const subjects = Object.entries(subjectDistribution.subject_distribution);
+      
+      return subjects.map(([subject, percentage], idx) => ({
+        name: subject,
+        value: parseFloat(percentage.replace('%', '')),
+        color: colors[idx % colors.length],
+      }));
+    }
+    
+    // Fallback to old subject coverage data
     if (loading || !subjectCoverage || subjectCoverage.length === 0) {
       return [];
     }
