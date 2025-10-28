@@ -576,7 +576,6 @@ export default function AnalyticsPage() {
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">✅ {analyticsMetrics.overallAccuracy}% correct answers across all attempts</p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -603,7 +602,6 @@ export default function AnalyticsPage() {
                 <Line type="monotone" dataKey="skipped" stroke="#F59E0B" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">📈 Correct answers increased by 45% over 4 weeks</p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -628,7 +626,6 @@ export default function AnalyticsPage() {
                 <Bar dataKey="accuracy" fill="#3B82F6" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">🎯 Programming has the highest accuracy (95%)</p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -674,7 +671,6 @@ export default function AnalyticsPage() {
                 <Bar dataKey="avgTime" name="Average Time (seconds)" fill="#8B5CF6" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">⏱️ Programming takes the most time (65s avg)</p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -710,7 +706,6 @@ export default function AnalyticsPage() {
                 />
               </ScatterChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">⚡ Science has the fastest response speed (1.5 q/min)</p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -896,9 +891,6 @@ export default function AnalyticsPage() {
                 />
               </BarChart>
             </ResponsiveContainer>
-            <p className="mt-4 text-sm text-gray-600">
-              🔥 {analyticsData.streak.last7Days.filter(d => d.active === 1).length} / 7 days active | Current streak: {analyticsData.streak.streakDays} days
-            </p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -925,11 +917,6 @@ export default function AnalyticsPage() {
                 <Line type="monotone" dataKey="skipped" stroke="#F59E0B" strokeWidth={2} name="Skipped %" />
               </LineChart>
             </ResponsiveContainer>
-            {analyticsData.answerRateTrends?.predicted && (
-              <p className="text-sm text-gray-600 mt-3">
-                📈 Predicted {analyticsData.answerRateTrends.predicted.nextMonth}: {analyticsData.answerRateTrends.predicted.predictedCorrectPct}% correct, {analyticsData.answerRateTrends.predicted.predictedWrongPct}% wrong, {analyticsData.answerRateTrends.predicted.predictedSkippedPct}% skipped
-              </p>
-            )}
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
