@@ -52,7 +52,7 @@
         <div className="bg-white/40 backdrop-blur-sm rounded-lg p-3">
           <div className="w-full h-32">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 2, right: 8, left: -16, bottom: 2 }}>
+              <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                 <defs>
                   {legendsData.map((legend, idx) => (
                     <linearGradient key={legend.key} id={`grad${idx}`} x1="0" y1="0" x2="0" y2="1">
@@ -63,8 +63,20 @@
                 </defs>
   
                 <CartesianGrid vertical={false} stroke="#e5e7eb" strokeDasharray="4 3" strokeOpacity={0.3} />
-                <XAxis dataKey="date" tick={{ fill: "#9ca3af", fontSize: 10 }} interval={0} tickMargin={3} axisLine={false} />
-                <YAxis tick={{ fill: "#9ca3af", fontSize: 10 }} width={20} axisLine={false} />
+                <XAxis 
+                  dataKey="date" 
+                  tick={{ fill: "#9ca3af", fontSize: 10 }} 
+                  interval={0} 
+                  tickMargin={5} 
+                  axisLine={{ stroke: "#e5e7eb" }}
+                  tickLine={{ stroke: "#e5e7eb" }}
+                />
+                <YAxis 
+                  tick={{ fill: "#9ca3af", fontSize: 10 }} 
+                  width={30} 
+                  axisLine={{ stroke: "#e5e7eb" }}
+                  tickLine={{ stroke: "#e5e7eb" }}
+                />
                 <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#d1d5db', strokeDasharray: '4 4' }} />
   
                 {legendsData.map((legend, idx) => (

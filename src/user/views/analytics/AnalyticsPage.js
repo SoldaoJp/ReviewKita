@@ -592,7 +592,6 @@ export default function AnalyticsPage() {
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">✅ {analyticsMetrics.overallAccuracy}% correct answers across all attempts</p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -619,7 +618,6 @@ export default function AnalyticsPage() {
                 <Line type="monotone" dataKey="skipped" stroke="#F59E0B" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">📈 Correct answers increased by 45% over 4 weeks</p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -644,7 +642,6 @@ export default function AnalyticsPage() {
                 <Bar dataKey="accuracy" fill="#3B82F6" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">🎯 Programming has the highest accuracy (95%)</p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -690,7 +687,6 @@ export default function AnalyticsPage() {
                 <Bar dataKey="avgTime" name="Average Time (seconds)" fill="#8B5CF6" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">⏱️ Programming takes the most time (65s avg)</p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -726,7 +722,6 @@ export default function AnalyticsPage() {
                 />
               </ScatterChart>
             </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">⚡ Science has the fastest response speed (1.5 q/min)</p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -739,66 +734,6 @@ export default function AnalyticsPage() {
 
   const renderDescriptiveCharts = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Answer Distribution */}
-      <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">Answer Distribution</h3>
-        <p className="text-sm text-gray-500 mb-4">Counts and percentages of answers</p>
-        {processedData.answerDistributionData.length > 0 ? (
-          <>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={processedData.answerDistributionData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  label={({ value }) => `${value}%`}
-                >
-                  {processedData.answerDistributionData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => `${value}%`} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-4 space-y-2 text-sm">
-              <p className="text-green-700">✅ Correct: {analyticsData.correctWrongSkipped?.overall.correct} ({((analyticsData.correctWrongSkipped?.overall.correct / analyticsData.correctWrongSkipped?.overall.total) * 100).toFixed(1)}%)</p>
-              <p className="text-red-700">❌ Wrong: {analyticsData.correctWrongSkipped?.overall.wrong} ({((analyticsData.correctWrongSkipped?.overall.wrong / analyticsData.correctWrongSkipped?.overall.total) * 100).toFixed(1)}%)</p>
-              <p className="text-yellow-700">⏭️ Skipped: {analyticsData.correctWrongSkipped?.overall.skipped} ({((analyticsData.correctWrongSkipped?.overall.skipped / analyticsData.correctWrongSkipped?.overall.total) * 100).toFixed(1)}%)</p>
-            </div>
-          </>
-        ) : (
-          <div className="flex items-center justify-center h-[300px] text-gray-400">
-            <p>No answer distribution data available yet</p>
-          </div>
-        )}
-      </div>
-
-      {/* Per Subject Accuracy */}
-      <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">Per Subject Accuracy</h3>
-        <p className="text-sm text-gray-500 mb-4">Subject-wise performance distribution</p>
-        {perSubjectAccuracyData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={perSubjectAccuracyData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="subject" />
-              <YAxis />
-              <Tooltip formatter={(value) => `${value}%`} />
-              <Legend />
-              <Bar dataKey="accuracy" fill="#3B82F6" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        ) : (
-          <div className="flex items-center justify-center h-[300px] text-gray-400">
-            <p>No subject data available yet</p>
-          </div>
-        )}
-      </div>
-
       {/* Per-Subject Coverage */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Per-Subject Coverage</h3>
@@ -846,31 +781,6 @@ export default function AnalyticsPage() {
 
   const renderAnalyticalCharts = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Per Subject Speed */}
-      <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">Per Subject Speed</h3>
-        <p className="text-sm text-gray-500 mb-4">Questions answered per minute by subject</p>
-        {perSubjectSpeedData.length > 0 ? (
-          <>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={perSubjectSpeedData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="subject" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="speed" name="Questions per Minute" fill="#10B981" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-            <p className="text-sm text-gray-600 mt-3">⚡ Science has the fastest response speed (1.5 q/min)</p>
-          </>
-        ) : (
-          <div className="flex items-center justify-center h-[300px] text-gray-400">
-            <p>No speed data available yet</p>
-          </div>
-        )}
-      </div>
-
       {/* Difficulty Performance */}
       <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Difficulty Performance</h3>
@@ -918,36 +828,6 @@ export default function AnalyticsPage() {
           </div>
         )}
       </div>
-
-      {/* Subject Mastery Score */}
-      <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">Subject Mastery Score</h3>
-        <p className="text-sm text-gray-500 mb-4">Long-term progress weighted by item count</p>
-        {processedData.subjectMasteryData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={processedData.subjectMasteryData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="subject" />
-              <YAxis />
-              <Tooltip formatter={(value) => `${value}%`} />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="mastery"
-                name="Mastery Percentage"
-                stroke="#8B5CF6"
-                strokeWidth={3}
-                dot={{ r: 5 }}
-                activeDot={{ r: 7 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        ) : (
-          <div className="flex items-center justify-center h-[300px] text-gray-400">
-            <p>No mastery data available yet</p>
-          </div>
-        )}
-      </div>
     </div>
   );
 
@@ -969,12 +849,6 @@ export default function AnalyticsPage() {
                 <Line type="monotone" dataKey="score" stroke="#3B82F6" strokeWidth={3} dot={{ r: 6 }} name="Average Score" />
               </LineChart>
             </ResponsiveContainer>
-            {analyticsData.improvementTrajectory && (
-              <p className="text-sm text-gray-600 mt-3">
-                🔮 Predicted next score: {analyticsData.improvementTrajectory.predictedNextScore}% | 
-                🚀 {analyticsData.improvementTrajectory.improvementPct}% improvement since first attempt
-              </p>
-            )}
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">
@@ -1027,9 +901,6 @@ export default function AnalyticsPage() {
                 />
               </BarChart>
             </ResponsiveContainer>
-            <p className="mt-4 text-sm text-gray-600">
-              🔥 {analyticsData.streak.last7Days.filter(d => d.active === 1).length} / 7 days active | Current streak: {analyticsData.streak.streakDays} days
-            </p>
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-gray-400">

@@ -69,7 +69,7 @@ function ForgotPassword() {
             onClick={() => navigate(-1)}
             className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center mb-6"
           >
-            â†
+            ←
           </button>
 
           <h2 className="text-2xl font-bold text-gray-900 mb-3">
