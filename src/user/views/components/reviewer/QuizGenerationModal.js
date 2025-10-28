@@ -14,7 +14,7 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [reviewers, setReviewers] = useState([]);
-  const [selectedReviewerId, setSelectedReviewerId] = useState(reviewerId || '');
+  const [selectedReviewerId, setSelectedReviewerId] = useState('');
   const [loadingReviewers, setLoadingReviewers] = useState(false);
   const navigate = useNavigate();
 
@@ -132,6 +132,10 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
       setIsGenerating(true);
       
       const targetReviewerId = fromDashboard ? selectedReviewerId : reviewerId;
+      
+      if (!targetReviewerId) {
+        throw new Error('Reviewer ID is missing. Please select a reviewer.');
+      }
       
       let questionTypesArray;
       if (formData.questionType === 'mixed') {

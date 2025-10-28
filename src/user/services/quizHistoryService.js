@@ -10,14 +10,41 @@ export async function addAttempt(attempt) {
       score_percent: attempt.stats?.percentage || 0,
       details: attempt.questions.map((q, idx) => {
         const ans = attempt.answers?.[idx];
+        let userAnswerText = '';
+        
+        if (ans?.isSkipped) {
+          userAnswerText = 'Skipped';
+        } else if (ans?.answer) {
+          if (typeof ans.answer === 'object' && ans.answer !== null) {
+            userAnswerText = Object.values(ans.answer).join(', ');
+          } else {
+            userAnswerText = String(ans.answer);
+          }
+        } else {
+          userAnswerText = '';
+        }
+        
+        let correctAnswerText = '';
+        if (q.type === 'multiple-choice') {
+          correctAnswerText = `${q.correct_answer}${q.options ? ` (${q.options[q.correct_answer]})` : ''}`;
+        } else if (q.type === 'fill-in-the-blanks') {
+          if (Array.isArray(q.fill_in_the_blank_answers)) {
+            correctAnswerText = q.fill_in_the_blank_answers.join(', ');
+          } else if (typeof q.fill_in_the_blank_answers === 'object') {
+            correctAnswerText = Object.values(q.fill_in_the_blank_answers).join(', ');
+          } else {
+            correctAnswerText = q.fill_in_the_blank_answers || '';
+          }
+        } else {
+          correctAnswerText = q.identification_answer || '';
+        }
+        
         return {
           number: idx + 1,
           question: q.question,
           numberedQuestion: `${idx + 1}. ${q.question}`,
-          userAnswer: ans?.isSkipped ? 'Skipped' : (ans?.answer ?? ''),
-          correctAnswer: q.type === 'multiple-choice' 
-            ? `${q.correct_answer}${q.options ? ` (${q.options[q.correct_answer]})` : ''}`
-            : (q.identification_answer || ''),
+          userAnswer: userAnswerText,
+          correctAnswer: correctAnswerText,
           explanation: q.explanation || '',
         };
       }),

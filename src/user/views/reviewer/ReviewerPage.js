@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect } from "react";
 import Topbar from "../components/sidebar/Topbar";
-import { getAllReviewers, deleteReviewer, getReviewerById } from "../../services/reviewerService";
+import { getAllReviewers, deleteReviewer } from "../../services/reviewerService";
 import { createQuiz, createRetakeQuiz } from "../../services/quizService";
 import { useNavigate } from "react-router-dom";
 import { useReviewerContext } from "../../controllers/context/ReviewerContext";
@@ -97,17 +97,9 @@ function ReviewerPage({ title }) {
     navigate(`/reviewer/${reviewerId}`);
   };
 
-  const handleGenerateQuizClick = async (reviewer) => {
-    try {
-      const fullReviewer = await getReviewerById(reviewer._id);
-      if (fullReviewer.success) {
-        setSelectedReviewer(fullReviewer.data);
-        setShowDifficultyModal(true);
-      }
-    } catch (err) {
-      console.error("Error fetching reviewer:", err);
-      showNotification('error', 'Failed to load reviewer data');
-    }
+  const handleGenerateQuizClick = (reviewer) => {
+    setSelectedReviewer(reviewer);
+    setShowDifficultyModal(true);
   };
 
   const handleDifficultySelect = (difficulty) => {
@@ -509,7 +501,6 @@ function ReviewerPage({ title }) {
         isOpen={showQuizModal}
         onClose={() => {
           setShowQuizModal(false);
-          setSelectedReviewer(null);
           setSelectedDifficulty(null);
         }}
         onGenerate={handleGenerateQuiz}
