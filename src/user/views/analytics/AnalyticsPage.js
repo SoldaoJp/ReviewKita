@@ -192,25 +192,51 @@ export default function AnalyticsPage() {
   };
 
   const processedData = {
-    overallAccuracyData: analyticsData.overallAccuracy
-      ? [
-          { name: 'Correct', value: analyticsData.overallAccuracy.totalCorrect, color: '#22C55E' },
-          { name: 'Wrong', value: analyticsData.overallAccuracy.totalQuestions - analyticsData.overallAccuracy.totalCorrect - (analyticsData.overallAccuracy.totalSkipped || 0), color: '#EF4444' },
-          { name: 'Skipped', value: analyticsData.overallAccuracy.totalSkipped || 0, color: '#F59E0B' },
-        ]
+    overallAccuracyData: analyticsData.answerRateTrends?.monthly?.length > 0
+      ? (() => {
+          // Use the latest month's data from answer rate trends
+          const latestMonth = analyticsData.answerRateTrends.monthly[analyticsData.answerRateTrends.monthly.length - 1];
+          const correctPct = Number(latestMonth.correctPct || 0);
+          const wrongPct = Number(latestMonth.wrongPct || 0);
+          const skippedPct = Number(latestMonth.skippedPct || 0);
+          
+          return [
+            { name: 'Correct', value: correctPct, color: '#22C55E' },
+            { name: 'Wrong', value: wrongPct, color: '#EF4444' },
+            { name: 'Skipped', value: skippedPct, color: '#F59E0B' },
+          ];
+        })()
       : [],
 
-    analyticsMetrics: analyticsData.overallAccuracy
-      ? {
-          overallAccuracy: analyticsData.overallAccuracy.accuracyPct,
-          totalQuestionsTaken: analyticsData.overallAccuracy.totalQuestions,
-          correctAnswers: analyticsData.overallAccuracy.totalCorrect,
-          wrongAnswers: analyticsData.overallAccuracy.totalQuestions - analyticsData.overallAccuracy.totalCorrect - (analyticsData.overallAccuracy.totalSkipped || 0),
-          skippedAnswers: analyticsData.overallAccuracy.totalSkipped || 0,
-          totalQuizzes: analyticsData.overallAccuracy.totalQuizzes,
-          totalRetakes: analyticsData.overallAccuracy.totalRetakes,
-          totalAttempts: analyticsData.overallAccuracy.totalAttempts,
-        }
+    analyticsMetrics: analyticsData.answerRateTrends?.monthly?.length > 0
+      ? (() => {
+          // Calculate overall metrics from all monthly data
+          const allMonths = analyticsData.answerRateTrends.monthly;
+          let totalCorrect = 0;
+          let totalWrong = 0;
+          let totalSkipped = 0;
+          
+          allMonths.forEach(month => {
+            totalCorrect += month.correct || 0;
+            totalWrong += month.wrong || 0;
+            totalSkipped += month.skipped || 0;
+          });
+          
+          const totalQuestions = totalCorrect + totalWrong + totalSkipped;
+          const answeredQuestions = totalCorrect + totalWrong; // Exclude skipped
+          const overallAccuracy = answeredQuestions > 0 ? Math.round((totalCorrect / answeredQuestions) * 100) : 0;
+          
+          return {
+            overallAccuracy: overallAccuracy,
+            totalQuestionsTaken: totalQuestions,
+            correctAnswers: totalCorrect,
+            wrongAnswers: totalWrong,
+            skippedAnswers: totalSkipped,
+            totalQuizzes: analyticsData.overallAccuracy?.totalQuizzes || 0,
+            totalRetakes: analyticsData.overallAccuracy?.totalRetakes || 0,
+            totalAttempts: analyticsData.overallAccuracy?.totalAttempts || 0,
+          };
+        })()
       : {
           overallAccuracy: 0,
           totalQuestionsTaken: 0,

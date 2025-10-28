@@ -27,7 +27,7 @@ export default function FillInTheBlanksQuiz({
 
   const parseQuestion = () => {
     const text = question.question || "";
-    const blanks = getBlankAnswersArray(question.fill_in_the_blank_answers);
+    const blanks = getBlankAnswersArray(question.blank_answers);
     
     const parts = text.split(/(___|blank|\[blank\])/gi);
     let blankIndex = 0;
@@ -55,7 +55,7 @@ export default function FillInTheBlanksQuiz({
     
     if (!allAnswersFilled) return;
 
-    const correctAnswers = getBlankAnswersArray(question.fill_in_the_blank_answers);
+    const correctAnswers = getBlankAnswersArray(question.blank_answers);
     const correctnessResults = {};
     
     Object.keys(answers).forEach((blankIndex) => {
@@ -179,7 +179,7 @@ export default function FillInTheBlanksQuiz({
               <div className="mb-3">
                 <p className="text-sm text-blue-700 mb-2"><strong>Correct answers:</strong></p>
                 <ul className="text-sm text-blue-700 list-disc list-inside">
-                  {getBlankAnswersArray(question.fill_in_the_blank_answers).map((answer, idx) => (
+                  {getBlankAnswersArray(question.blank_answers).map((answer, idx) => (
                     <li key={idx}>Blank {idx + 1}: {answer}</li>
                   ))}
                 </ul>
