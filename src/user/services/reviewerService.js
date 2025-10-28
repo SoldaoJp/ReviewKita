@@ -91,6 +91,15 @@ export const reportReviewer = async (id, reportData) => {
     }
 };
 
+export const getSubjectDistribution = async () => {
+    try {
+        const response = await httpService.get('/reviewers/analytics/subject-distribution');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export default {
     getAllReviewers,
     getReviewerById,
@@ -99,5 +108,6 @@ export default {
     deleteReviewer,
     reenhanceReviewerContent,
     reportReviewer,
+    getSubjectDistribution,
 };
 
