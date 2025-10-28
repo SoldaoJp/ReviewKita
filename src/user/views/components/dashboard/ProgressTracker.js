@@ -8,7 +8,7 @@
     YAxis,
   } from "recharts";
   
-  export default function ProgressTracker({ data, legends, quizStats }) {
+  export default function ProgressTracker({ data, legends }) {
     const chartData = data && data.length > 0 ? data : [
       { date: "09/20", correct: 0, wrong: 0, skipped: 0 },
       { date: "09/22", correct: 0, wrong: 0, skipped: 0 },
@@ -21,12 +21,6 @@
       { key: "correct", name: "Correct", color: "#10b981", value: 0 },
       { key: "wrong", name: "Wrong", color: "#ef4444", value: 0 },
       { key: "skipped", name: "Skipped", color: "#f59e0b", value: 0 },
-    ];
-
-    const quizStatsData = quizStats && quizStats.length > 0 ? quizStats : [
-      { label: "Total Attempts", value: 0, color: "#a855f7" },
-      { label: "Avg per Day", value: 0, color: "#ec4899" },
-      { label: "This Month", value: 0, color: "#3b82f6" },
     ];
   
     const CustomTooltip = ({ active, payload }) => {
@@ -100,22 +94,6 @@
                     <span className="text-gray-700 font-medium text-[10px] truncate">{l.name}</span>
                   </div>
                   <div className="text-gray-600 font-semibold text-[9px] flex-shrink-0">{l.value}%</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Quiz stats divider */}
-            <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent my-1"></div>
-
-            {/* Quiz attempts stats */}
-            <div className="grid grid-cols-3 gap-1.5 text-xs">
-              {quizStatsData.map((stat, idx) => (
-                <div key={idx} className="flex items-center justify-between gap-1 px-1.5 py-1 rounded bg-gradient-to-r" style={{ backgroundImage: `linear-gradient(to right, ${stat.color}15, ${stat.color}08)` }}>
-                  <div className="flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full" style={{ background: stat.color }} />
-                    <span className="text-gray-700 font-medium text-[10px] truncate">{stat.label}</span>
-                  </div>
-                  <div className="text-gray-600 font-semibold text-[9px] flex-shrink-0">{stat.value}</div>
                 </div>
               ))}
             </div>

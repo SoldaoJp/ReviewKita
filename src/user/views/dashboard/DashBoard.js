@@ -207,48 +207,8 @@ export default function Dashboard() {
       }));
   };
 
-  const getQuizStatsData = () => {
-    if (!quizAttempts || quizAttempts.length === 0) {
-      return [
-        { label: "Total Attempts", value: 0, color: "#a855f7" },
-        { label: "Avg per Day", value: 0, color: "#ec4899" },
-        { label: "This Month", value: 0, color: "#3b82f6" },
-      ];
-    }
-    
-    const totalAttempts = quizAttempts.length;
-    
-    const daysWithAttempts = new Set();
-    quizAttempts.forEach(attempt => {
-      if (attempt.date) {
-        const date = new Date(attempt.date);
-        daysWithAttempts.add(date.toDateString());
-      }
-    });
-    
-    const avgPerDay = daysWithAttempts.size > 0 ? Math.round(totalAttempts / daysWithAttempts.size) : 0;
-    
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-    const thisMonthAttempts = quizAttempts.filter(attempt => {
-      if (attempt.date) {
-        const date = new Date(attempt.date);
-        return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
-      }
-      return false;
-    }).length;
-    
-    return [
-      { label: "Total Attempts", value: totalAttempts, color: "#a855f7" },
-      { label: "Avg per Day", value: avgPerDay, color: "#ec4899" },
-      { label: "This Month", value: thisMonthAttempts, color: "#3b82f6" },
-    ];
-  };
-
   const progressTrackerData = getProgressTrackerData();
   const subjectTrackerData = getSubjectTrackerData();
-  const quizStatsData = getQuizStatsData();
   
   return (
     <div className="p-8 max-w-[1800px] mx-auto">
@@ -261,66 +221,7 @@ export default function Dashboard() {
           <WelcomeCard />
           <div className="grid grid-cols-2 gap-2 mt-2.5">
             <div data-search-section="progress">
-              <ProgressTracker data={progressTrackerData.data} legends={progressTrackerData.legends} quizStats={quizStatsData} />
-              
-              {/* Weekly Activity Chart Below Progress Tracker */}
-              <div className="bg-gradient-to-br from-white via-indigo-50/20 to-violet-50/10 rounded-xl p-3 shadow-md border border-white/60 backdrop-blur-sm mt-2">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="p-1.5 bg-gradient-to-br from-indigo-100 to-violet-100 rounded-lg">
-                    <svg className="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                  </div>
-                  <h3 className="font-bold text-gray-800 text-xs">Weekly Activity</h3>
-                </div>
-
-                {quizAttempts && quizAttempts.length > 0 ? (
-                  <div className="bg-white/40 backdrop-blur-sm rounded-lg p-2.5">
-                    <div className="w-full h-24">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={(() => {
-                          const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                          const attemptsByDay = {};
-                          
-                          quizAttempts.forEach(attempt => {
-                            if (attempt.date) {
-                              try {
-                                const date = new Date(attempt.date);
-                                if (!isNaN(date.getTime())) {
-                                  const dayName = dayNames[date.getDay()];
-                                  attemptsByDay[dayName] = (attemptsByDay[dayName] || 0) + 1;
-                                }
-                              } catch (e) {
-                                console.warn('Invalid date format:', attempt.date);
-                              }
-                            }
-                          });
-                          
-                          const chartData = dayNames.map(day => ({
-                            name: day.slice(0, 1),
-                            value: attemptsByDay[day] || 0,
-                          }));
-                          
-                          return chartData;
-                        })()} margin={{ top: 2, right: 4, left: -12, bottom: 2 }}>
-                          <CartesianGrid vertical={false} stroke="#e5e7eb" strokeDasharray="3 2" strokeOpacity={0.2} />
-                          <XAxis dataKey="name" tick={{ fill: "#9ca3af", fontSize: 9 }} tickMargin={2} axisLine={false} />
-                          <YAxis tick={{ fill: "#9ca3af", fontSize: 9 }} width={16} axisLine={false} />
-                          <Tooltip 
-                            contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '11px' }}
-                            cursor={{ fill: 'rgba(99, 102, 241, 0.1)' }}
-                          />
-                          <Bar dataKey="value" radius={[3, 3, 0, 0]} fill="#6366f1" isAnimationActive={false} />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-4 text-xs text-gray-500">
-                    No activity data yet
-                  </div>
-                )}
-              </div>
+              <ProgressTracker data={progressTrackerData.data} legends={progressTrackerData.legends} />
             </div>
             <div data-search-section="subjects"><SubjectTracker data={subjectTrackerData} /></div>
           </div>
