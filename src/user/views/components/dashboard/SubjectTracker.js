@@ -8,7 +8,7 @@ export default function SubjectTracker({ data }) {
   const mainPct = items[0]?.value ?? 0;
 
   return (
-    <div className="bg-gradient-to-br from-white via-blue-50/20 to-cyan-50/10 rounded-xl p-3.5 shadow-md border border-white/60 backdrop-blur-sm">
+    <div className="bg-gradient-to-br from-white via-blue-50/20 to-cyan-50/10 rounded-xl p-3.5 shadow-md border border-white/60 backdrop-blur-sm h-full flex flex-col">
       <div className="flex items-center gap-2 mb-2.5">
         <div className="p-1.5 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-lg">
           <svg className="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -18,8 +18,8 @@ export default function SubjectTracker({ data }) {
         <h3 className="font-bold text-gray-800 text-sm">Reviewer Subject Tracker</h3>
       </div>
 
-      <div className="bg-white/40 backdrop-blur-sm rounded-lg p-3 flex flex-col items-center">
-        <div className="relative w-40 h-40">
+      <div className="bg-white/40 backdrop-blur-sm rounded-lg p-3 flex flex-col flex-1 overflow-hidden">
+        <div className="relative w-40 h-40 mx-auto flex-shrink-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -47,21 +47,18 @@ export default function SubjectTracker({ data }) {
           </div>
         </div>
 
-        <div className="mt-3 w-full grid grid-cols-1 gap-1.5 text-xs">
-          {items.slice(0, 6).map((d) => (
-            <div key={d.name} className="flex items-center justify-between gap-2 px-2 py-1.5 rounded-lg bg-gradient-to-r transition-all hover:shadow-sm" style={{ backgroundImage: `linear-gradient(to right, ${d.color}15, ${d.color}08)` }}>
-              <div className="flex items-center gap-2 min-w-0 flex-1">
-                <span className="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm" style={{ background: d.color }} />
-                <span className="text-gray-700 font-medium text-[11px] truncate">{d.name}</span>
+        <div className="mt-3 w-full overflow-y-auto flex-1 pr-1" style={{ maxHeight: '120px' }}>
+          <div className="grid grid-cols-1 gap-1.5 text-xs">
+            {items.map((d) => (
+              <div key={d.name} className="flex items-center justify-between gap-2 px-2 py-1.5 rounded-lg bg-gradient-to-r transition-all hover:shadow-sm" style={{ backgroundImage: `linear-gradient(to right, ${d.color}15, ${d.color}08)` }}>
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <span className="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm" style={{ background: d.color }} />
+                  <span className="text-gray-700 font-medium text-[11px] truncate">{d.name}</span>
+                </div>
+                <div className="text-gray-600 font-bold text-[10px] flex-shrink-0 ml-2">{d.value}%</div>
               </div>
-              <div className="text-gray-600 font-bold text-[10px] flex-shrink-0 ml-2">{d.value}%</div>
-            </div>
-          ))}
-          {items.length > 6 && (
-            <div className="text-center text-[10px] text-gray-500 mt-1">
-              +{items.length - 6} more
-            </div>
-          )}
+            ))}
+          </div>
         </div>
       </div>
     </div>
