@@ -165,18 +165,43 @@ export default function QuizHistoryPage() {
                 })()}
               </div>
               <div className="space-y-4">
-                {selected.details?.map((detail, idx) => (
-                  <div key={idx} className="border rounded p-3">
-                    <div className="font-medium text-gray-800 mb-2">{detail.numberedQuestion}</div>
-                    <div className="text-sm space-y-1">
-                      <div><strong>Your answer:</strong> {detail.userAnswer && detail.userAnswer.trim() ? detail.userAnswer : '—'}</div>
-                      <div><strong>Correct answer:</strong> {detail.correctAnswer || '—'}</div>
+                {selected.details?.map((detail, idx) => {
+                  // Compare user answer with correct answer to determine if correct
+                  const userAnswer = detail.userAnswer?.toString().trim().toLowerCase() || '';
+                  const correctAnswer = detail.correctAnswer?.toString().trim().toLowerCase() || '';
+                  const isCorrect = userAnswer && correctAnswer && userAnswer === correctAnswer;
+                  const isSkipped = !detail.userAnswer || detail.userAnswer.trim() === '';
+                  
+                  // Determine border and background color
+                  const cardStyle = isSkipped 
+                    ? 'border-gray-300 bg-gray-50' 
+                    : isCorrect 
+                      ? 'border-green-300 bg-green-50' 
+                      : 'border-red-300 bg-red-50';
+                  
+                  return (
+                    <div key={idx} className={`border rounded p-3 ${cardStyle}`}>
+                      <div className="font-medium text-gray-800 mb-2">{detail.numberedQuestion}</div>
+                      <div className="text-sm space-y-1">
+                        <div>
+                          <strong>Your answer:</strong> 
+                          <span className={isSkipped ? 'text-gray-500' : isCorrect ? 'text-green-700' : 'text-red-700'}>
+                            {' '}{detail.userAnswer && detail.userAnswer.trim() ? detail.userAnswer : '—'}
+                          </span>
+                        </div>
+                        <div>
+                          <strong>Correct answer:</strong> 
+                          <span className="text-gray-700">
+                            {' '}{detail.correctAnswer || '—'}
+                          </span>
+                        </div>
+                      </div>
+                      {detail.explanation && (
+                        <div className="mt-2 text-sm text-gray-700"><strong>Explanation:</strong> {detail.explanation}</div>
+                      )}
                     </div>
-                    {detail.explanation && (
-                      <div className="mt-2 text-sm text-gray-700"><strong>Explanation:</strong> {detail.explanation}</div>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
             <div className="px-5 py-3 border-t flex justify-end">
