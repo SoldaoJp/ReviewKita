@@ -100,8 +100,15 @@ export default function QuizResults({ quiz, userAnswers, onRetake, onGoBack }) {
                       )}
                       {question.type === 'fill-in-the-blanks' && (
                         <div className="space-y-1 text-sm">
-                          <p className="text-gray-600"><strong>Your answer:</strong> {isSkipped ? 'Skipped' : userAnswer.answer || 'No answer'}</p>
-                          <p className="text-gray-600"><strong>Correct answer:</strong> {question.blank_answers?.join(', ') || 'N/A'}</p>
+                          <p className="text-gray-600">
+                            <strong>Your answer:</strong> {
+                              isSkipped ? 'Skipped' : 
+                              typeof userAnswer.answer === 'object' && userAnswer.answer !== null
+                                ? Object.values(userAnswer.answer).join(', ')
+                                : userAnswer.answer || 'No answer'
+                            }
+                          </p>
+                          <p className="text-gray-600"><strong>Correct answer:</strong> {Array.isArray(question.blank_answers) ? question.blank_answers.join(', ') : Object.values(question.blank_answers || {}).join(', ') || 'N/A'}</p>
                         </div>
                       )}
                       {question.type === 'open-ended' && (
