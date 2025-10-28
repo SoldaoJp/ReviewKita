@@ -597,7 +597,7 @@ export default function AdminAnalytics() {
         </div>
 
         {/* Top Performers and Most Active Users */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 mt-8">
           {/* Top Performers */}
           <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6">
             <h2 className="text-xl font-semibold text-gray-700 mb-4">Top Performers</h2>
