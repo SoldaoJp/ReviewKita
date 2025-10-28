@@ -1,6 +1,6 @@
-﻿import { useState, useEffect } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import Topbar from "../components/sidebar/Topbar";
-import { getAllReviewers, deleteReviewer } from "../../services/reviewerService";
+import { getAllReviewers, deleteReviewer, getReviewerById } from "../../services/reviewerService";
 import { createQuiz, createRetakeQuiz } from "../../services/quizService";
 import { useNavigate } from "react-router-dom";
 import { useReviewerContext } from "../../controllers/context/ReviewerContext";
@@ -22,6 +22,7 @@ const colors = [
 function ReviewerPage({ title }) {
   const navigate = useNavigate();
   const { triggerReviewerUpdate } = useReviewerContext();
+  const selectedReviewerRef = useRef(null); // Track reviewer ID for modal
   const [showAddModal, setShowAddModal] = useState(false);
   const [showLearnModal, setShowLearnModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -97,62 +98,19 @@ function ReviewerPage({ title }) {
     navigate(`/reviewer/${reviewerId}`);
   };
 
-  const handleGenerateQuizClick = (reviewer) => {
-    setSelectedReviewer(reviewer);
-    setShowDifficultyModal(true);
-  };
-
-  const handleDifficultySelect = (difficulty) => {
-    setSelectedDifficulty(difficulty);
-    setShowDifficultyModal(false);
-    
-    const hasQuizForDifficulty = selectedReviewer?.quizzes?.[difficulty]?.quizId;
-    
-    if (hasQuizForDifficulty) {
-      setShowRetakeModal(true);
-    } else {
-      setShowQuizModal(true);
-    }
-  };
-
-  const handleRetakeQuiz = async () => {
-    if (!selectedReviewer || !selectedDifficulty) return;
-    
+  const handleGenerateQuizClick = async (reviewer) => {
     try {
-      setShowRetakeModal(false);
-      showNotification('loading', `Generating new ${selectedDifficulty} quiz...`);
-      
-      const quizId = selectedReviewer.quizzes?.[selectedDifficulty]?.quizId;
-      
-      if (!quizId) {
-        throw new Error('Quiz ID not found for selected difficulty');
+      const fullReviewer = await getReviewerById(reviewer._id);
+      if (fullReviewer.success && fullReviewer.data) {
+        selectedReviewerRef.current = fullReviewer.data;
+        setSelectedReviewer(fullReviewer.data);
+        setShowDifficultyModal(true);
+      } else {
+        throw new Error('Invalid reviewer response');
       }
-      
-      const response = await createRetakeQuiz(quizId);
-      console.log('Retake quiz created successfully:', response);
-      
-      const retakeQuizId = response.retake?._id || response._id;
-      
-      showNotification('success', 'New quiz generated successfully! Redirecting...');
-      
-      setTimeout(() => {
-        navigate(`/retake-quiz/${retakeQuizId}`);
-      }, 1500);
-    } catch (error) {
-      console.error('Error generating retake quiz:', error);
-      
-      let errorMessage = 'Failed to generate new quiz. Please try again.';
-      if (error.response?.data?.error) {
-        errorMessage = error.response.data.error;
-      } else if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
-        errorMessage = error.response.data.errors.map(e => e.msg).join(', ');
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      showNotification('error', errorMessage);
-      setSelectedReviewer(null);
-      setSelectedDifficulty(null);
+    } catch (err) {
+      console.error("Error fetching reviewer:", err);
+      showNotification('error', 'Failed to load reviewer data');
     }
   };
 
@@ -187,7 +145,59 @@ function ReviewerPage({ title }) {
       }
       
       showNotification('error', errorMessage);
-      setSelectedReviewer(null);
+      setSelectedDifficulty(null);
+    }
+  };
+
+  const handleDifficultySelect = (difficulty) => {
+    setSelectedDifficulty(difficulty);
+    setShowDifficultyModal(false);
+    
+    const hasQuizForDifficulty = selectedReviewer?.quizzes?.[difficulty]?.quizId;
+    
+    if (hasQuizForDifficulty) {
+      setShowRetakeModal(true);
+    } else {
+      setShowQuizModal(true);
+    }
+  };
+
+  const handleRetakeQuiz = async () => {
+    if (!selectedReviewer || !selectedDifficulty) return;
+    
+    try {
+      setShowRetakeModal(false);
+      showNotification('loading', `Generating new ${selectedDifficulty} quiz...`);
+      
+      const quizId = selectedReviewer?.quizzes?.[selectedDifficulty]?.quizId;
+      
+      if (!quizId) {
+        throw new Error('Quiz ID not found for selected difficulty');
+      }
+      
+      const response = await createRetakeQuiz(quizId);
+      console.log('Retake quiz created successfully:', response);
+      
+      const retakeQuizId = response.retake?._id || response._id;
+      
+      showNotification('success', 'New quiz generated successfully! Redirecting...');
+      
+      setTimeout(() => {
+        navigate(`/retake-quiz/${retakeQuizId}`);
+      }, 1500);
+    } catch (error) {
+      console.error('Error generating retake quiz:', error);
+      
+      let errorMessage = 'Failed to generate new quiz. Please try again.';
+      if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        errorMessage = error.response.data.errors.map(e => e.msg).join(', ');
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      showNotification('error', errorMessage);
       setSelectedDifficulty(null);
     }
   };
@@ -304,16 +314,7 @@ function ReviewerPage({ title }) {
                   )}
                 </div>
 
-                <div className="flex justify-between items-center mt-4">
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleGenerateQuizClick(reviewer);
-                    }}
-                    className="px-3 py-1 bg-cyan-500 text-white text-sm rounded hover:bg-cyan-600"
-                  >
-                    {reviewer.hasAllDifficulties ? "Retake Quiz" : reviewer.hasQuiz ? "Generate/Retake Quiz" : "Generate Quiz"}
-                  </button>
+                <div className="flex justify-end items-center mt-4">
                   <span className="text-xs text-gray-400">{formatDate(reviewer.extractedDate)}</span>
                 </div>
 
@@ -504,7 +505,7 @@ function ReviewerPage({ title }) {
           setSelectedDifficulty(null);
         }}
         onGenerate={handleGenerateQuiz}
-        reviewerId={selectedReviewer?._id}
+        reviewerId={selectedReviewerRef.current?._id || selectedReviewer?._id}
         preSelectedDifficulty={selectedDifficulty}
       />
 

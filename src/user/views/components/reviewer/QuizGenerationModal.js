@@ -134,7 +134,9 @@ function QuizGenerationModal({ isOpen, onClose, onGenerate, reviewerId, fromDash
       const targetReviewerId = fromDashboard ? selectedReviewerId : reviewerId;
       
       if (!targetReviewerId) {
-        throw new Error('Reviewer ID is missing. Please select a reviewer.');
+        alert('Please select a reviewer');
+        setIsGenerating(false);
+        return;
       }
       
       let questionTypesArray;

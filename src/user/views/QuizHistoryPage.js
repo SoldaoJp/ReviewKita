@@ -169,8 +169,8 @@ export default function QuizHistoryPage() {
                   <div key={idx} className="border rounded p-3">
                     <div className="font-medium text-gray-800 mb-2">{detail.numberedQuestion}</div>
                     <div className="text-sm space-y-1">
-                      <div><strong>Your answer:</strong> {detail.userAnswer || '—'}</div>
-                      <div><strong>Correct answer:</strong> {detail.correctAnswer}</div>
+                      <div><strong>Your answer:</strong> {detail.userAnswer && detail.userAnswer.trim() ? detail.userAnswer : '—'}</div>
+                      <div><strong>Correct answer:</strong> {detail.correctAnswer || '—'}</div>
                     </div>
                     {detail.explanation && (
                       <div className="mt-2 text-sm text-gray-700"><strong>Explanation:</strong> {detail.explanation}</div>
