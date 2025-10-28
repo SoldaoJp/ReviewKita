@@ -121,12 +121,26 @@ function QuizPage() {
   const handleQuizComplete = async (timeUp = false, answersOverride = null) => {
     const answers = answersOverride || userAnswers;
     
-    const formattedAnswers = answers.map((ans, idx) => ({
-      questionId: idx + 1,
-      answer: ans?.answer || undefined,
-      isSkipped: ans?.isSkipped || false,
-      timePerQuestionSeconds: ans?.timePerQuestionSeconds || 0
-    }));
+    const formattedAnswers = answers.map((ans, idx) => {
+      let formattedAnswer = ans?.answer;
+      
+      // Convert fill-in-the-blanks answer object to array or string
+      if (formattedAnswer && typeof formattedAnswer === 'object' && !Array.isArray(formattedAnswer)) {
+        // Convert {0: "answer1", 1: "answer2"} to ["answer1", "answer2"]
+        const keys = Object.keys(formattedAnswer).sort((a, b) => parseInt(a) - parseInt(b));
+        const answerArray = keys.map(key => formattedAnswer[key]);
+        
+        // If single blank, send as string; otherwise send as array
+        formattedAnswer = answerArray.length === 1 ? answerArray[0] : answerArray;
+      }
+      
+      return {
+        questionId: idx + 1,
+        answer: formattedAnswer || undefined,
+        isSkipped: ans?.isSkipped || false,
+        timePerQuestionSeconds: ans?.timePerQuestionSeconds || 0
+      };
+    });
 
     try {
       const submitResponse = await submitQuiz(quiz._id, formattedAnswers);
