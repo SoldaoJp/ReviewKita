@@ -20,6 +20,7 @@ function QuizPage() {
   const [timeLeft, setTimeLeft] = useState(null);
   const [startTime, setStartTime] = useState(null);
   const [showExitModal, setShowExitModal] = useState(false);
+  const [showEvaluatingModal, setShowEvaluatingModal] = useState(false);
 
   useEffect(() => {
     fetchQuiz();
@@ -121,6 +122,14 @@ function QuizPage() {
   const handleQuizComplete = async (timeUp = false, answersOverride = null) => {
     const answers = answersOverride || userAnswers;
     
+    // Check if quiz has essay questions
+    const hasEssayQuestions = quiz.questions.some(q => q.type === 'open-ended');
+    
+    // Show evaluating modal if there are essay questions
+    if (hasEssayQuestions) {
+      setShowEvaluatingModal(true);
+    }
+    
     const formattedAnswers = answers.map((ans, idx) => {
       let formattedAnswer = ans?.answer;
       
@@ -165,6 +174,7 @@ function QuizPage() {
         console.error('Failed to save to quiz history:', historyError);
       }
 
+      setShowEvaluatingModal(false);
       setIsCompleted(true);
     } catch (error) {
       console.error('Failed to submit quiz:', error);
@@ -185,6 +195,7 @@ function QuizPage() {
         });
       } catch {}
       
+      setShowEvaluatingModal(false);
       setIsCompleted(true);
     }
   };
@@ -237,26 +248,31 @@ function QuizPage() {
     </div>
   );
 
-  if (isCompleted) return (
-    <QuizResults
-      quiz={quiz}
-      userAnswers={userAnswers}
-      onRetake={() => {
-        setCurrentQuestionIndex(0);
-        setIsCompleted(false);
-        setUserAnswers(quiz.questions.map(q => ({
-          questionId: q.id,
-          answer: null,
-          isCorrect: null,
-          isSkipped: false,
-          timePerQuestionSeconds: null
-        })));
-        setStartTime(Date.now());
-        if (quiz.settings.timerMinutes > 0) setTimeLeft(quiz.settings.timerMinutes * 60);
-      }}
-      onGoBack={handleBackClick}
-    />
-  );
+  if (isCompleted) {
+    const hasEssayQuestions = quiz.questions.some(q => q.type === 'open-ended');
+    
+    return (
+      <QuizResults
+        quiz={quiz}
+        userAnswers={userAnswers}
+        hasEssayQuestions={hasEssayQuestions}
+        onRetake={() => {
+          setCurrentQuestionIndex(0);
+          setIsCompleted(false);
+          setUserAnswers(quiz.questions.map(q => ({
+            questionId: q.id,
+            answer: null,
+            isCorrect: null,
+            isSkipped: false,
+            timePerQuestionSeconds: null
+          })));
+          setStartTime(Date.now());
+          if (quiz.settings.timerMinutes > 0) setTimeLeft(quiz.settings.timerMinutes * 60);
+        }}
+        onGoBack={handleBackClick}
+      />
+    );
+  }
 
   const currentQuestion = quiz.questions[currentQuestionIndex];
 
@@ -373,10 +389,17 @@ function QuizPage() {
           </div>
         </div>
       )}
+      {showEvaluatingModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-8 text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
+            <h3 className="text-xl font-semibold mb-3 text-gray-800">Please wait</h3>
+            <p className="text-gray-600 text-sm">The AI is evaluating your answers...</p>
+          </div>
+        </div>
+      )}
     </>
   );
 }
 
 export default QuizPage;
-
-

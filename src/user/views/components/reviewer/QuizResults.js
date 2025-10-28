@@ -1,7 +1,7 @@
 ﻿import React from 'react';
-import { Trophy, Clock, CheckCircle, XCircle, SkipForward, RotateCcw, ArrowLeft } from 'lucide-react';
+import { Trophy, Clock, CheckCircle, XCircle, SkipForward, RotateCcw, ArrowLeft, AlertCircle } from 'lucide-react';
 
-export default function QuizResults({ quiz, userAnswers, onRetake, onGoBack }) {
+export default function QuizResults({ quiz, userAnswers, hasEssayQuestions, onRetake, onGoBack }) {
   const calculateStats = () => {
     const totalQuestions = quiz.questions.length;
     const correctAnswers = userAnswers.filter(answer => answer.isCorrect === true).length;
@@ -38,30 +38,52 @@ export default function QuizResults({ quiz, userAnswers, onRetake, onGoBack }) {
           <p className="text-gray-600">{quiz.title}</p>
         </div>
 
-        <div className={`bg-white rounded-2xl shadow-lg p-8 mb-8 border-2 ${getGradeBg(stats.percentage)}`}>
-          <div className="text-center">
-            <div className={`text-6xl font-bold mb-2 ${getGradeColor(stats.percentage)}`}>{stats.percentage}%</div>
-            <p className="text-gray-600 text-lg">{stats.correctAnswers} out of {stats.totalQuestions} correct</p>
+        {hasEssayQuestions ? (
+          // AI Processing Message for Essay Questions
+          <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border-2 border-blue-200">
+            <div className="text-center">
+              <AlertCircle className="w-16 h-16 text-blue-500 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-gray-800 mb-3">AI is Processing Your Essay Answers</h2>
+              <p className="text-gray-600 text-lg">
+                Please look at the quiz history for the updated results.
+              </p>
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-gray-700">
+                  <Clock className="w-4 h-4 inline mr-2" />
+                  Essay questions require AI evaluation and may take a few moments to process.
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
+        ) : (
+          // Regular Results Display (No Essay Questions)
+          <>
+            <div className={`bg-white rounded-2xl shadow-lg p-8 mb-8 border-2 ${getGradeBg(stats.percentage)}`}>
+              <div className="text-center">
+                <div className={`text-6xl font-bold mb-2 ${getGradeColor(stats.percentage)}`}>{stats.percentage}%</div>
+                <p className="text-gray-600 text-lg">{stats.correctAnswers} out of {stats.totalQuestions} correct</p>
+              </div>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-            <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-3" />
-            <div className="text-2xl font-bold text-green-600 mb-1">{stats.correctAnswers}</div>
-            <p className="text-gray-600 text-sm">Correct Answers</p>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-            <XCircle className="w-8 h-8 text-red-500 mx-auto mb-3" />
-            <div className="text-2xl font-bold text-red-600 mb-1">{stats.incorrectAnswers}</div>
-            <p className="text-gray-600 text-sm">Incorrect Answers</p>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-            <SkipForward className="w-8 h-8 text-gray-500 mx-auto mb-3" />
-            <div className="text-2xl font-bold text-gray-600 mb-1">{stats.skippedAnswers}</div>
-            <p className="text-gray-600 text-sm">Skipped Questions</p>
-          </div>
-        </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+                <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-3" />
+                <div className="text-2xl font-bold text-green-600 mb-1">{stats.correctAnswers}</div>
+                <p className="text-gray-600 text-sm">Correct Answers</p>
+              </div>
+              <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+                <XCircle className="w-8 h-8 text-red-500 mx-auto mb-3" />
+                <div className="text-2xl font-bold text-red-600 mb-1">{stats.incorrectAnswers}</div>
+                <p className="text-gray-600 text-sm">Incorrect Answers</p>
+              </div>
+              <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+                <SkipForward className="w-8 h-8 text-gray-500 mx-auto mb-3" />
+                <div className="text-2xl font-bold text-gray-600 mb-1">{stats.skippedAnswers}</div>
+                <p className="text-gray-600 text-sm">Skipped Questions</p>
+              </div>
+            </div>
+          </>
+        )}
 
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
           <h3 className="text-xl font-semibold text-gray-800 mb-6">Question Review</h3>
