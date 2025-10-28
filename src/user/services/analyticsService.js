@@ -140,6 +140,16 @@ export const extractUserDataset = async () => {
   }
 };
 
+export const getUserStats = async () => {
+  try {
+    const response = await httpService.get('/analytics/user-stats');
+    return response;
+  } catch (error) {
+    console.error('Error fetching user stats:', error);
+    throw error;
+  }
+};
+
 export default {
   getOverallAccuracy,
   getCorrectWrongSkipped,
@@ -155,5 +165,6 @@ export default {
   getImprovementTrajectory,
   getAnswerRateTrends,
   extractUserDataset,
+  getUserStats,
 };
 

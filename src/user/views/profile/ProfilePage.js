@@ -1,11 +1,10 @@
 ﻿import React, { useState, useEffect } from "react";
 import Topbar from "../components/sidebar/Topbar";
 import { getUserProfile, updateProfilePicture, changeUsername, changePassword } from "../../services/userService";
-import { getAllReviewers } from "../../services/reviewerService";
+import { getUserStats } from "../../services/analyticsService";
 import { useAuth } from "../../controllers/AuthContext";
 import StreakIcon from "../../../assets/StreakIcon.svg";
 import LongestStreakIcon from "../../../assets/LongestStreak.svg";
-import AchievementIcon from "../../../assets/Achievement.svg";
 import { Edit } from 'lucide-react';
 
 function ProfilePage() {
@@ -20,23 +19,37 @@ function ProfilePage() {
   });
   const [profilePicFile, setProfilePicFile] = useState(null);
   const [profilePicPreview, setProfilePicPreview] = useState(null);
-  const [reviewerCount, setReviewerCount] = useState(0);
   const [notification, setNotification] = useState(null);
-  const [quizCount] = useState(12);
-  const [masteredCount] = useState(3);
+  const [userStats, setUserStats] = useState({
+    totalReviewers: 0,
+    totalQuizzes: 0,
+    masteredSubjectsCount: 0,
+    currentStreak: 0,
+    longestStreak: 0,
+  });
 
-  const fetchReviewerCount = async () => {
+  const fetchUserStats = async () => {
     try {
-      const response = await getAllReviewers(1000);
-      console.log('ProfilePage - Fetched reviewers:', response);
-      if (response.success && Array.isArray(response.data)) {
-        setReviewerCount(response.data.length);
-      } else if (Array.isArray(response)) {
-        setReviewerCount(response.length);
+      const response = await getUserStats();
+      console.log('ProfilePage - Fetched user stats:', response);
+      if (response.stats) {
+        setUserStats({
+          totalReviewers: response.stats.totalReviewers || 0,
+          totalQuizzes: response.stats.totalQuizzes || 0,
+          masteredSubjectsCount: response.stats.masteredSubjectsCount || 0,
+          currentStreak: response.stats.currentStreak || 0,
+          longestStreak: response.stats.longestStreak || 0,
+        });
       }
     } catch (error) {
-      console.error('Error fetching reviewers:', error);
-      setReviewerCount(0);
+      console.error('Error fetching user stats:', error);
+      setUserStats({
+        totalReviewers: 0,
+        totalQuizzes: 0,
+        masteredSubjectsCount: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+      });
     }
   };
 
@@ -56,7 +69,7 @@ function ProfilePage() {
 
   useEffect(() => {
     fetchUserProfile();
-    fetchReviewerCount();
+    fetchUserStats();
   }, []);
 
   const handleProfilePicChange = (e) => {
@@ -159,18 +172,18 @@ function ProfilePage() {
           <div className="grid grid-cols-3 gap-4 mb-6">
             <div className="bg-green-100 p-4 rounded-lg">
               <h3 className="text-xs font-semibold text-gray-600 mb-1">Total Reviewers</h3>
-              <p className="text-2xl font-bold text-green-700">{reviewerCount}</p>
+              <p className="text-2xl font-bold text-green-700">{userStats.totalReviewers}</p>
               <p className="text-xs text-gray-500 mt-1">No. of reviewers</p>
             </div>
             <div className="bg-yellow-100 p-4 rounded-lg">
               <h3 className="text-xs font-semibold text-gray-600 mb-1">Total Quizzes</h3>
-              <p className="text-2xl font-bold text-yellow-700">{quizCount}</p>
-              <p className="text-xs text-gray-500 mt-1">No. of generated quizzes</p>
+              <p className="text-2xl font-bold text-yellow-700">{userStats.totalQuizzes}</p>
+              <p className="text-xs text-gray-500 mt-1">Including retakes</p>
             </div>
             <div className="bg-pink-100 p-4 rounded-lg">
               <h3 className="text-xs font-semibold text-gray-600 mb-1">Mastered</h3>
-              <p className="text-2xl font-bold text-pink-700">{masteredCount}</p>
-              <p className="text-xs text-gray-500 mt-1">Reviewer</p>
+              <p className="text-2xl font-bold text-pink-700">{userStats.masteredSubjectsCount}</p>
+              <p className="text-xs text-gray-500 mt-1">Subject mastery</p>
             </div>
           </div>
 
@@ -189,7 +202,7 @@ function ProfilePage() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Current Streak</p>
-                  <p className="text-lg font-bold">5 days</p>
+                  <p className="text-lg font-bold">{userStats.currentStreak} days</p>
                 </div>
               </div>
               <div className="flex items-center">
@@ -198,16 +211,7 @@ function ProfilePage() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Longest Streak</p>
-                  <p className="text-lg font-bold">7 days</p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
-                  <img src={AchievementIcon} alt="Achievement" className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Achievement</p>
-                  <p className="text-lg font-bold">Over Achiever</p>
+                  <p className="text-lg font-bold">{userStats.longestStreak} days</p>
                 </div>
               </div>
             </div>
