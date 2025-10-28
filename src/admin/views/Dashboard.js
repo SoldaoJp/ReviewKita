@@ -112,7 +112,6 @@ export default function AdminDashboard() {
       <div className="p-6">
         <h1 className="text-2xl font-bold mb-8">Dashboard</h1>
 
-        {/* User Activity Analytics - 30 Days */}
         <div className="bg-white/50 rounded-2xl shadow-sm border border-[#eef3fb] p-6 mb-8">
           <h2 className="text-xl font-semibold text-gray-700 mb-2">
             User Activity Overview (Last 30 Days)

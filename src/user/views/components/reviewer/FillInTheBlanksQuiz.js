@@ -17,7 +17,6 @@ export default function FillInTheBlanksQuiz({
   const [showFeedback, setShowFeedback] = useState(false);
   const [correctnessMap, setCorrectnessMap] = useState({});
 
-  // Helper function to safely convert blank_answers to array
   const getBlankAnswersArray = (blankAnswers) => {
     if (Array.isArray(blankAnswers)) return blankAnswers;
     if (blankAnswers && typeof blankAnswers === 'object') {

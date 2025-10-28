@@ -237,41 +237,53 @@ export default function AddReviewerModal({
           </span>
         </label>
         
-        <select
-          value={subjectCategory}
-          onChange={(e) => {
-            setSubjectCategory(e.target.value);
-            setFormData({ ...formData, subject: "" });
-            setShowCustomSubject(false);
-            setSubjectSearch("");
-          }}
-          className="w-full px-3 py-2 border rounded mb-3 focus:ring-2 focus:ring-cyan-400"
-        >
-          <option value="">Select category...</option>
-          {Object.entries(SUBJECT_CATEGORIES).map(([key, category]) => (
-            <option key={key} value={key}>{category.label}</option>
-          ))}
-        </select>
+        {!formData.subject && (
+          <select
+            value={subjectCategory}
+            onChange={(e) => {
+              setSubjectCategory(e.target.value);
+              setFormData({ ...formData, subject: "" });
+              setShowCustomSubject(false);
+              setSubjectSearch("");
+            }}
+            className="w-full px-3 py-2 border rounded mb-3 focus:ring-2 focus:ring-cyan-400"
+          >
+            <option value="">Select category...</option>
+            {Object.entries(SUBJECT_CATEGORIES).map(([key, category]) => (
+              <option key={key} value={key}>{category.label}</option>
+            ))}
+          </select>
+        )}
 
-        {subjectCategory && (
+        {formData.subject && !showCustomSubject && (
+          <div className="mb-4 p-3 bg-cyan-50 border border-cyan-200 rounded flex items-center justify-between">
+            <p className="text-sm text-gray-700">
+              <span className="font-medium">Selected Subject:</span> {formData.subject}
+            </p>
+            <button
+              onClick={() => {
+                setFormData({ ...formData, subject: "" });
+                setSubjectCategory("");
+                setSubjectSearch("");
+                setShowCustomSubject(false);
+              }}
+              className="ml-2 text-gray-500 hover:text-gray-700 font-bold text-lg"
+              title="Clear selection"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        {subjectCategory && !formData.subject && (
           <>
-            {/* Selected Subject Display */}
-            {formData.subject && !showCustomSubject && (
-              <div className="mb-4 p-3 bg-cyan-50 border border-cyan-200 rounded-t">
-                <p className="text-sm text-gray-700">
-                  <span className="font-medium">Selected Subject:</span> {formData.subject}
-                </p>
-              </div>
-            )}
-
-            {/* Subject Dropdown with search functionality */}
-            <div className={`mb-4 ${formData.subject && !showCustomSubject ? '' : ''}`}>
+            <div className="mb-4">
               <input
                 type="text"
                 placeholder="🔍 Search subjects..."
                 value={subjectSearch}
                 onChange={(e) => setSubjectSearch(e.target.value)}
-                className={`w-full px-3 py-2 border focus:ring-2 focus:ring-cyan-400 text-sm ${formData.subject && !showCustomSubject ? 'rounded-b' : 'rounded-t'}`}
+                className="w-full px-3 py-2 border rounded-t focus:ring-2 focus:ring-cyan-400 text-sm"
               />
               
               {/* Custom scrollable subject list */}

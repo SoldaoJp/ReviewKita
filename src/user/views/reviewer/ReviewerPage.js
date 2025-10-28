@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useReviewerContext } from "../../controllers/context/ReviewerContext";
 import QuizGenerationModal from "../components/reviewer/QuizGenerationModal";
 import AddReviewerModal from "../components/reviewer/AddReviewerModal";
+import { Trash2 } from "lucide-react";
 
 const colors = [
   { bg: "bg-blue-200", border: "border-blue-400" },
@@ -322,10 +323,10 @@ function ReviewerPage({ title }) {
                     e.stopPropagation();
                     handleDeleteClick(reviewer);
                   }}
-                  className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                  className="absolute top-2 right-2 text-red-500 hover:text-red-700 transition"
                   title="Delete Reviewer"
                 >
-                  🗑️
+                  <Trash2 size={18} />
                 </button>
               </div>
             );
